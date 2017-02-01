@@ -40,7 +40,7 @@ function GBayHomePageFull(DFrame, data)
 			draw.RoundedBox(0,0,0,100,100,Color(238,238,238))
 		end
 
-		if LocalPlayer():GBayIsAdmin(data) then
+		if LocalPlayer():GBayIsAdmin(data) or v[2] == LocalPlayer():SteamID64() then
 			local ViewMoreBTN = vgui.Create("DButton",ItemMain)
 			ViewMoreBTN:SetPos(5, ItemMain:GetTall() - 20)
 			ViewMoreBTN:SetSize(80, 20)
@@ -62,6 +62,10 @@ function GBayHomePageFull(DFrame, data)
 			EditBTN.Paint = function(s, w, h)
 				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+			end
+			EditBTN.DoClick = function()
+				LocalPlayer().GBayIsEditing = v[1]
+				GBaySideBarOpened(DFrame, "EditShip", false, data, false)
 			end
 
 			local RemoveBTN = vgui.Create("DButton",ItemMain)
@@ -198,13 +202,40 @@ function GBayHomePageSmall(DFrame, data)
 			draw.RoundedBox(0,0,0,100,100,Color(238,238,238))
 		end
 
-		if LocalPlayer():GBayIsAdmin(data) then
+		if LocalPlayer():GBayIsAdmin(data) or v[2] == LocalPlayer():SteamID64() then
 			local ViewMoreBTN = vgui.Create("DButton",ItemMain)
-			ViewMoreBTN:SetPos(20, ItemMain:GetTall() - 20)
-			ViewMoreBTN:SetSize(50, 20)
+			ViewMoreBTN:SetPos(5, ItemMain:GetTall() - 20)
+			ViewMoreBTN:SetSize(80, 20)
 			ViewMoreBTN:SetText("View More")
 			ViewMoreBTN:SetTextColor(Color(185,201,229))
 			ViewMoreBTN.Paint = function(s, w, h)
+				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
+				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+			end
+			ViewMoreBTN.DoClick = function()
+				GBayViewMoreItemSmall("Shipment", DFrame, data, v)
+			end
+
+			local EditBTN = vgui.Create("DButton",ItemMain)
+			EditBTN:SetPos(95, ItemMain:GetTall() - 20)
+			EditBTN:SetSize(80, 20)
+			EditBTN:SetText("Edit")
+			EditBTN:SetTextColor(Color(255,0,0))
+			EditBTN.Paint = function(s, w, h)
+				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
+				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+			end
+			EditBTN.DoClick = function()
+				LocalPlayer().GBayIsEditing = v[1]
+				GBaySideBarOpened(DFrame, "EditShip", false, data, false)
+			end
+
+			local RemoveBTN = vgui.Create("DButton",ItemMain)
+			RemoveBTN:SetPos(185, ItemMain:GetTall() - 20)
+			RemoveBTN:SetSize(80, 20)
+			RemoveBTN:SetText("Remove")
+			RemoveBTN:SetTextColor(Color(255,0,0))
+			RemoveBTN.Paint = function(s, w, h)
 				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
@@ -217,6 +248,9 @@ function GBayHomePageSmall(DFrame, data)
 			ViewMoreBTN.Paint = function(s, w, h)
 				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+			end
+			ViewMoreBTN.DoClick = function()
+				GBayViewMoreItemSmall("Shipment", DFrame, data, v)
 			end
 		end
 

@@ -24,3 +24,5 @@ config.AllowedWeapons = {
 
 config.PriceToPayToSell = 100 -- Fee to sell items
 config.MaxPrice = 100000 -- Max price to sell items
+
+config.TaxToMultiplyBy = 0.08

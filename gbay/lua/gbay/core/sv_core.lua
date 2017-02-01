@@ -1,6 +1,7 @@
 resource.AddSingleFile("materials/gbay/Logo.png")
 resource.AddSingleFile("materials/gbay/Settings_Logo.png")
 resource.AddSingleFile("materials/gbay/Create_Logo.png")
+resource.AddSingleFile("materials/gbay/Check_Out.png")
 resource.AddSingleFile("materials/gbay/Settings.png")
 resource.AddSingleFile("materials/gbay/Positive.png")
 resource.AddSingleFile("materials/gbay/Negative.png")
@@ -13,9 +14,11 @@ util.AddNetworkString("GBayFinishSettingUpServer")
 util.AddNetworkString("GBayUpdateSettings")
 util.AddNetworkString("GBayOpenLoadingSettingUpServer")
 util.AddNetworkString("GBaySubmitShipment")
+util.AddNetworkString("GBayEditShipment")
 util.AddNetworkString("GBayDoneLoading")
+util.AddNetworkString("GBayDoneLoading2")
 util.AddNetworkString("GBayOpenMenu")
-
+util.AddNetworkString("GBayPurchaseItem")
 
 -- If you change anything below you risk getting errors so please do not
 local StatsWebsite = "http://xxlmm13xxgaming.com/addons/data/serveradd.php" -- my stats website (DO NOT TOUCH)
@@ -29,6 +32,20 @@ function GBayEscapeString(string)
   else
     return string
   end
+end
+
+function GBayIsSuperadmin(data)
+  if data.rank == "Superadmin" then
+    return true
+  end
+  return false
+end
+
+function GBayIsAdmin(data)
+  if data.rank == "Admin" or data.rank == "Superadmin" then
+    return true
+  end
+  return false
 end
 
 hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
@@ -171,6 +188,14 @@ net.Receive("GBayUpdateSettings",function(len, ply)
       end)
     end
   end)
+end)
+
+net.Receive("GBayPurchaseItem",function(len, ply)
+  local type = net.ReadString()
+  local quantity = net.ReadFloat()
+  local item = net.ReadTable()
+  
+
 end)
 
 concommand.Add("gbaytest",function(ply)

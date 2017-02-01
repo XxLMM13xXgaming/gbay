@@ -46,9 +46,9 @@ end)
 
 net.Receive("GBayOpenMenu",function()
 	LocalPlayer().GBayOpenMenuTabStatus = false
-	local data = net.ReadTable()
+	data = net.ReadTable()
 	PrintTable(data)
-	local DFrame = vgui.Create( "DFrame" )
+	DFrame = vgui.Create( "DFrame" )
 	DFrame:SetSize( 1000, 700 )
 	DFrame:Center()
 	DFrame:SetDraggable( false )

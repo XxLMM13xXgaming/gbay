@@ -97,6 +97,14 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				draw.SimpleText("restart GBay!","GBayLabelFont",w / 2,h/2 +80,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end
 		end
+	elseif tab == "PleaseRefreshOther" then
+		SideBarOpened.Paint = function(s, w, h)
+			surface.SetDrawColor(255,255,255, 255)
+			surface.DrawRect(0, 0, w, h)
+			draw.SimpleText("Please Refresh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("GBay needs to be refreshed!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("Close and then re-open!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		end
 	elseif tab == "Loading" then
 		net.Receive("GBayDoneLoading",function()
 			local newtype = net.ReadString()
@@ -105,6 +113,9 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				table.insert(data[3],newdata[1],newdata)
 			end
 			GBaySideBarOpened(DFrame, "Terms", false, data, false)
+		end)
+		net.Receive("GBayDoneLoading2",function()
+			GBaySideBarOpened(DFrame, "PleaseRefreshOther", false, data, false)
 		end)
 		SideBarOpened.Paint = function(s, w, h)
 			surface.SetDrawColor(255,255,255, 255)
@@ -259,7 +270,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
 		end
 		TermsAccept.DoClick = function()
-			GBaySideBarClosed(DFrame, "Dashboard", false, data, false)			
+			GBaySideBarClosed(DFrame, "Dashboard", false, data, false)
 		end
 	elseif tab == "Settings" or settingbtnclicked then
 		local GBayLogoSettings = Material("gbay/Settings_Logo.png")
@@ -587,6 +598,9 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 					draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
 					draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 				end
+				ViewMoreBTN.DoClick = function()
+					GBayViewMoreItemSmall("Shipment", DFrame, data, v)
+				end
 
 				local theweaponpic = false
 
@@ -867,6 +881,201 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				end
 			end
 			used = true
+		end
+	elseif tab == "EditShip" then
+		local GBayLogoCreate = Material("gbay/Create_Logo.png")
+		usedshipments = true
+		tab = "Dashboard"
+		SideBarOpened.Paint = function(s, w, h)
+			surface.SetDrawColor(255,255,255, 255)
+			surface.DrawRect(0, 0, w, h)
+			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetMaterial( GBayLogoCreate	)
+			surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
+			draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
+			draw.SimpleText("What type of item?","GBayLabelFont",w / 2,140,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			if usedshipments then
+				draw.SimpleText("Name of the shipment?","GBayLabelFont",w / 2,200,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Description of the shipment?","GBayLabelFont",w / 2,260,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Select your weapon!","GBayLabelFont",w / 2,340,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("What is the price of your shipment?","GBayLabelFont",w / 2,400,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Submit your Item??","GBayLabelFont",w / 2,460,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+
+				draw.RoundedBox(0,0,520,w,2,Color(221,221,221))
+				draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Check updates tab often","GBayLabelFont",w / 2,590,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,610,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+
+			end
+		end
+
+		local CreateItmType = vgui.Create( "DComboBox", SideBarOpened )
+		CreateItmType:SetPos(20, 170)
+		CreateItmType:SetSize(SideBarOpened:GetWide() - 40, 20 )
+		CreateItmType:SetValue( "Shipment" )
+		CreateItmType:AddChoice( "Shipment" )
+
+		local editingwep = nil
+
+		for k, v in pairs(data[3]) do
+			if v[1] == LocalPlayer().GBayIsEditing then
+				editingwep = v
+			end
+		end
+
+		local CreateItmShipName = vgui.Create( "DTextEntry", SideBarOpened )
+		CreateItmShipName:SetPos(20, 230)
+		CreateItmShipName:SetSize(SideBarOpened:GetWide() - 40, 20 )
+		CreateItmShipName:SetText( editingwep[3] )
+		CreateItmShipName.OnTextChanged = function(s)
+			if string.len(s:GetValue()) > 27 then
+				local timeleftforrestriction = 5
+				s:SetText("Shipment name must be < 27 characters... ("..timeleftforrestriction..")")
+				s:SetEditable(false)
+				timer.Create("GBayUnlockServerNameEntry",1, 5, function()
+					timeleftforrestriction = timeleftforrestriction - 1
+					if timeleftforrestriction <= 0 then
+						s:SetText("Shipment name")
+						s:SetEditable(true)
+						return
+					end
+					s:SetText("Shipment name must be < 27 characters... ("..timeleftforrestriction..")")
+				end)
+			end
+		end
+
+		local CreateItmShipDesc = vgui.Create( "DTextEntry", SideBarOpened )
+		CreateItmShipDesc:SetPos(20, 290)
+		CreateItmShipDesc:SetSize(SideBarOpened:GetWide() - 40, 40 )
+		CreateItmShipDesc:SetText( editingwep[4] )
+		CreateItmShipDesc:SetMultiline( true )
+		CreateItmShipDesc.OnTextChanged = function(s)
+			if string.len(s:GetValue()) > 81 then
+				local timeleftforrestriction = 5
+				s:SetText("Shipment description must be < 81 characters... ("..timeleftforrestriction..")")
+				s:SetEditable(false)
+				timer.Create("GBayUnlockServerNameEntry",1, 5, function()
+					timeleftforrestriction = timeleftforrestriction - 1
+					if timeleftforrestriction <= 0 then
+						s:SetText("Shipment Description")
+						s:SetEditable(true)
+						return
+					end
+					s:SetText("Shipment description must be < 81 characters... ("..timeleftforrestriction..")")
+				end)
+			end
+		end
+
+		local SelWepBtn = vgui.Create("DButton", SideBarOpened)
+		SelWepBtn:SetPos(20, 370)
+		SelWepBtn:SetSize(SideBarOpened:GetWide() - 40, 20)
+		SelWepBtn:SetText(editingwep[5])
+		SelWepBtn:SetTextColor(Color(255,255,255))
+		SelWepBtn.Paint = function(s, w, h)
+			draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+		end
+		SelWepBtn.DoClick = function()
+
+		end
+
+		local SelWepPrice = vgui.Create( "DNumSlider", SideBarOpened )
+		SelWepPrice:SetPos( 20, 430 )
+		SelWepPrice:SetSize( SideBarOpened:GetWide() - 40, 20 )
+		SelWepPrice:SetText( "" )
+		SelWepPrice:SetMin( 0 )
+		SelWepPrice:SetMax( GBayConfig.MaxPrice )
+		SelWepPrice:SetValue(editingwep[6])
+		SelWepPrice:SetDecimals( 0 )
+
+		local SelWepSubBtn = vgui.Create("DButton", SideBarOpened)
+		SelWepSubBtn:SetPos(20, 490)
+		SelWepSubBtn:SetSize(SideBarOpened:GetWide() - 40, 20)
+		SelWepSubBtn:SetText("Edit Shipment")
+		SelWepSubBtn:SetTextColor(Color(255,255,255))
+		SelWepSubBtn.Paint = function(s, w, h)
+			draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+		end
+		SelWepSubBtn.DoClick = function()
+			net.Start("GBayEditShipment")
+				net.WriteTable(editingwep)
+				net.WriteString(CreateItmShipName:GetValue())
+				net.WriteString(CreateItmShipDesc:GetValue())
+				net.WriteFloat(SelWepPrice:GetValue())
+			net.SendToServer()
+			GBaySideBarOpened(DFrame, "Loading", false, data, firstjoined)
+		end
+		usedshipments = true
+	elseif tab == "Purchase" then
+		local GBayLogoCheckOut = Material("gbay/Check_Out.png")
+		local postoputtext = 190
+		local totalprice = 0
+		local costofone = LocalPlayer().GBayBuyingItem[6] / LocalPlayer().GBayBuyingItem[7]
+		SideBarOpened.Paint = function(s, w, h)
+			surface.SetDrawColor(255,255,255, 255)
+			surface.DrawRect(0, 0, w, h)
+			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetMaterial( GBayLogoCheckOut	)
+			surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
+			draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
+			draw.SimpleText(LocalPlayer().GBayBuyingItem[3] .." Purchase","GBayLabelFontBold",w / 2,150,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("Quantity to purchase: "..LocalPlayer().GBayBuyingItemQ,"GBayLabelFont",w / 2,170,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		end
+
+		for i=1, LocalPlayer().GBayBuyingItemQ do
+			local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
+			TheLabelForItems:SetPos(20, postoputtext)
+			TheLabelForItems:SetText("+1 "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone))
+			TheLabelForItems:SetFont("GBayLabelFont")
+			TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheLabelForItems:SizeToContents()
+			postoputtext = postoputtext + 20
+			totalprice = totalprice + costofone
+		end
+
+		local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
+		TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 160)
+		TheTaxRate:SetText("Price: "..DarkRP.formatMoney(totalprice))
+		TheTaxRate:SetFont("GBayLabelFont")
+		TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
+		TheTaxRate:SizeToContents()
+
+		local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
+		TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 140)
+		TheTaxRate:SetText("Tax Rate: "..GBayConfig.TaxToMultiplyBy * 100 .. "%")
+		TheTaxRate:SetFont("GBayLabelFont")
+		TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
+		TheTaxRate:SizeToContents()
+
+		local TheTaxPrice = vgui.Create("DLabel", SideBarOpened)
+		TheTaxPrice:SetPos(20, SideBarOpened:GetTall() - 120)
+		TheTaxPrice:SetText("Tax: "..DarkRP.formatMoney(totalprice * GBayConfig.TaxToMultiplyBy))
+		TheTaxPrice:SetFont("GBayLabelFont")
+		TheTaxPrice:SetTextColor(Color( 137, 137, 137, 255 ))
+		TheTaxPrice:SizeToContents()
+
+		totalprice = totalprice + totalprice * GBayConfig.TaxToMultiplyBy
+
+		local TheFinalPrice = vgui.Create("DLabel", SideBarOpened)
+		TheFinalPrice:SetPos(20, SideBarOpened:GetTall() - 100)
+		TheFinalPrice:SetText("Subtotal: "..DarkRP.formatMoney(totalprice))
+		TheFinalPrice:SetFont("GBayLabelFont")
+		TheFinalPrice:SetTextColor(Color( 137, 137, 137, 255 ))
+		TheFinalPrice:SizeToContents()
+
+		local CheckOutBtn = vgui.Create("DButton",SideBarOpened)
+		CheckOutBtn:SetPos(20, SideBarOpened:GetTall() - 70)
+		CheckOutBtn:SetSize(SideBarOpened:GetWide() - 40, 40)
+		CheckOutBtn:SetText("Check out")
+		CheckOutBtn:SetTextColor(Color(255,255,255))
+		CheckOutBtn.Paint = function(s, w, h)
+			draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+		end
+		CheckOutBtn.DoClick = function()
+			net.Start("GBayPurchaseItem")
+				net.WriteString(LocalPlayer().GBayBuyingItemT)
+			  net.WriteFloat(LocalPlayer().GBayBuyingItemQ)
+			  net.WriteTable(LocalPlayer().GBayBuyingItem)				
+			net.SendToServer()
 		end
 	end
 end
