@@ -12,6 +12,7 @@ if (SERVER) then
   AddCSLuaFile("gbay/gui/cl_sidebar.lua")
   AddCSLuaFile("gbay/gui/cl_orderpage.lua")
   AddCSLuaFile("gbay/gui/cl_homepage.lua")
+  AddCSLuaFile("gbay/shipment/cl_shipment.lua")
 end
 if (CLIENT) then
   include("gbay/config/gbay_config.lua")
@@ -22,4 +23,5 @@ if (CLIENT) then
   include("gbay/gui/cl_sidebar.lua")
   include("gbay/gui/cl_orderpage.lua")
   include("gbay/gui/cl_homepage.lua")
+  include("gbay/shipment/cl_shipment.lua")
 end

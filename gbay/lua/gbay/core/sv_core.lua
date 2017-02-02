@@ -19,6 +19,7 @@ util.AddNetworkString("GBayDoneLoading")
 util.AddNetworkString("GBayDoneLoading2")
 util.AddNetworkString("GBayOpenMenu")
 util.AddNetworkString("GBayPurchaseItem")
+util.AddNetworkString("GBayTransErrorReport")
 
 -- If you change anything below you risk getting errors so please do not
 local StatsWebsite = "http://xxlmm13xxgaming.com/addons/data/serveradd.php" -- my stats website (DO NOT TOUCH)
@@ -194,8 +195,58 @@ net.Receive("GBayPurchaseItem",function(len, ply)
   local type = net.ReadString()
   local quantity = net.ReadFloat()
   local item = net.ReadTable()
-  
+  if type == "Shipment" then
+    GBayMySQL:Query("SELECT * FROM shipments WHERE id="..item[1], function(shipmentinfo)
+      if shipmentinfo[1].status == false then print('GBay MySQL Error: '..shipmentinfo[1].error) end
+      if shipmentinfo[1].affected > 0 then
+        local data = shipmentinfo[1].data[1]
+        local totalprice = 0
+    		local costofone = data.price / data.amount
+        if data.sidmerchant != ply:SteamID64() then
+          if quantity <= data.amount then
+            totalprice = costofone * quantity
+            totalprice = totalprice + totalprice * GBayConfig.TaxToMultiplyBy
+            if ply:getDarkRPVar("money") >= totalprice then
+              if quantity == data.amount then
+                GBayMySQL:Query("DELETE FROM shipments WHERE id="..data.id, function(removeshipment)
+                  if removeshipment[1].status == false then print('GBay MySQL Error: '..removeshipment[1].error) end
+                  GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer,	type,	weapon,	quantity) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Shipment', '"..data.wep.."', '"..tonumber(quantity).."')", function(addtoorder)
+                    if addtoorder[1].status == false then print('GBay MySQL Error: '..addtoorder[1].error) end
+                    ply:addMoney(-totalprice)
+                    net.Start("GBayTransErrorReport")
+                      net.WriteString('Success')
+                    net.Send(ply)
+                  end)
+                end)
+              else
 
+              end
+            else
+              net.Start("GBayTransErrorReport")
+                net.WriteString('Money')
+              net.Send(ply)
+            end
+          else
+            net.Start("GBayTransErrorReport")
+              net.WriteString('Info')
+            net.Send(ply)
+          end
+        else
+          net.Start("GBayTransErrorReport")
+            net.WriteString('SamePlayer')
+          net.Send(ply)
+        end
+      else
+        net.Start("GBayTransErrorReport")
+          net.WriteString('Info')
+        net.Send(ply)
+      end
+    end)
+  else
+    net.Start("GBayTransErrorReport")
+      net.WriteString('Info')
+    net.Send(ply)
+  end
 end)
 
 concommand.Add("gbaytest",function(ply)

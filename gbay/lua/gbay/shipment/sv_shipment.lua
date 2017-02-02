@@ -14,7 +14,7 @@ net.Receive("GBaySubmitShipment",function(len, ply)
                 if createshipment[1].status == false then print('GBay MySQL Error: '..createshipment[1].error) end
                 net.Start("GBayDoneLoading")
                   net.WriteString("Shipment")
-                  net.WriteTable({createshipment[1].lastid, ply:SteamID64(), shipname, shipdesc, CustomShipments[v:Getcontents()].entity, shipprice})
+                  net.WriteTable({createshipment[1].lastid, ply:SteamID64(), shipname, shipdesc, CustomShipments[v:Getcontents()].entity, shipprice, CustomShipments[v:Getcontents()].amount})
                 net.Send(ply)
               end)
             end

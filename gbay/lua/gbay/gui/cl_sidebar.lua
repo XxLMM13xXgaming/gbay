@@ -180,6 +180,108 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
         end
       end
 		end
+	elseif tab == "TransPending" then
+		local nomoney = false
+		local wronginfo = false
+		local error = false
+		net.Receive("GBayTransErrorReport",function()
+			report = net.ReadString()
+			nomoney = false
+			wronginfo = false
+			error = false
+			samep = false
+			success = false
+			if report == "Money" then nomoney = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
+			if report == "Info" then wronginfo = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
+			if report == "Error" then error = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
+			if report == "SamePlayer" then samep = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
+			if report == "Success" then success = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
+		end)
+		SideBarOpened.Paint = function(s, w, h)
+			surface.SetDrawColor(255,255,255, 255)
+			surface.DrawRect(0, 0, w, h)
+			if nomoney then
+				draw.SimpleText("No money!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("It looks like you do not have the funds","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("To purchase this item!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			elseif wronginfo then
+				draw.SimpleText("Ugh oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Item was not found!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			elseif error then
+				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Close GBay and try again!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			elseif samep then
+				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Do not buy your own item!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			elseif success then
+				draw.SimpleText("Transaction Successful!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Your order has now been sent! ","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Please wait for the delivery","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			else
+				draw.SimpleText("Transaction Pending!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Please wait while we process...","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Errors will be reported below!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+			for k, v in pairs(mf.fireworks) do
+        if (not v.peaked) then
+          draw.RoundedBox(mf.size / 2, v.pos[1], v.pos[2], mf.size, mf.size, v.color)
+        else
+          local part = v.particles
+
+          for i = 1, #part do
+            draw.RoundedBox(mf.particlesize/2, part[i].pos[1], part[i].pos[2], mf.particlesize, mf.particlesize, v.color)
+          end
+        end
+      end
+		end
+		SideBarOpened.Think = function(s)
+      if (math.random(0, 100) < 0.01 and #mf.fireworks <= 5) then
+        mf.newfirework(s, math.random(0, s:GetWide()), s:GetTall() + 5)
+      end
+
+      for k, v in pairs(mf.fireworks) do
+        if (v.color.a < 0) then
+          table.remove(mf.fireworks, k)
+          continue
+        end
+
+        if (not v.peaked) then
+          v.pos[2] = Lerp(mf.speed * FrameTime(), v.pos[2], s:GetTall() / v.peak)
+        else
+          if (v.particlenum ~= #v.particles) then
+            for i = 1, v.particlenum do
+                mf.newparticle(v, v.pos[1], v.pos[2])
+            end
+          else
+            local part = v.particles
+
+            for i = 1, v.particlenum do
+              if (part[i].peaked) then
+                part[i].pos[2] = part[i].pos[4] + v.pos[2]
+                part[i].pos[1] = part[i].pos[3] + v.pos[1]
+              else
+                if (part[i].pos[1] >= part[i].pos[3] + v.pos[1]) and (part[i].pos[2] >= part[i].pos[4] + v.pos[2]) then
+                  part[i].peaked = true
+                else
+                  part[i].pos[2] = Lerp(mf.particlespeed * FrameTime(), part[i].pos[2], part[i].pos[4] + v.pos[2])
+                  part[i].pos[1] = Lerp(mf.particlespeed * FrameTime(), part[i].pos[1], part[i].pos[3] + v.pos[1])
+                end
+              end
+            end
+          end
+
+          v.color.a = v.color.a - 2
+          v.pos[2] = v.pos[2] + 0.5
+        end
+
+        if (v.pos[2] <= ((s:GetTall() / v.peak) + 5)) then
+          v.peaked = true
+        end
+      end
+		end
 	elseif tab == "Terms" then
 		SideBarOpened.Paint = function(s, w, h)
 			surface.SetDrawColor(255,255,255, 255)
@@ -1008,6 +1110,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 	elseif tab == "Purchase" then
 		local GBayLogoCheckOut = Material("gbay/Check_Out.png")
 		local postoputtext = 190
+		local keepgoing = true
 		local totalprice = 0
 		local costofone = LocalPlayer().GBayBuyingItem[6] / LocalPlayer().GBayBuyingItem[7]
 		SideBarOpened.Paint = function(s, w, h)
@@ -1022,14 +1125,27 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 		end
 
 		for i=1, LocalPlayer().GBayBuyingItemQ do
-			local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
-			TheLabelForItems:SetPos(20, postoputtext)
-			TheLabelForItems:SetText("+1 "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone))
-			TheLabelForItems:SetFont("GBayLabelFont")
-			TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
-			TheLabelForItems:SizeToContents()
-			postoputtext = postoputtext + 20
-			totalprice = totalprice + costofone
+			if i > 10 then
+				if keepgoing then
+					local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
+					TheLabelForItems:SetPos(20, postoputtext)
+					TheLabelForItems:SetText("+"..LocalPlayer().GBayBuyingItemQ - i.." "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone * LocalPlayer().GBayBuyingItemQ -i ))
+					TheLabelForItems:SetFont("GBayLabelFont")
+					TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
+					TheLabelForItems:SizeToContents()
+					keepgoing = false
+					totalprice = totalprice + costofone * LocalPlayer().GBayBuyingItemQ -i
+				end
+			else
+				local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
+				TheLabelForItems:SetPos(20, postoputtext)
+				TheLabelForItems:SetText("+1 "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone))
+				TheLabelForItems:SetFont("GBayLabelFont")
+				TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
+				TheLabelForItems:SizeToContents()
+				postoputtext = postoputtext + 20
+				totalprice = totalprice + costofone
+			end
 		end
 
 		local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
@@ -1074,8 +1190,9 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			net.Start("GBayPurchaseItem")
 				net.WriteString(LocalPlayer().GBayBuyingItemT)
 			  net.WriteFloat(LocalPlayer().GBayBuyingItemQ)
-			  net.WriteTable(LocalPlayer().GBayBuyingItem)				
+			  net.WriteTable(LocalPlayer().GBayBuyingItem)
 			net.SendToServer()
+			GBaySideBarOpened(DFrame, "TransPending", false, data, firstjoined)
 		end
 	end
 end

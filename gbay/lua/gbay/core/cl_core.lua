@@ -112,7 +112,11 @@ net.Receive("GBayOpenMenu",function()
 	ShipmentsBTN:SizeToContents()
 	ShipmentsBTN.Paint = function() end
 	ShipmentsBTN.DoClick = function()
-		GBayShipmentsPage(DFrame, data)
+		if LocalPlayer().GBayOpenMenuTabStatus then
+			GBayShipmentsPageSmall(DFrame, data)
+		else
+			GBayShipmentsPageFull(DFrame, data)
+		end
 	end
 
 	EntitiesBTN = vgui.Create("DButton", DFrame)

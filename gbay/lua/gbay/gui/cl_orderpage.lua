@@ -101,6 +101,8 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 	end
 	PurchaseBtn.DoClick = function()
 		LocalPlayer().GBayBuyingItem = v
+		LocalPlayer().GBayBuyingItemQ = QuantitySel:GetValue()
+		LocalPlayer().GBayBuyingItemT = "Shipment"
 		GBaySideBarOpened(DFrame, "Purchase", false, data, false)
 	end
 
