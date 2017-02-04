@@ -3,26 +3,13 @@ local config = GBayConfig
 /*
   Made By: XxLMM13xXgaming
 */
--- Currently only supports the following weapon packs
--- FAS:2 Weapons (id = fas)
--- M9K Weapons (id = m9k)
--- Hl2 Weapons (defualt with gmod) (id = hl2)
--- DarkRP Weapons (defualt with darkrp) (id = darkrp)
-
--- How to edit the table below...
--- Add a new entry by writing this '{},'
--- Next put in this "", ""
--- In the first qoutes put in the allowed weapon id
--- In the second qoutes put in the weapon type (id shown above)
-
-config.AllowedWeapons = {
-  {"m9k_ak47", "m9k"},
-  {"weapon_ar2", "hl2"},
-  {"weapon_mac102", "darkrp"},
-  {"weapon_ak472", "darkrp"},
-}
-
 config.PriceToPayToSell = 100 -- Fee to sell items
 config.MaxPrice = 100000 -- Max price to sell items
 
-config.TaxToMultiplyBy = 0.08
+config.TaxToMultiplyBy = 0.08 -- The tax of all items... This should be a .00 number as anything higher would cause CRAZY tax
+
+config.AllowUpdates = true -- Should we take code from gist? All code will be retrevied and ran clientside giving NO abusable access to XxLMM13xXgaming or anyone else!
+-- If you feel like LMM is attempting to backdoor your server and/or hack or whatever you think please check out the link below that is where i get the code from
+-- As you can see it is just derma and some more links for the owner to download!
+
+config.UpdatesURL = "https://gist.githubusercontent.com/XxLMM13xXgaming/9ca699471e82b1bde1b26454ffaf6ad1/raw/GBay%2520Updates" -- DO NOT CHANGE UNLESS LMM TELLS YOU TO!

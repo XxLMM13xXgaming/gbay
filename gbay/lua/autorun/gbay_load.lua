@@ -1,27 +1,7 @@
 if (SERVER) then
-  AddCSLuaFile("gbay/config/gbay_config.lua")
-  include("gbay/config/gbay_mysql_config.lua")
-  include("gbay/config/gbay_config.lua")
   include("gbay/core/sv_core.lua")
   AddCSLuaFile("gbay/core/cl_core.lua")
-  include("gbay/mysql/sv_mysql.lua")
-  include("gbay/shipment/sv_shipment.lua")
-  AddCSLuaFile("gbay/gui/cl_fonts.lua")
-  AddCSLuaFile("gbay/gui/cl_bases.lua")
-  AddCSLuaFile("gbay/gui/cl_loading.lua")
-  AddCSLuaFile("gbay/gui/cl_sidebar.lua")
-  AddCSLuaFile("gbay/gui/cl_orderpage.lua")
-  AddCSLuaFile("gbay/gui/cl_homepage.lua")
-  AddCSLuaFile("gbay/shipment/cl_shipment.lua")
 end
 if (CLIENT) then
-  include("gbay/config/gbay_config.lua")
   include("gbay/core/cl_core.lua")
-  include("gbay/gui/cl_fonts.lua")
-  include("gbay/gui/cl_bases.lua")
-  include("gbay/gui/cl_loading.lua")
-  include("gbay/gui/cl_sidebar.lua")
-  include("gbay/gui/cl_orderpage.lua")
-  include("gbay/gui/cl_homepage.lua")
-  include("gbay/shipment/cl_shipment.lua")
 end

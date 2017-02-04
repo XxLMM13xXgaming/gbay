@@ -1,11 +1,31 @@
+include("gbay/config/gbay_config.lua")
+include("gbay/gui/cl_fonts.lua")
+include("gbay/gui/cl_bases.lua")
+include("gbay/gui/cl_loading.lua")
+include("gbay/gui/cl_sidebar.lua")
+include("gbay/gui/cl_orderpage.lua")
+include("gbay/gui/cl_homepage.lua")
+include("gbay/gui/cl_updates.lua")
+include("gbay/shipment/cl_shipment.lua")
+
 local plymeta = FindMetaTable("Player")
 
 function plymeta:GBayIsSuperAdmin(data)
-	if data[1][1][3] == "Superadmin" then return true else return false end
+	for k, v in pairs(data[1]) do
+		if v[2] == self:SteamID64() then
+			playerdata = v
+		end
+	end
+	if playerdata[3] == "Superadmin" then return true else return false end
 end
 
 function plymeta:GBayIsAdmin(data)
-	if data[1][1][3] == "Admin" or data[1][1][3] == "Superadmin" then return true else return false end
+	for k, v in pairs(data[1]) do
+		if v[2] == self:SteamID64() then
+			playerdata = v
+		end
+	end
+	if playerdata[3] == "Admin" or playerdata[3] == "Superadmin" then return true else return false end
 end
 
 function GBayErrorMessage(msg)
@@ -91,6 +111,7 @@ net.Receive("GBayOpenMenu",function()
 	HomeBTN.DoClick = function()
 		GBayHomePageFull(DFrame, data)
 		LocalPlayer().TabCurrentlyOn = "Home"
+		GBaySideBarClosed(DFrame, "Dashboard", false, data, false)
 	end
 
 	UpdatesBTN = vgui.Create("DButton", DFrame)
@@ -101,7 +122,8 @@ net.Receive("GBayOpenMenu",function()
 	UpdatesBTN:SizeToContents()
 	UpdatesBTN.Paint = function() end
 	UpdatesBTN.DoClick = function()
-
+		GBayViewUpdatesFull(DFrame, data)
+		LocalPlayer().TabCurrentlyOn = "Updates"
 	end
 
 	ShipmentsBTN = vgui.Create("DButton", DFrame)
@@ -177,9 +199,12 @@ net.Receive("GBayOpenMenu",function()
 	LocalPlayer().TabCurrentlyOn = "Home"
 	GBaySideBarClosed(DFrame, "Dashboard", false, data, false)
 	GBayHomePageFull(DFrame, data)
-
 	hook.Add("GBaySideBarClosed","CheckToSeeIfSidebarOpened",function()
 		if LocalPlayer().TabCurrentlyOn == "Home" then
+			GBayHomePageFull(DFrame, data)
+		elseif LocalPlayer().TabCurrentlyOn == "Order" then
+			GBayViewMoreItemFull(LocalPlayer().GBayOrderType, DFrame, data, LocalPlayer().GBayOrderItem)
+		else
 			GBayHomePageFull(DFrame, data)
 		end
 		HomeBTN:SetDisabled( false )
@@ -197,6 +222,10 @@ net.Receive("GBayOpenMenu",function()
 
 	hook.Add("GBaySideBarOpened","CheckToSeeIfSidebarOpened",function()
 		if LocalPlayer().TabCurrentlyOn == "Home" then
+			GBayHomePageSmall(DFrame, data)
+		elseif LocalPlayer().TabCurrentlyOn == "Order" then
+			GBayViewMoreItemSmall(LocalPlayer().GBayOrderType, DFrame, data, LocalPlayer().GBayOrderItem)
+		else
 			GBayHomePageSmall(DFrame, data)
 		end
 		HomeBTN:SetDisabled( true )

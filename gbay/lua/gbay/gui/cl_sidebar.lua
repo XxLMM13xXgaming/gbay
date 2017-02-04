@@ -616,7 +616,12 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			end
 		end
 	elseif tab == "Dashboard" then
-		local numbers = {data[1][1][4], -data[1][1][5], -data[1][1][6]}
+		for k, v in pairs(data[1]) do
+			if v[2] == LocalPlayer():SteamID64() then
+				playerdata = v
+			end
+		end
+		local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
 		local sum = 0
 		local total = 0
 		for i = 1, #numbers do
@@ -624,23 +629,28 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 		    total = total + math.abs(numbers[i])
 		end
 		local percent = math.Round(numbers[1]/total * 100, 1)
+		if IsValid(player.GetBySteamID64(playerdata[2])) then
+			playerdatanick = player.GetBySteamID64(playerdata[2]):Nick()
+		else
+			playerdatanick = "Unknown"
+		end
 		SideBarOpened.Paint = function(s, w, h)
 			surface.SetDrawColor(255,255,255, 255)
 			surface.DrawRect(0, 0, w, h)
 			draw.RoundedBox(0,13,38,68,68,Color(221,221,221))
-			draw.SimpleText(LocalPlayer():Nick(),"GBayLabelFontBold",180,60,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(playerdatanick,"GBayLabelFontBold",180,60,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			draw.SimpleText(percent.."% positive feedback","GBayLabelFontSmall",165,80,Color( 188, 188, 188, 255 ),TEXT_ALIGN_CENTER)
-			draw.SimpleText(data[1][1][4],"GBayLabelFontBold",55,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(playerdata[4],"GBayLabelFontBold",55,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			draw.SimpleText("Positive","GBayLabelFontSmall",55,175,Color( 188, 188, 188, 255 ),TEXT_ALIGN_CENTER)
-			draw.SimpleText(data[1][1][5],"GBayLabelFontBold",155,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(playerdata[5],"GBayLabelFontBold",155,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			draw.SimpleText("Neutral","GBayLabelFontSmall",155,175,Color( 188, 188, 188, 255 ),TEXT_ALIGN_CENTER)
-			draw.SimpleText(data[1][1][6],"GBayLabelFontBold",245,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(playerdata[6],"GBayLabelFontBold",245,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			draw.SimpleText("Negative","GBayLabelFontSmall",245,175,Color( 188, 188, 188, 255 ),TEXT_ALIGN_CENTER)
 			draw.SimpleText("User Info","GBayLabelFontSmall",5,230,Color( 188, 188, 188, 255 ))
 			draw.RoundedBox(0,0,250,w,2,Color(221,221,221))
-			draw.SimpleText("Player ID: "..data[1][1][1],"GBayLabelFontSmall",5,270,Color( 188, 188, 188, 255 ))
-			draw.SimpleText("Player Rank: "..data[1][1][3],"GBayLabelFontSmall",5,300,Color( 188, 188, 188, 255 ))
-			draw.SimpleText("Total Player Rep: "..data[1][1][4] + data[1][1][5] + data[1][1][6],"GBayLabelFontSmall",5,330,Color( 188, 188, 188, 255 ))
+			draw.SimpleText("Player ID: "..playerdata[1],"GBayLabelFontSmall",5,270,Color( 188, 188, 188, 255 ))
+			draw.SimpleText("Player Rank: "..playerdata[3],"GBayLabelFontSmall",5,300,Color( 188, 188, 188, 255 ))
+			draw.SimpleText("Total Player Rep: "..playerdata[4] + playerdata[5] + playerdata[6],"GBayLabelFontSmall",5,330,Color( 188, 188, 188, 255 ))
 			draw.SimpleText("Below are your current items for sale!","GBayLabelFontSmall",5,380,Color( 188, 188, 188, 255 ))
 			draw.RoundedBox(0,0,400,w,2,Color(221,221,221))
 		end
@@ -648,7 +658,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 		local PlayerAvatar = vgui.Create( "AvatarImage", SideBarOpened )
 		PlayerAvatar:SetPos( 15, 40 )
 		PlayerAvatar:SetSize( 64, 64 )
-		PlayerAvatar:SetPlayer( LocalPlayer(), 64 )
+		PlayerAvatar:SetSteamID( playerdata[2], 64 )
 
 		local PositiveIMG = vgui.Create("DImage", SideBarOpened)
 		PositiveIMG:SetPos(30, 160)
@@ -679,7 +689,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 		end
 
 		for k, v in pairs(data[3]) do
-			if v[2] == LocalPlayer():SteamID64() then
+			if v[2] == playerdata[2] then
 				local ItemMain = vgui.Create("DFrame")
 				ItemMain:SetSize( 270, 130 )
 				ItemMain:SetDraggable( false )
@@ -732,7 +742,173 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				UserRatingText:SetFont("GBayLabelFontSmall")
 
 				local thestars = 0
-				local numbers = {data[1][1][4], -data[1][1][5], -data[1][1][6]}
+				local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
+				local sum = 0
+				local total = 0
+				for i = 1, #numbers do
+				    sum = sum + numbers[i]
+				    total = total + math.abs(numbers[i])
+				end
+				local percent = math.Round(numbers[1]/total * 100, 1)
+
+				if percent <= 20 then thestars = 1 end
+				if percent <= 40 then thestars = 2 end
+				if percent <= 60 then thestars = 3 end
+				if percent <= 80 then thestars = 4 end
+				if percent <= 100 then thestars = 5 end
+
+				local theposforstars = 185
+				for i=1, thestars do
+					local RatingStars = vgui.Create("DImage", ItemMain)
+					RatingStars:SetPos(theposforstars,35)
+					RatingStars:SetSize(10, 10)
+					RatingStars:SetImage("gbay/Star128.png")
+					theposforstars = theposforstars + 15
+				end
+
+				local UserRatingText = vgui.Create("DLabel", ItemMain)
+				UserRatingText:SetPos(110, 50)
+				UserRatingText:SetSize(ItemMain:GetWide(), 20)
+				UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[6]))
+				UserRatingText:SetTextColor(Color(0,0,0))
+				UserRatingText:SetFont("GBayLabelFontSmall")
+
+				local PlayerAvatar = vgui.Create("EnhancedAvatarImage", ItemMain)
+				PlayerAvatar:SetPos( ItemMain:GetWide() - 40, 60 )
+				PlayerAvatar:SetSize( 34, 34 )
+				PlayerAvatar:SetSteamID( v[2], 64 )
+
+				ScrollList:AddItem(ItemMain)
+			end
+		end
+	elseif tab == "PlayerProfile" then
+		for k, v in pairs(data[1]) do
+			if v[2] == LocalPlayer().GBayPlayerProfileWho then
+				playerdata = v
+			end
+		end
+		local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
+		local sum = 0
+		local total = 0
+		for i = 1, #numbers do
+		    sum = sum + numbers[i]
+		    total = total + math.abs(numbers[i])
+		end
+		local percent = math.Round(numbers[1]/total * 100, 1)
+		if IsValid(player.GetBySteamID64(playerdata[2])) then
+			playerdatanick = player.GetBySteamID64(playerdata[2]):Nick()
+		else
+			playerdatanick = "Unknown"
+		end
+		SideBarOpened.Paint = function(s, w, h)
+			surface.SetDrawColor(255,255,255, 255)
+			surface.DrawRect(0, 0, w, h)
+			draw.RoundedBox(0,13,38,68,68,Color(221,221,221))
+			draw.SimpleText(playerdatanick,"GBayLabelFontBold",180,60,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(percent.."% positive feedback","GBayLabelFontSmall",165,80,Color( 188, 188, 188, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(playerdata[4],"GBayLabelFontBold",55,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Positive","GBayLabelFontSmall",55,175,Color( 188, 188, 188, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(playerdata[5],"GBayLabelFontBold",155,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Neutral","GBayLabelFontSmall",155,175,Color( 188, 188, 188, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(playerdata[6],"GBayLabelFontBold",245,155,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Negative","GBayLabelFontSmall",245,175,Color( 188, 188, 188, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("User Info","GBayLabelFontSmall",5,230,Color( 188, 188, 188, 255 ))
+			draw.RoundedBox(0,0,250,w,2,Color(221,221,221))
+			draw.SimpleText("Player ID: "..playerdata[1],"GBayLabelFontSmall",5,270,Color( 188, 188, 188, 255 ))
+			draw.SimpleText("Player Rank: "..playerdata[3],"GBayLabelFontSmall",5,300,Color( 188, 188, 188, 255 ))
+			draw.SimpleText("Total Player Rep: "..playerdata[4] + playerdata[5] + playerdata[6],"GBayLabelFontSmall",5,330,Color( 188, 188, 188, 255 ))
+			draw.SimpleText("Below are this users items!","GBayLabelFontSmall",5,380,Color( 188, 188, 188, 255 ))
+			draw.RoundedBox(0,0,400,w,2,Color(221,221,221))
+		end
+
+		local PlayerAvatar = vgui.Create( "AvatarImage", SideBarOpened )
+		PlayerAvatar:SetPos( 15, 40 )
+		PlayerAvatar:SetSize( 64, 64 )
+		PlayerAvatar:SetSteamID( playerdata[2], 64 )
+
+		local PositiveIMG = vgui.Create("DImage", SideBarOpened)
+		PositiveIMG:SetPos(30, 160)
+		PositiveIMG:SizeToContents()
+		PositiveIMG:SetImage("gbay/Positive.png")
+
+		local NeutralIMG = vgui.Create("DImage", SideBarOpened)
+		NeutralIMG:SetPos(130, 160)
+		NeutralIMG:SizeToContents()
+		NeutralIMG:SetImage("gbay/Neutral.png")
+
+		local NegativeIMG = vgui.Create("DImage", SideBarOpened)
+		NegativeIMG:SetPos(220, 160)
+		NegativeIMG:SizeToContents()
+		NegativeIMG:SetImage("gbay/Negative.png")
+
+		local ScrollList = vgui.Create( "DPanelList", SideBarOpened )
+		ScrollList:SetPos( 5, 420 )
+		ScrollList:SetSize( SideBarOpened:GetWide(), SideBarOpened:GetTall() - 440 )
+		ScrollList:EnableHorizontal(true)
+		ScrollList:SetSpacing( 20 )
+		ScrollList:EnableVerticalScrollbar( true )
+		ScrollList.VBar.Paint = function( s, w, h )
+		end
+		ScrollList.VBar.btnUp.Paint = function( s, w, h ) end
+		ScrollList.VBar.btnDown.Paint = function( s, w, h ) end
+		ScrollList.VBar.btnGrip.Paint = function( s, w, h )
+		end
+
+		for k, v in pairs(data[3]) do
+			if v[2] == playerdata[2] then
+				local ItemMain = vgui.Create("DFrame")
+				ItemMain:SetSize( 270, 130 )
+				ItemMain:SetDraggable( false )
+				ItemMain:SetTitle( "" )
+				ItemMain:ShowCloseButton( false )
+				ItemMain.Paint = function(s, w, h)
+					draw.RoundedBox(0,0,0,w,h - 30,Color(238,238,238))
+					draw.RoundedBox(0,2,2,w - 4,h - 34,Color(255,255,255))
+					draw.RoundedBox(0,0,0,100,100,Color(238,238,238))
+				end
+
+				local ViewMoreBTN = vgui.Create("DButton",ItemMain)
+				ViewMoreBTN:SetPos(20, ItemMain:GetTall() - 20)
+				ViewMoreBTN:SetSize(ItemMain:GetWide() - 40, 20)
+				ViewMoreBTN:SetText("View More")
+				ViewMoreBTN:SetTextColor(Color(185,201,229))
+				ViewMoreBTN.Paint = function(s, w, h)
+					draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
+					draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+				end
+				ViewMoreBTN.DoClick = function()
+					GBayViewMoreItemSmall("Shipment", DFrame, data, v)
+				end
+
+				local theweaponpic = false
+
+				if file.Exists("materials/vgui/entities/"..v[5]..".vmt","GAME") then
+					theweaponpic = "vgui/entities/"..v[5]..".vmt"
+				elseif file.Exists("materials/entities/"..v[5]..".png","GAME") then
+					theweaponpic = "entities/"..v[5]..".png"
+				end
+
+				local WeaponModel = vgui.Create("DImage", ItemMain)
+				WeaponModel:SetPos(0,0)
+				WeaponModel:SetSize(100, 100)
+				WeaponModel:SetImage(theweaponpic)
+
+				local ItemName = vgui.Create("DLabel", ItemMain)
+				ItemName:SetPos(110, 10)
+				ItemName:SetSize(ItemMain:GetWide(), 20)
+				ItemName:SetText(v[3])
+				ItemName:SetTextColor(Color(0,0,0))
+				ItemName:SetFont("GBayLabelFontSmall")
+
+				local UserRatingText = vgui.Create("DLabel", ItemMain)
+				UserRatingText:SetPos(110, 30)
+				UserRatingText:SetSize(ItemMain:GetWide(), 20)
+				UserRatingText:SetText("User Rating: ")
+				UserRatingText:SetTextColor(Color(0,0,0))
+				UserRatingText:SetFont("GBayLabelFontSmall")
+
+				local thestars = 0
+				local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
 				local sum = 0
 				local total = 0
 				for i = 1, #numbers do

@@ -1,5 +1,6 @@
 function GBayShipmentsPageFull(DFrame, data)
 	if IsValid(HomePanel) then HomePanel:Remove() end
+	if IsValid(HomePanel2) then HomePanel2:Remove() end
 	if !IsValid(DFrame) then return end
 	HomePanel = vgui.Create("DFrame", DFrame)
 	HomePanel:SetPos(50, 180)
@@ -162,6 +163,7 @@ end
 
 function GBayShipmentsPageSmall(DFrame, data)
 	if IsValid(HomePanel) then HomePanel:Remove() end
+	if IsValid(HomePanel2) then HomePanel2:Remove() end
 	if !IsValid(DFrame) then return end
 	HomePanel = vgui.Create("DFrame", DFrame)
 	HomePanel:SetPos(290, 180)

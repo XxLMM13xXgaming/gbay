@@ -51,7 +51,12 @@ function GBayHomePageFull(DFrame, data)
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
 			ViewMoreBTN.DoClick = function()
+				LocalPlayer().GBayOrderType = "Shipment"
+				LocalPlayer().GBayOrderItem = v
+				HomePanel:Remove()
 				GBayViewMoreItemFull("Shipment", DFrame, data, v)
+				LocalPlayer().GBayPlayerProfileWho = v[2]
+				GBaySideBarClosed(DFrame, "PlayerProfile", false, data, false)
 			end
 
 			local EditBTN = vgui.Create("DButton",ItemMain)
@@ -88,7 +93,12 @@ function GBayHomePageFull(DFrame, data)
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
 			ViewMoreBTN.DoClick = function()
+				LocalPlayer().GBayOrderType = "Shipment"
+				LocalPlayer().GBayOrderItem = v
+				HomePanel:Remove()
 				GBayViewMoreItemFull("Shipment", DFrame, data, v)
+				LocalPlayer().GBayPlayerProfileWho = v[2]
+				GBaySideBarClosed(DFrame, "PlayerProfile", false, data, false)
 			end
 		end
 
@@ -118,9 +128,13 @@ function GBayHomePageFull(DFrame, data)
 		UserRatingText:SetText("User Rating: ")
 		UserRatingText:SetTextColor(Color(0,0,0))
 		UserRatingText:SetFont("GBayLabelFontSmall")
-
+		for playerid, player in pairs(data[1]) do
+			if playerdata[2] == v[2] then
+				playerdata = player
+			end
+		end
 		local thestars = 0
-		local numbers = {data[1][1][4], -data[1][1][5], -data[1][1][6]}
+		local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
 		local sum = 0
 		local total = 0
 		for i = 1, #numbers do
@@ -213,7 +227,12 @@ function GBayHomePageSmall(DFrame, data)
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
 			ViewMoreBTN.DoClick = function()
+				LocalPlayer().GBayOrderType = "Shipment"
+				LocalPlayer().GBayOrderItem = v
+				HomePanel:Remove()
 				GBayViewMoreItemSmall("Shipment", DFrame, data, v)
+				LocalPlayer().GBayPlayerProfileWho = v[2]
+				GBaySideBarOpened(DFrame, "PlayerProfile", false, data, false)
 			end
 
 			local EditBTN = vgui.Create("DButton",ItemMain)
@@ -250,7 +269,12 @@ function GBayHomePageSmall(DFrame, data)
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
 			ViewMoreBTN.DoClick = function()
+				LocalPlayer().GBayOrderType = "Shipment"
+				LocalPlayer().GBayOrderItem = v
+				HomePanel:Remove()
 				GBayViewMoreItemSmall("Shipment", DFrame, data, v)
+				LocalPlayer().GBayPlayerProfileWho = v[2]
+				GBaySideBarOpened(DFrame, "PlayerProfile", false, data, false)
 			end
 		end
 
@@ -281,8 +305,13 @@ function GBayHomePageSmall(DFrame, data)
 		UserRatingText:SetTextColor(Color(0,0,0))
 		UserRatingText:SetFont("GBayLabelFontSmall")
 
+		for playerid, player in pairs(data[1]) do
+			if playerdata[2] == v[2] then
+				playerdata = player
+			end
+		end
 		local thestars = 0
-		local numbers = {data[1][1][4], -data[1][1][5], -data[1][1][6]}
+		local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
 		local sum = 0
 		local total = 0
 		for i = 1, #numbers do
