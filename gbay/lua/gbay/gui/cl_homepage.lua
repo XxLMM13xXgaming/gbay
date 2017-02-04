@@ -128,11 +128,13 @@ function GBayHomePageFull(DFrame, data)
 		UserRatingText:SetText("User Rating: ")
 		UserRatingText:SetTextColor(Color(0,0,0))
 		UserRatingText:SetFont("GBayLabelFontSmall")
+
 		for playerid, player in pairs(data[1]) do
-			if playerdata[2] == v[2] then
+			if player[2] == v[2] then
 				playerdata = player
 			end
 		end
+
 		local thestars = 0
 		local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
 		local sum = 0
@@ -306,7 +308,7 @@ function GBayHomePageSmall(DFrame, data)
 		UserRatingText:SetFont("GBayLabelFontSmall")
 
 		for playerid, player in pairs(data[1]) do
-			if playerdata[2] == v[2] then
+			if player[2] == v[2] then
 				playerdata = player
 			end
 		end
