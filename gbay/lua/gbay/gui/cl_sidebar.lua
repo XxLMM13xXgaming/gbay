@@ -821,6 +821,41 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			draw.RoundedBox(0,0,400,w,2,Color(221,221,221))
 		end
 
+		local BanBTN = vgui.Create("DButton",SideBarOpened)
+		BanBTN:SetPos(20, 350)
+		BanBTN:SetSize(SideBarOpened:GetWide() / 3 - 20, 20)
+		BanBTN:SetText("Ban User")
+		BanBTN:SetTextColor(Color(255,0,0))
+		BanBTN.Paint = function(s, w, h)
+			draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
+			draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+		end
+		BanBTN.DoClick = function()
+
+		end
+
+		local SetRankBTN = vgui.Create("DButton",SideBarOpened)
+		SetRankBTN:SetPos(SideBarOpened:GetWide() / 3 + 10, 350)
+		SetRankBTN:SetSize(SideBarOpened:GetWide() / 3 - 20, 20)
+		SetRankBTN:SetText("Set Rank")
+		SetRankBTN:SetTextColor(Color(185,201,229))
+		SetRankBTN.Paint = function(s, w, h)
+			draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
+			draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+		end
+		SetRankBTN.DoClick = function()
+		end
+
+		local EditUserBTN = vgui.Create("DButton",SideBarOpened)
+		EditUserBTN:SetPos(SideBarOpened:GetWide() / 3 + 10 + SideBarOpened:GetWide() / 3 - 10, 350)
+		EditUserBTN:SetSize(SideBarOpened:GetWide() / 3 - 20, 20)
+		EditUserBTN:SetText("Edit User")
+		EditUserBTN:SetTextColor(Color(185,201,229))
+		EditUserBTN.Paint = function(s, w, h)
+			draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
+			draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+		end
+
 		local PlayerAvatar = vgui.Create( "AvatarImage", SideBarOpened )
 		PlayerAvatar:SetPos( 15, 40 )
 		PlayerAvatar:SetSize( 64, 64 )

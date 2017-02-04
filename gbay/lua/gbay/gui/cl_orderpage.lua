@@ -237,8 +237,13 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 			UserRatingText:SetTextColor(Color(0,0,0))
 			UserRatingText:SetFont("GBayLabelFontSmall")
 
+			for pid, players in pairs(data[1]) do
+				if samewep[2] == players[2] then
+					playerdata = players
+				end
+			end
 			local thestars = 0
-			local numbers = {data[1][1][4], -data[1][1][5], -data[1][1][6]}
+			local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
 			local sum = 0
 			local total = 0
 			for i = 1, #numbers do
@@ -272,7 +277,7 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 			local PlayerAvatar = vgui.Create("EnhancedAvatarImage", ItemMain)
 			PlayerAvatar:SetPos( ItemMain:GetWide() - 40, 60 )
 			PlayerAvatar:SetSize( 34, 34 )
-			PlayerAvatar:SetSteamID( item[2], 64 )
+			PlayerAvatar:SetSteamID( samewep[2], 64 )
 
 			ScrollList:AddItem(ItemMain)
 		end
@@ -520,8 +525,13 @@ function GBayViewMoreItemSmall(type, DFrame, data, item)
 			UserRatingText:SetTextColor(Color(0,0,0))
 			UserRatingText:SetFont("GBayLabelFontSmall")
 
+			for pid, players in pairs(data[1]) do
+				if samewep[2] == players[2] then
+					playerdata = players
+				end
+			end
 			local thestars = 0
-			local numbers = {data[1][1][4], -data[1][1][5], -data[1][1][6]}
+			local numbers = {playerdata[4], -playerdata[5], -playerdata[6]}
 			local sum = 0
 			local total = 0
 			for i = 1, #numbers do
