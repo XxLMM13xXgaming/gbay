@@ -28,6 +28,18 @@ function plymeta:GBayIsAdmin(data)
 	if playerdata[3] == "Admin" or playerdata[3] == "Superadmin" then return true else return false end
 end
 
+net.Receive("GBayNotify",function()
+	local type = net.ReadString()
+	local message = net.ReadString()
+	if type == "generic" then
+		chat.AddText(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] ", Color(255,255,255), message)
+	elseif type == "error" then
+		chat.AddText(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] ", Color(255,0,0), message)
+	else
+		chat.AddText(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] ", Color(255,255,255), message)		
+	end
+end)
+
 function GBayErrorMessage(msg)
 	chat.AddText(Color(255,0,0), msg)
 end
