@@ -1,4 +1,4 @@
-function GBayShipmentsPageFull(DFrame, data)
+function GBayServicePageFull(DFrame, data)
 	if IsValid(HomePanel) then HomePanel:Remove() end
 	if IsValid(HomePanel2) then HomePanel2:Remove() end
 	if !IsValid(DFrame) then return end
@@ -29,7 +29,7 @@ function GBayShipmentsPageFull(DFrame, data)
 	CreateItemPage.Paint = function(s, w, h)
 	end
 
-	for k, v in pairs(data[3]) do
+	for k, v in pairs(data[4]) do
 		local ItemMain = vgui.Create("DFrame")
 		ItemMain:SetSize( 270, 130 )
 		ItemMain:SetDraggable( false )
@@ -52,7 +52,7 @@ function GBayShipmentsPageFull(DFrame, data)
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
 			ViewMoreBTN.DoClick = function()
-				GBayViewMoreItemFull("Shipment", DFrame, data, v)
+				GBayViewMoreItemFull("Service", DFrame, data, v)
 			end
 
 			local EditBTN = vgui.Create("DButton",ItemMain)
@@ -66,7 +66,7 @@ function GBayShipmentsPageFull(DFrame, data)
 			end
 			EditBTN.DoClick = function()
 				LocalPlayer().GBayIsEditing = v[1]
-				GBaySideBarOpened(DFrame, "EditShip", false, data, false)
+				GBaySideBarOpened(DFrame, "EditServ", false, data, false)
 			end
 
 			local RemoveBTN = vgui.Create("DButton",ItemMain)
@@ -80,7 +80,7 @@ function GBayShipmentsPageFull(DFrame, data)
 			end
 			RemoveBTN.DoClick = function()
 				Derma_Query( "Are you sure you want to remove this item?", "GBay Remove Item", "Yes", function()
-					net.Start("GBayRemoveShipment")
+					net.Start("GBayRemoveService")
 						net.WriteFloat(v[1])
 					net.SendToServer()
 				end, "No", function()
@@ -98,22 +98,16 @@ function GBayShipmentsPageFull(DFrame, data)
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
 			ViewMoreBTN.DoClick = function()
-				GBayViewMoreItemFull("Shipment", DFrame, data, v)
+				GBayViewMoreItemFull("Service", DFrame, data, v)
 			end
 		end
 
 		local theweaponpic = false
 
-		if file.Exists("materials/vgui/entities/"..v[5]..".vmt","GAME") then
-			theweaponpic = "vgui/entities/"..v[5]..".vmt"
-		elseif file.Exists("materials/entities/"..v[5]..".png","GAME") then
-			theweaponpic = "entities/"..v[5]..".png"
-		end
-
-		local WeaponModel = vgui.Create("DImage", ItemMain)
-		WeaponModel:SetPos(0,0)
-		WeaponModel:SetSize(100, 100)
-		WeaponModel:SetImage(theweaponpic)
+    local ServModel = vgui.Create("DImage", ItemMain)
+		ServModel:SetPos(0,0)
+		ServModel:SetSize(100, 100)
+		ServModel:SetImage("gbay/Services_Small.png")
 
 		local ItemName = vgui.Create("DLabel", ItemMain)
 		ItemName:SetPos(110, 10)
@@ -144,7 +138,7 @@ function GBayShipmentsPageFull(DFrame, data)
 		end
 		local percent = math.Round(numbers[1]/total * 100, 1)
 
-		if percent <= 20 then
+    if percent <= 20 then
 			thestars = 1
 		elseif percent <= 40 then
 			thestars = 2
@@ -168,7 +162,7 @@ function GBayShipmentsPageFull(DFrame, data)
 		local UserRatingText = vgui.Create("DLabel", ItemMain)
 		UserRatingText:SetPos(110, 50)
 		UserRatingText:SetSize(ItemMain:GetWide(), 20)
-		UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[6]))
+		UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[5]))
 		UserRatingText:SetTextColor(Color(0,0,0))
 		UserRatingText:SetFont("GBayLabelFontSmall")
 
@@ -181,7 +175,7 @@ function GBayShipmentsPageFull(DFrame, data)
 	end
 end
 
-function GBayShipmentsPageSmall(DFrame, data)
+function GBayServicePageSmall(DFrame, data)
 	if IsValid(HomePanel) then HomePanel:Remove() end
 	if IsValid(HomePanel2) then HomePanel2:Remove() end
 	if !IsValid(DFrame) then return end
@@ -212,7 +206,7 @@ function GBayShipmentsPageSmall(DFrame, data)
 	CreateItemPage.Paint = function(s, w, h)
 	end
 
-	for k, v in pairs(data[3]) do
+	for k, v in pairs(data[4]) do
 		local ItemMain = vgui.Create("DFrame")
 		ItemMain:SetSize( 270, 130 )
 		ItemMain:SetDraggable( false )
@@ -235,7 +229,7 @@ function GBayShipmentsPageSmall(DFrame, data)
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
 			ViewMoreBTN.DoClick = function()
-				GBayViewMoreItemSmall("Shipment", DFrame, data, v)
+				GBayViewMoreItemSmall("Service", DFrame, data, v)
 			end
 
 			local EditBTN = vgui.Create("DButton",ItemMain)
@@ -249,7 +243,7 @@ function GBayShipmentsPageSmall(DFrame, data)
 			end
 			EditBTN.DoClick = function()
 				LocalPlayer().GBayIsEditing = v[1]
-				GBaySideBarOpened(DFrame, "EditShip", false, data, false)
+				GBaySideBarOpened(DFrame, "EditServ", false, data, false)
 			end
 
 			local RemoveBTN = vgui.Create("DButton",ItemMain)
@@ -263,7 +257,7 @@ function GBayShipmentsPageSmall(DFrame, data)
 			end
 			RemoveBTN.DoClick = function()
 				Derma_Query( "Are you sure you want to remove this item?", "GBay Remove Item", "Yes", function()
-					net.Start("GBayRemoveShipment")
+					net.Start("GBayRemoveService")
 						net.WriteFloat(v[1])
 					net.SendToServer()
 				end, "No", function()
@@ -281,22 +275,14 @@ function GBayShipmentsPageSmall(DFrame, data)
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
 			ViewMoreBTN.DoClick = function()
-				GBayViewMoreItemSmall("Shipment", DFrame, data, v)
+				GBayViewMoreItemSmall("Service", DFrame, data, v)
 			end
 		end
 
-		local theweaponpic = false
-
-		if file.Exists("materials/vgui/entities/"..v[5]..".vmt","GAME") then
-			theweaponpic = "vgui/entities/"..v[5]..".vmt"
-		elseif file.Exists("materials/entities/"..v[5]..".png","GAME") then
-			theweaponpic = "entities/"..v[5]..".png"
-		end
-
-		local WeaponModel = vgui.Create("DImage", ItemMain)
-		WeaponModel:SetPos(0,0)
-		WeaponModel:SetSize(100, 100)
-		WeaponModel:SetImage(theweaponpic)
+    local ServModel = vgui.Create("DImage", ItemMain)
+		ServModel:SetPos(0,0)
+		ServModel:SetSize(100, 100)
+		ServModel:SetImage("gbay/Services_Small.png")
 
 		local ItemName = vgui.Create("DLabel", ItemMain)
 		ItemName:SetPos(110, 10)
@@ -327,7 +313,7 @@ function GBayShipmentsPageSmall(DFrame, data)
 		end
 		local percent = math.Round(numbers[1]/total * 100, 1)
 
-		if percent <= 20 then
+    if percent <= 20 then
 			thestars = 1
 		elseif percent <= 40 then
 			thestars = 2
@@ -351,7 +337,7 @@ function GBayShipmentsPageSmall(DFrame, data)
 		local UserRatingText = vgui.Create("DLabel", ItemMain)
 		UserRatingText:SetPos(110, 50)
 		UserRatingText:SetSize(ItemMain:GetWide(), 20)
-		UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[6]))
+		UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[5]))
 		UserRatingText:SetTextColor(Color(0,0,0))
 		UserRatingText:SetFont("GBayLabelFontSmall")
 

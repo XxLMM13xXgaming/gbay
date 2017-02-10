@@ -154,7 +154,7 @@ net.Receive("GBayOpenMenu",function()
 			GBayShipmentsPageSmall(DFrame, data)
 		else
 			GBayShipmentsPageFull(DFrame, data)
-		end
+		end 
 	end
 
 	EntitiesBTN = vgui.Create("DButton", DFrame)
@@ -176,7 +176,11 @@ net.Receive("GBayOpenMenu",function()
 	ServicesBTN:SizeToContents()
 	ServicesBTN.Paint = function() end
 	ServicesBTN.DoClick = function()
-
+		if LocalPlayer().GBayOpenMenuTabStatus then
+			GBayServicePageSmall(DFrame, data)
+		else
+			GBayServicePageFull(DFrame, data)
+		end
 	end
 
 	AdsBTN = vgui.Create("DButton", DFrame)
