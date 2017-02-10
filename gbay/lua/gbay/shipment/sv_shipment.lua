@@ -51,3 +51,19 @@ net.Receive("GBayEditShipment",function(len, ply)
     end
   end
 end)
+
+net.Receive("GBayRemoveShipment",function(len, ply)
+  item = net.ReadFloat()
+  GBayMySQL:Query("SELECT * FROM shipments WHERE id="..item, function(shipwepr)
+    if shipwepr[1].status == false then print('GBay MySQL Error: '..shipwepr[1].error) end
+    GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
+      if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
+      if GBayIsAdmin(adminplayersresult[1].data[1]) then
+        GBayMySQL:Query("DELETE FROM shipments WHERE id="..item, function(deleteshipment)
+          if deleteshipment[1].status == false then print('GBay MySQL Error: '..deleteshipment[1].error) end
+          ply:GBayNotify("generic", "You have deleted this shipment! Please restart GBay to remove it!")          
+        end)
+      end
+    end)
+  end)
+end)

@@ -3,6 +3,7 @@ include("gbay/config/gbay_mysql_config.lua")
 include("gbay/config/gbay_config.lua")
 include("gbay/mysql/sv_mysql.lua")
 include("gbay/shipment/sv_shipment.lua")
+include("gbay/service/sv_service.lua")
 AddCSLuaFile("gbay/gui/cl_fonts.lua")
 AddCSLuaFile("gbay/gui/cl_bases.lua")
 AddCSLuaFile("gbay/gui/cl_loading.lua")
@@ -11,6 +12,7 @@ AddCSLuaFile("gbay/gui/cl_orderpage.lua")
 AddCSLuaFile("gbay/gui/cl_homepage.lua")
 AddCSLuaFile("gbay/gui/cl_updates.lua")
 AddCSLuaFile("gbay/shipment/cl_shipment.lua")
+AddCSLuaFile("gbay/service/cl_service.lua")
 resource.AddSingleFile("materials/gbay/Logo.png")
 resource.AddSingleFile("materials/gbay/Settings_Logo.png")
 resource.AddSingleFile("materials/gbay/Create_Logo.png")
@@ -20,6 +22,8 @@ resource.AddSingleFile("materials/gbay/Positive.png")
 resource.AddSingleFile("materials/gbay/Negative.png")
 resource.AddSingleFile("materials/gbay/Neutral.png")
 resource.AddSingleFile("materials/gbay/Star128.png")
+resource.AddSingleFile("materials/gbay/Services_Small.png")
+resource.AddSingleFile("materials/gbay/Services_Large.png")
 util.AddNetworkString("GBayNotify")
 util.AddNetworkString("GBayOpenLoading")
 util.AddNetworkString("GBayCloseLoading")
@@ -29,11 +33,16 @@ util.AddNetworkString("GBayUpdateSettings")
 util.AddNetworkString("GBayOpenLoadingSettingUpServer")
 util.AddNetworkString("GBaySubmitShipment")
 util.AddNetworkString("GBayEditShipment")
+util.AddNetworkString("GBayRemoveShipment")
+util.AddNetworkString("GBaySubmitService")
+util.AddNetworkString("GBayEditService")
+util.AddNetworkString("GBayRemoveService")
 util.AddNetworkString("GBayDoneLoading")
 util.AddNetworkString("GBayDoneLoading2")
 util.AddNetworkString("GBayOpenMenu")
 util.AddNetworkString("GBayPurchaseItem")
 util.AddNetworkString("GBayTransErrorReport")
+util.AddNetworkString("GBayRemoveItem")
 util.AddNetworkString("GBayBanPlayer")
 util.AddNetworkString("GBaySetPlayerRank")
 util.AddNetworkString("GBaySetprep")
@@ -180,7 +189,7 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
                   GBayMySQL:Query("SELECT * FROM service", function(serviceinfo)
                     if serviceinfo[1].status == false then print('GBay MySQL Error: '..serviceinfo[1].error) end
                     for k, v in pairs(serviceinfo[1].data) do
-                      table.insert(serviceinfotable,{v.id, v.sidmerchant, v.name, v.description, v.price, v.coupons, v.advertisment, v.buyers})
+                      table.insert(serviceinfotable,{v.id, v.sidmerchant, v.name, v.description, v.price, v.buyers})
                     end
                     timer.Simple(2,function()
                       local JammedTable = {}
@@ -284,6 +293,48 @@ net.Receive("GBayPurchaseItem",function(len, ply)
           else
             net.Start("GBayTransErrorReport")
               net.WriteString('Info')
+            net.Send(ply)
+          end
+        else
+          net.Start("GBayTransErrorReport")
+            net.WriteString('SamePlayer')
+          net.Send(ply)
+        end
+      else
+        net.Start("GBayTransErrorReport")
+          net.WriteString('Info')
+        net.Send(ply)
+      end
+    end)
+  elseif type == "Service" then
+    GBayMySQL:Query("SELECT * FROM service WHERE id="..item[1], function(serviceinfo)
+      if serviceinfo[1].status == false then print('GBay MySQL Error: '..serviceinfo[1].error) end
+      if serviceinfo[1].affected > 0 then
+        local data = serviceinfo[1].data[1]
+        local totalprice = 0
+    		local costofone = data.price
+        local prevbuyers = util.JSONToTable(data.buyers)
+        if data.sidmerchant != ply:SteamID64() then
+          if !table.HasValue(prevbuyers,ply:SteamID64()) then
+            totalprice = costofone * quantity
+            totalprice = totalprice + totalprice * GBayConfig.TaxToMultiplyBy
+            if ply:getDarkRPVar("money") >= totalprice then
+              table.insert(prevbuyers,#prevbuyers + 1,ply:SteamID64())
+              GBayMySQL:Query("UPDATE service SET buyers='"..util.TableToJSON(prevbuyers).."'", function(addtoorder)
+                if addtoorder[1].status == false then print('GBay MySQL Error: '..addtoorder[1].error) end
+                ply:addMoney(-totalprice)
+                net.Start("GBayTransErrorReport")
+                  net.WriteString('Success')
+                net.Send(ply)
+              end)
+            else
+              net.Start("GBayTransErrorReport")
+                net.WriteString('Money')
+              net.Send(ply)
+            end
+          else
+            net.Start("GBayTransErrorReport")
+              net.WriteString('Bought')
             net.Send(ply)
           end
         else

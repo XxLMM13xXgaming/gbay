@@ -7,6 +7,7 @@ include("gbay/gui/cl_orderpage.lua")
 include("gbay/gui/cl_homepage.lua")
 include("gbay/gui/cl_updates.lua")
 include("gbay/shipment/cl_shipment.lua")
+include("gbay/service/cl_service.lua")
 
 local plymeta = FindMetaTable("Player")
 
@@ -36,7 +37,7 @@ net.Receive("GBayNotify",function()
 	elseif type == "error" then
 		chat.AddText(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] ", Color(255,0,0), message)
 	else
-		chat.AddText(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] ", Color(255,255,255), message)		
+		chat.AddText(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] ", Color(255,255,255), message)
 	end
 end)
 
@@ -65,6 +66,9 @@ function GBaySelectWeapon(DFrame, thebutton)
 					end
 				end
 			end
+		elseif key == IN_DUCK and LocalPlayer().GBayIsSelectingWeapon then
+			LocalPlayer().GBayIsSelectingWeapon = false
+			DFrame:SetVisible(true)
 		end
 	end )
 end
@@ -72,7 +76,7 @@ end
 hook.Add("HUDPaint","GBaySelBound",function()
 	if LocalPlayer().GBayIsSelectingWeapon then
 
-		draw.SimpleText("Press Shift when item is in crosshair","DermaDefault",ScrW()/2,ScrH()/2 - 80,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
+		draw.SimpleText("Press Shift when item is in crosshair or press CTRL to cancel!","GBayLabelFont",ScrW()/2,ScrH()/2 - 80,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
 	end
 end)
 

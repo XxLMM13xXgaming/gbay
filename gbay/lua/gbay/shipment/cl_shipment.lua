@@ -78,6 +78,15 @@ function GBayShipmentsPageFull(DFrame, data)
 				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 			end
+			RemoveBTN.DoClick = function()
+				Derma_Query( "Are you sure you want to remove this item?", "GBay Remove Item", "Yes", function()
+					net.Start("GBayRemoveShipment")
+						net.WriteFloat(v[1])
+					net.SendToServer()
+				end, "No", function()
+
+				end)
+			end
 		else
 			local ViewMoreBTN = vgui.Create("DButton",ItemMain)
 			ViewMoreBTN:SetPos(20, ItemMain:GetTall() - 20)
@@ -245,6 +254,15 @@ function GBayShipmentsPageSmall(DFrame, data)
 			RemoveBTN.Paint = function(s, w, h)
 				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
 				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+			end
+			RemoveBTN.DoClick = function()
+				Derma_Query( "Are you sure you want to remove this item?", "GBay Remove Item", "Yes", function()
+					net.Start("GBayRemoveShipment")
+						net.WriteFloat(v[1])
+					net.SendToServer()
+				end, "No", function()
+
+				end)
 			end
 		else
 			local ViewMoreBTN = vgui.Create("DButton",ItemMain)

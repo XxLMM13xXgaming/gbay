@@ -111,6 +111,8 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			local newdata = net.ReadTable()
 			if newtype == "Shipment" then
 				table.insert(data[3],newdata[1],newdata)
+			elseif newtype == "Service" then
+				table.insert(data[4],newdata[1],newdata)
 			end
 			GBaySideBarOpened(DFrame, "Terms", false, data, false)
 		end)
@@ -181,20 +183,26 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
       end
 		end
 	elseif tab == "TransPending" then
-		local nomoney = false
-		local wronginfo = false
-		local error = false
+		nomoney = false
+		wronginfo = false
+		error = false
+		samep = false
+		bought = false
+		success = false
+
 		net.Receive("GBayTransErrorReport",function()
 			report = net.ReadString()
 			nomoney = false
 			wronginfo = false
 			error = false
 			samep = false
+			bought = false
 			success = false
 			if report == "Money" then nomoney = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
 			if report == "Info" then wronginfo = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
 			if report == "Error" then error = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
 			if report == "SamePlayer" then samep = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
+			if report == "Bought" then bought = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
 			if report == "Success" then success = true timer.Simple(5, function() GBaySideBarClosed(DFrame, "Dashboard", false, data, false) end) end
 		end)
 		SideBarOpened.Paint = function(s, w, h)
@@ -216,6 +224,10 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				draw.SimpleText("Do not buy your own item!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			elseif bought then
+				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Do not buy this twice!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			elseif success then
 				draw.SimpleText("Transaction Successful!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				draw.SimpleText("Your order has now been sent! ","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -1099,12 +1111,21 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				draw.SimpleText("Description of the shipment?","GBayLabelFont",w / 2,260,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 				draw.SimpleText("Select your weapon!","GBayLabelFont",w / 2,340,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 				draw.SimpleText("What is the price of your shipment?","GBayLabelFont",w / 2,400,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
-				draw.SimpleText("Submit your Item??","GBayLabelFont",w / 2,460,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
-
+				draw.SimpleText("Submit your Shipment??","GBayLabelFont",w / 2,460,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 				draw.RoundedBox(0,0,520,w,2,Color(221,221,221))
 				draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 				draw.SimpleText("Check updates tab often","GBayLabelFont",w / 2,590,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 				draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,610,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			elseif usedservice then
+				draw.SimpleText("Name of the service?","GBayLabelFont",w / 2,200,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Description of the service?","GBayLabelFont",w / 2,260,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("What is the price of your service?","GBayLabelFont",w / 2,340,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Submit your Service??","GBayLabelFont",w / 2,400,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+
+				draw.RoundedBox(0,0,460,w,2,Color(221,221,221))
+				draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,550,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Check updates tab often","GBayLabelFont",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,590,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 
 			end
 		end
@@ -1202,8 +1223,11 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 						net.SendToServer()
 						GBaySideBarOpened(DFrame, "Loading", false, data, firstjoined)
 					end
+					usedshipments = true
+				elseif value == "Service" then
+
+					usedservice = true
 				end
-				usedshipments = true
 			else
 				if value == "Shipment" then
 					usedshipments = true
@@ -1285,6 +1309,75 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 							net.WriteString(CreateItmShipDesc:GetValue())
 							net.WriteEntity(SelWepBtn.Weapon)
 							net.WriteFloat(SelWepPrice:GetValue())
+						net.SendToServer()
+						GBaySideBarOpened(DFrame, "Loading", false, data, firstjoined)
+					end
+				elseif value == "Service" then
+					usedservice = true
+					local CreateItmServName = vgui.Create( "DTextEntry", SideBarOpened )
+					CreateItmServName:SetPos(20, 230)
+					CreateItmServName:SetSize(SideBarOpened:GetWide() - 40, 20 )
+					CreateItmServName:SetText( "Service name" )
+					CreateItmServName.OnTextChanged = function(s)
+						if string.len(s:GetValue()) > 27 then
+							local timeleftforrestriction = 5
+							s:SetText("Service name must be < 27 characters... ("..timeleftforrestriction..")")
+							s:SetEditable(false)
+							timer.Create("GBayUnlockServerNameEntry",1, 5, function()
+								timeleftforrestriction = timeleftforrestriction - 1
+								if timeleftforrestriction <= 0 then
+									s:SetText("Shipment name")
+									s:SetEditable(true)
+									return
+								end
+								s:SetText("Service name must be < 27 characters... ("..timeleftforrestriction..")")
+							end)
+						end
+					end
+
+					local CreateItmServDesc = vgui.Create( "DTextEntry", SideBarOpened )
+					CreateItmServDesc:SetPos(20, 290)
+					CreateItmServDesc:SetSize(SideBarOpened:GetWide() - 40, 40 )
+					CreateItmServDesc:SetText( "Service Description" )
+					CreateItmServDesc:SetMultiline( true )
+					CreateItmServDesc.OnTextChanged = function(s)
+						if string.len(s:GetValue()) > 81 then
+							local timeleftforrestriction = 5
+							s:SetText("Service description must be < 81 characters... ("..timeleftforrestriction..")")
+							s:SetEditable(false)
+							timer.Create("GBayUnlockServerNameEntry",1, 5, function()
+								timeleftforrestriction = timeleftforrestriction - 1
+								if timeleftforrestriction <= 0 then
+									s:SetText("Service Description")
+									s:SetEditable(true)
+									return
+								end
+								s:SetText("Service description must be < 81 characters... ("..timeleftforrestriction..")")
+							end)
+						end
+					end
+
+					local SelServPrice = vgui.Create( "DNumSlider", SideBarOpened )
+					SelServPrice:SetPos( 20, 370 )
+					SelServPrice:SetSize( SideBarOpened:GetWide() - 40, 20 )
+					SelServPrice:SetText( "" )
+					SelServPrice:SetMin( 0 )
+					SelServPrice:SetMax( GBayConfig.MaxPrice )
+					SelServPrice:SetDecimals( 0 )
+
+					local SelServSubBtn = vgui.Create("DButton", SideBarOpened)
+					SelServSubBtn:SetPos(20, 430)
+					SelServSubBtn:SetSize(SideBarOpened:GetWide() - 40, 20)
+					SelServSubBtn:SetText("Submit Service")
+					SelServSubBtn:SetTextColor(Color(255,255,255))
+					SelServSubBtn.Paint = function(s, w, h)
+						draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+					end
+					SelServSubBtn.DoClick = function()
+						net.Start("GBaySubmitService")
+							net.WriteString(CreateItmServName:GetValue())
+							net.WriteString(CreateItmServDesc:GetValue())
+							net.WriteFloat(SelServPrice:GetValue())
 						net.SendToServer()
 						GBaySideBarOpened(DFrame, "Loading", false, data, firstjoined)
 					end
@@ -1415,92 +1508,292 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			GBaySideBarOpened(DFrame, "Loading", false, data, firstjoined)
 		end
 		usedshipments = true
-	elseif tab == "Purchase" then
-		local GBayLogoCheckOut = Material("gbay/Check_Out.png")
-		local postoputtext = 190
-		local keepgoing = true
-		local totalprice = 0
-		local costofone = LocalPlayer().GBayBuyingItem[6] / LocalPlayer().GBayBuyingItem[7]
+	elseif tab == "EditServ" then
+		local GBayLogoCreate = Material("gbay/Create_Logo.png")
+		usedservice = true
+		tab = "Dashboard"
 		SideBarOpened.Paint = function(s, w, h)
 			surface.SetDrawColor(255,255,255, 255)
 			surface.DrawRect(0, 0, w, h)
 			surface.SetDrawColor( 255, 255, 255, 255 )
-			surface.SetMaterial( GBayLogoCheckOut	)
+			surface.SetMaterial( GBayLogoCreate	)
 			surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
 			draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
-			draw.SimpleText(LocalPlayer().GBayBuyingItem[3] .." Purchase","GBayLabelFontBold",w / 2,150,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-			draw.SimpleText("Quantity to purchase: "..LocalPlayer().GBayBuyingItemQ,"GBayLabelFont",w / 2,170,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-		end
+			draw.SimpleText("What type of item?","GBayLabelFont",w / 2,140,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			if usedservice then
+				draw.SimpleText("Name of the service?","GBayLabelFont",w / 2,200,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Description of the service?","GBayLabelFont",w / 2,260,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("What is the price of your shipment?","GBayLabelFont",w / 2,340,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Submit your Item??","GBayLabelFont",w / 2,400,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 
-		for i=1, LocalPlayer().GBayBuyingItemQ do
-			if i > 10 then
-				if keepgoing then
-					local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
-					TheLabelForItems:SetPos(20, postoputtext)
-					TheLabelForItems:SetText("+"..LocalPlayer().GBayBuyingItemQ - i.." "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone * LocalPlayer().GBayBuyingItemQ -i ))
-					TheLabelForItems:SetFont("GBayLabelFont")
-					TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
-					TheLabelForItems:SizeToContents()
-					keepgoing = false
-					totalprice = totalprice + costofone * LocalPlayer().GBayBuyingItemQ -i
-				end
-			else
-				local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
-				TheLabelForItems:SetPos(20, postoputtext)
-				TheLabelForItems:SetText("+1 "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone))
-				TheLabelForItems:SetFont("GBayLabelFont")
-				TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
-				TheLabelForItems:SizeToContents()
-				postoputtext = postoputtext + 20
-				totalprice = totalprice + costofone
+				draw.RoundedBox(0,0,560,w,2,Color(221,221,221))
+				draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("Check updates tab often","GBayLabelFont",w / 2,590,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,610,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+
 			end
 		end
 
-		local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
-		TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 160)
-		TheTaxRate:SetText("Price: "..DarkRP.formatMoney(totalprice))
-		TheTaxRate:SetFont("GBayLabelFont")
-		TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
-		TheTaxRate:SizeToContents()
+		local CreateItmType = vgui.Create( "DComboBox", SideBarOpened )
+		CreateItmType:SetPos(20, 170)
+		CreateItmType:SetSize(SideBarOpened:GetWide() - 40, 20 )
+		CreateItmType:SetValue( "Service" )
+		CreateItmType:AddChoice( "Service" )
 
-		local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
-		TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 140)
-		TheTaxRate:SetText("Tax Rate: "..GBayConfig.TaxToMultiplyBy * 100 .. "%")
-		TheTaxRate:SetFont("GBayLabelFont")
-		TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
-		TheTaxRate:SizeToContents()
+		local editingwep = nil
 
-		local TheTaxPrice = vgui.Create("DLabel", SideBarOpened)
-		TheTaxPrice:SetPos(20, SideBarOpened:GetTall() - 120)
-		TheTaxPrice:SetText("Tax: "..DarkRP.formatMoney(totalprice * GBayConfig.TaxToMultiplyBy))
-		TheTaxPrice:SetFont("GBayLabelFont")
-		TheTaxPrice:SetTextColor(Color( 137, 137, 137, 255 ))
-		TheTaxPrice:SizeToContents()
+		for k, v in pairs(data[4]) do
+			if v[1] == LocalPlayer().GBayIsEditing then
+				editingwep = v
+			end
+		end
 
-		totalprice = totalprice + totalprice * GBayConfig.TaxToMultiplyBy
+		local CreateItmServName = vgui.Create( "DTextEntry", SideBarOpened )
+		CreateItmServName:SetPos(20, 230)
+		CreateItmServName:SetSize(SideBarOpened:GetWide() - 40, 20 )
+		CreateItmServName:SetText( editingwep[3] )
+		CreateItmServName.OnTextChanged = function(s)
+			if string.len(s:GetValue()) > 27 then
+				local timeleftforrestriction = 5
+				s:SetText("Service name must be < 27 characters... ("..timeleftforrestriction..")")
+				s:SetEditable(false)
+				timer.Create("GBayUnlockServerNameEntry",1, 5, function()
+					timeleftforrestriction = timeleftforrestriction - 1
+					if timeleftforrestriction <= 0 then
+						s:SetText("Service name")
+						s:SetEditable(true)
+						return
+					end
+					s:SetText("Service name must be < 27 characters... ("..timeleftforrestriction..")")
+				end)
+			end
+		end
 
-		local TheFinalPrice = vgui.Create("DLabel", SideBarOpened)
-		TheFinalPrice:SetPos(20, SideBarOpened:GetTall() - 100)
-		TheFinalPrice:SetText("Subtotal: "..DarkRP.formatMoney(totalprice))
-		TheFinalPrice:SetFont("GBayLabelFont")
-		TheFinalPrice:SetTextColor(Color( 137, 137, 137, 255 ))
-		TheFinalPrice:SizeToContents()
+		local CreateItmServDesc = vgui.Create( "DTextEntry", SideBarOpened )
+		CreateItmServDesc:SetPos(20, 290)
+		CreateItmServDesc:SetSize(SideBarOpened:GetWide() - 40, 40 )
+		CreateItmServDesc:SetText( editingwep[4] )
+		CreateItmServDesc:SetMultiline( true )
+		CreateItmServDesc.OnTextChanged = function(s)
+			if string.len(s:GetValue()) > 81 then
+				local timeleftforrestriction = 5
+				s:SetText("Service description must be < 81 characters... ("..timeleftforrestriction..")")
+				s:SetEditable(false)
+				timer.Create("GBayUnlockServerNameEntry",1, 5, function()
+					timeleftforrestriction = timeleftforrestriction - 1
+					if timeleftforrestriction <= 0 then
+						s:SetText("Service Description")
+						s:SetEditable(true)
+						return
+					end
+					s:SetText("Service description must be < 81 characters... ("..timeleftforrestriction..")")
+				end)
+			end
+		end
 
-		local CheckOutBtn = vgui.Create("DButton",SideBarOpened)
-		CheckOutBtn:SetPos(20, SideBarOpened:GetTall() - 70)
-		CheckOutBtn:SetSize(SideBarOpened:GetWide() - 40, 40)
-		CheckOutBtn:SetText("Check out")
-		CheckOutBtn:SetTextColor(Color(255,255,255))
-		CheckOutBtn.Paint = function(s, w, h)
+		local SelServPrice = vgui.Create( "DNumSlider", SideBarOpened )
+		SelServPrice:SetPos( 20, 370 )
+		SelServPrice:SetSize( SideBarOpened:GetWide() - 40, 20 )
+		SelServPrice:SetText( "" )
+		SelServPrice:SetMin( 0 )
+		SelServPrice:SetMax( GBayConfig.MaxPrice )
+		SelServPrice:SetValue(editingwep[6])
+		SelServPrice:SetDecimals( 0 )
+
+		local SelServSubBtn = vgui.Create("DButton", SideBarOpened)
+		SelServSubBtn:SetPos(20, 430)
+		SelServSubBtn:SetSize(SideBarOpened:GetWide() - 40, 20)
+		SelServSubBtn:SetText("Edit Service")
+		SelServSubBtn:SetTextColor(Color(255,255,255))
+		SelServSubBtn.Paint = function(s, w, h)
 			draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
 		end
-		CheckOutBtn.DoClick = function()
-			net.Start("GBayPurchaseItem")
-				net.WriteString(LocalPlayer().GBayBuyingItemT)
-			  net.WriteFloat(LocalPlayer().GBayBuyingItemQ)
-			  net.WriteTable(LocalPlayer().GBayBuyingItem)
+		SelServSubBtn.DoClick = function()
+			net.Start("GBayEditService")
+				net.WriteTable(editingwep)
+				net.WriteString(CreateItmServName:GetValue())
+				net.WriteString(CreateItmServDesc:GetValue())
+				net.WriteFloat(SelServPrice:GetValue())
 			net.SendToServer()
-			GBaySideBarOpened(DFrame, "TransPending", false, data, firstjoined)
+			GBaySideBarOpened(DFrame, "Loading", false, data, firstjoined)
+		end
+		usedservice = true
+	elseif tab == "Purchase" then
+		print(LocalPlayer().GBayBuyingItemT)
+		if LocalPlayer().GBayBuyingItemT == "Shipment" then
+			local GBayLogoCheckOut = Material("gbay/Check_Out.png")
+			local postoputtext = 190
+			local keepgoing = true
+			local totalprice = 0
+			local costofone = LocalPlayer().GBayBuyingItem[6] / LocalPlayer().GBayBuyingItem[7]
+			SideBarOpened.Paint = function(s, w, h)
+				surface.SetDrawColor(255,255,255, 255)
+				surface.DrawRect(0, 0, w, h)
+				surface.SetDrawColor( 255, 255, 255, 255 )
+				surface.SetMaterial( GBayLogoCheckOut	)
+				surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
+				draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
+				draw.SimpleText(LocalPlayer().GBayBuyingItem[3] .." Purchase","GBayLabelFontBold",w / 2,150,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Quantity to purchase: "..LocalPlayer().GBayBuyingItemQ,"GBayLabelFont",w / 2,170,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			for i=1, LocalPlayer().GBayBuyingItemQ do
+				if i > 10 then
+					if keepgoing then
+						local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
+						TheLabelForItems:SetPos(20, postoputtext)
+						TheLabelForItems:SetText("+"..LocalPlayer().GBayBuyingItemQ - i.." "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone * LocalPlayer().GBayBuyingItemQ -i ))
+						TheLabelForItems:SetFont("GBayLabelFont")
+						TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
+						TheLabelForItems:SizeToContents()
+						keepgoing = false
+						totalprice = totalprice + costofone * LocalPlayer().GBayBuyingItemQ -i
+					end
+				else
+					local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
+					TheLabelForItems:SetPos(20, postoputtext)
+					TheLabelForItems:SetText("+1 "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone))
+					TheLabelForItems:SetFont("GBayLabelFont")
+					TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
+					TheLabelForItems:SizeToContents()
+					postoputtext = postoputtext + 20
+					totalprice = totalprice + costofone
+				end
+			end
+
+			local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
+			TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 160)
+			TheTaxRate:SetText("Price: "..DarkRP.formatMoney(totalprice))
+			TheTaxRate:SetFont("GBayLabelFont")
+			TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheTaxRate:SizeToContents()
+
+			local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
+			TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 140)
+			TheTaxRate:SetText("Tax Rate: "..GBayConfig.TaxToMultiplyBy * 100 .. "%")
+			TheTaxRate:SetFont("GBayLabelFont")
+			TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheTaxRate:SizeToContents()
+
+			local TheTaxPrice = vgui.Create("DLabel", SideBarOpened)
+			TheTaxPrice:SetPos(20, SideBarOpened:GetTall() - 120)
+			TheTaxPrice:SetText("Tax: "..DarkRP.formatMoney(totalprice * GBayConfig.TaxToMultiplyBy))
+			TheTaxPrice:SetFont("GBayLabelFont")
+			TheTaxPrice:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheTaxPrice:SizeToContents()
+
+			totalprice = totalprice + totalprice * GBayConfig.TaxToMultiplyBy
+
+			local TheFinalPrice = vgui.Create("DLabel", SideBarOpened)
+			TheFinalPrice:SetPos(20, SideBarOpened:GetTall() - 100)
+			TheFinalPrice:SetText("Subtotal: "..DarkRP.formatMoney(totalprice))
+			TheFinalPrice:SetFont("GBayLabelFont")
+			TheFinalPrice:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheFinalPrice:SizeToContents()
+
+			local CheckOutBtn = vgui.Create("DButton",SideBarOpened)
+			CheckOutBtn:SetPos(20, SideBarOpened:GetTall() - 70)
+			CheckOutBtn:SetSize(SideBarOpened:GetWide() - 40, 40)
+			CheckOutBtn:SetText("Check out")
+			CheckOutBtn:SetTextColor(Color(255,255,255))
+			CheckOutBtn.Paint = function(s, w, h)
+				draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+			end
+			CheckOutBtn.DoClick = function()
+				net.Start("GBayPurchaseItem")
+					net.WriteString(LocalPlayer().GBayBuyingItemT)
+				  net.WriteFloat(LocalPlayer().GBayBuyingItemQ)
+				  net.WriteTable(LocalPlayer().GBayBuyingItem)
+				net.SendToServer()
+				GBaySideBarOpened(DFrame, "TransPending", false, data, firstjoined)
+			end
+		elseif LocalPlayer().GBayBuyingItemT == "Service" then
+			local GBayLogoCheckOut = Material("gbay/Check_Out.png")
+			local postoputtext = 190
+			local keepgoing = true
+			local totalprice = 0
+			local costofone = LocalPlayer().GBayBuyingItem[5]
+			SideBarOpened.Paint = function(s, w, h)
+				surface.SetDrawColor(255,255,255, 255)
+				surface.DrawRect(0, 0, w, h)
+				surface.SetDrawColor( 255, 255, 255, 255 )
+				surface.SetMaterial( GBayLogoCheckOut	)
+				surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
+				draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
+				draw.SimpleText(LocalPlayer().GBayBuyingItem[3] .." Purchase","GBayLabelFontBold",w / 2,150,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Quantity to purchase: "..LocalPlayer().GBayBuyingItemQ,"GBayLabelFont",w / 2,170,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			for i=1, LocalPlayer().GBayBuyingItemQ do
+				if i > 10 then
+					if keepgoing then
+						local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
+						TheLabelForItems:SetPos(20, postoputtext)
+						TheLabelForItems:SetText("+"..LocalPlayer().GBayBuyingItemQ - i.." "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone * LocalPlayer().GBayBuyingItemQ -i ))
+						TheLabelForItems:SetFont("GBayLabelFont")
+						TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
+						TheLabelForItems:SizeToContents()
+						keepgoing = false
+						totalprice = totalprice + costofone * LocalPlayer().GBayBuyingItemQ -i
+					end
+				else
+					local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
+					TheLabelForItems:SetPos(20, postoputtext)
+					TheLabelForItems:SetText("+1 "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone))
+					TheLabelForItems:SetFont("GBayLabelFont")
+					TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
+					TheLabelForItems:SizeToContents()
+					postoputtext = postoputtext + 20
+					totalprice = totalprice + costofone
+				end
+			end
+
+			local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
+			TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 160)
+			TheTaxRate:SetText("Price: "..DarkRP.formatMoney(totalprice))
+			TheTaxRate:SetFont("GBayLabelFont")
+			TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheTaxRate:SizeToContents()
+
+			local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
+			TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 140)
+			TheTaxRate:SetText("Tax Rate: "..GBayConfig.TaxToMultiplyBy * 100 .. "%")
+			TheTaxRate:SetFont("GBayLabelFont")
+			TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheTaxRate:SizeToContents()
+
+			local TheTaxPrice = vgui.Create("DLabel", SideBarOpened)
+			TheTaxPrice:SetPos(20, SideBarOpened:GetTall() - 120)
+			TheTaxPrice:SetText("Tax: "..DarkRP.formatMoney(totalprice * GBayConfig.TaxToMultiplyBy))
+			TheTaxPrice:SetFont("GBayLabelFont")
+			TheTaxPrice:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheTaxPrice:SizeToContents()
+
+			totalprice = totalprice + totalprice * GBayConfig.TaxToMultiplyBy
+
+			local TheFinalPrice = vgui.Create("DLabel", SideBarOpened)
+			TheFinalPrice:SetPos(20, SideBarOpened:GetTall() - 100)
+			TheFinalPrice:SetText("Subtotal: "..DarkRP.formatMoney(totalprice))
+			TheFinalPrice:SetFont("GBayLabelFont")
+			TheFinalPrice:SetTextColor(Color( 137, 137, 137, 255 ))
+			TheFinalPrice:SizeToContents()
+
+			local CheckOutBtn = vgui.Create("DButton",SideBarOpened)
+			CheckOutBtn:SetPos(20, SideBarOpened:GetTall() - 70)
+			CheckOutBtn:SetSize(SideBarOpened:GetWide() - 40, 40)
+			CheckOutBtn:SetText("Check out")
+			CheckOutBtn:SetTextColor(Color(255,255,255))
+			CheckOutBtn.Paint = function(s, w, h)
+				draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+			end
+			CheckOutBtn.DoClick = function()
+				net.Start("GBayPurchaseItem")
+					net.WriteString(LocalPlayer().GBayBuyingItemT)
+				  net.WriteFloat(LocalPlayer().GBayBuyingItemQ)
+				  net.WriteTable(LocalPlayer().GBayBuyingItem)
+				net.SendToServer()
+				GBaySideBarOpened(DFrame, "TransPending", false, data, firstjoined)
+			end
 		end
 	end
 end
