@@ -4,6 +4,7 @@ include("gbay/config/gbay_config.lua")
 include("gbay/mysql/sv_mysql.lua")
 include("gbay/shipment/sv_shipment.lua")
 include("gbay/service/sv_service.lua")
+include("gbay/entity/sv_entity.lua")
 AddCSLuaFile("gbay/gui/cl_fonts.lua")
 AddCSLuaFile("gbay/gui/cl_bases.lua")
 AddCSLuaFile("gbay/gui/cl_loading.lua")
@@ -13,6 +14,7 @@ AddCSLuaFile("gbay/gui/cl_homepage.lua")
 AddCSLuaFile("gbay/gui/cl_updates.lua")
 AddCSLuaFile("gbay/shipment/cl_shipment.lua")
 AddCSLuaFile("gbay/service/cl_service.lua")
+AddCSLuaFile("gbay/entity/cl_entity.lua")
 resource.AddSingleFile("materials/gbay/Logo.png")
 resource.AddSingleFile("materials/gbay/Settings_Logo.png")
 resource.AddSingleFile("materials/gbay/Create_Logo.png")
@@ -34,6 +36,9 @@ util.AddNetworkString("GBayOpenLoadingSettingUpServer")
 util.AddNetworkString("GBaySubmitShipment")
 util.AddNetworkString("GBayEditShipment")
 util.AddNetworkString("GBayRemoveShipment")
+util.AddNetworkString("GBaySubmitEntity")
+util.AddNetworkString("GBayEditEntity")
+util.AddNetworkString("GBayRemoveEntity")
 util.AddNetworkString("GBaySubmitService")
 util.AddNetworkString("GBayEditService")
 util.AddNetworkString("GBayRemoveService")
@@ -135,6 +140,7 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
   local serverinfotable = {}
   local shipmentsinfotable = {}
   local serviceinfotable = {}
+  local entityinfotable = {}
   if text:lower():match('[!/:.]gbay') then
     net.Start("GBayOpenLoading")
     net.Send(ply)
@@ -191,12 +197,19 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
                     for k, v in pairs(serviceinfo[1].data) do
                       table.insert(serviceinfotable,{v.id, v.sidmerchant, v.name, v.description, v.price, v.buyers})
                     end
+                    GBayMySQL:Query("SELECT * FROM entities", function(entityinfo)
+                      if entityinfo[1].status == false then print('GBay MySQL Error: '..entityinfo[1].error) end
+                      for k, v in pairs(entityinfo[1].data) do
+                        table.insert(entityinfotable,{v.id, v.sidmerchant, v.name, v.description, v.ent, v.price})
+                      end
+                    end)
                     timer.Simple(2,function()
                       local JammedTable = {}
                       table.insert(JammedTable,1,playerinfotable)
                       table.insert(JammedTable,2,serverinfotable)
                       table.insert(JammedTable,3,shipmentsinfotable)
                       table.insert(JammedTable,4,serviceinfotable)
+                      table.insert(JammedTable,5,entityinfotable)
                       net.Start("GBayOpenMenu")
                       net.WriteTable(JammedTable)
                       net.Send(ply)
@@ -283,7 +296,16 @@ net.Receive("GBayPurchaseItem",function(len, ply)
                   end)
                 end)
               else
-
+                GBayMySQL:Query("UPDATE shipments SET amount='"..data.amount - quantity.."' WHERE id="..data.id, function(removeshipment)
+                  if removeshipment[1].status == false then print('GBay MySQL Error: '..removeshipment[1].error) end
+                  GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer,	type,	weapon,	quantity) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Shipment', '"..data.wep.."', '"..tonumber(quantity).."')", function(addtoorder)
+                    if addtoorder[1].status == false then print('GBay MySQL Error: '..addtoorder[1].error) end
+                    ply:addMoney(-totalprice)
+                    net.Start("GBayTransErrorReport")
+                      net.WriteString('Success')
+                    net.Send(ply)
+                  end)
+                end)
               end
             else
               net.Start("GBayTransErrorReport")
@@ -335,6 +357,43 @@ net.Receive("GBayPurchaseItem",function(len, ply)
           else
             net.Start("GBayTransErrorReport")
               net.WriteString('Bought')
+            net.Send(ply)
+          end
+        else
+          net.Start("GBayTransErrorReport")
+            net.WriteString('SamePlayer')
+          net.Send(ply)
+        end
+      else
+        net.Start("GBayTransErrorReport")
+          net.WriteString('Info')
+        net.Send(ply)
+      end
+    end)
+  elseif type == "Entity" then
+    GBayMySQL:Query("SELECT * FROM entities WHERE id="..item[1], function(entityinfo)
+      if entityinfo[1].status == false then print('GBay MySQL Error: '..entityinfo[1].error) end
+      if entityinfo[1].affected > 0 then
+        local data = entityinfo[1].data[1]
+        local totalprice = 0
+        local costofone = data.price
+        if data.sidmerchant != ply:SteamID64() then
+          totalprice = costofone * quantity
+          totalprice = totalprice + totalprice * GBayConfig.TaxToMultiplyBy
+          if ply:getDarkRPVar("money") >= totalprice then
+            GBayMySQL:Query("DELETE FROM entities WHERE id="..data.id, function(removeentity)
+              if removeentity[1].status == false then print('GBay MySQL Error: '..removeentity[1].error) end
+              GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer, type, weapon, quantity) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Entity', '"..data.ent.."', '"..tonumber(quantity).."')", function(addtoorder)
+                if addtoorder[1].status == false then print('GBay MySQL Error: '..addtoorder[1].error) end
+                ply:addMoney(-totalprice)
+                net.Start("GBayTransErrorReport")
+                  net.WriteString('Success')
+                net.Send(ply)
+              end)
+            end)
+          else
+            net.Start("GBayTransErrorReport")
+              net.WriteString('Money')
             net.Send(ply)
           end
         else

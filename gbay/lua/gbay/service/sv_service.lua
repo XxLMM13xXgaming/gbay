@@ -6,7 +6,7 @@ net.Receive("GBaySubmitService",function(len, ply)
   if string.len(servname) <= 27 then
     if string.len(servdesc) <= 81 then
       if servprice <= GBayConfig.MaxPrice then
-        GBayMySQL:Query("INSERT INTO service ( sidmerchant,	name,	description, price ) VALUES ('"..ply:SteamID64().."', '"..servname.."', '"..servdesc.."', '"..servprice.."')", function(createservice)
+        GBayMySQL:Query("INSERT INTO service ( sidmerchant,	name,	description, price, buyers ) VALUES ('"..ply:SteamID64().."', '"..servname.."', '"..servdesc.."', '"..servprice.."', '[]')", function(createservice)
           if createservice[1].status == false then print('GBay MySQL Error: '..createservice[1].error) end
           net.Start("GBayDoneLoading")
             net.WriteString("Service")
@@ -54,7 +54,7 @@ net.Receive("GBayRemoveService",function(len, ply)
       if GBayIsAdmin(adminplayersresult[1].data[1]) then
         GBayMySQL:Query("DELETE FROM service WHERE id="..item, function(deleteshipment)
           if deleteshipment[1].status == false then print('GBay MySQL Error: '..deleteshipment[1].error) end
-          ply:GBayNotify("generic", "You have deleted this service! Please restart GBay to remove it!")          
+          ply:GBayNotify("generic", "You have deleted this service! Please restart GBay to remove it!")
         end)
       end
     end)

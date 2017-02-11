@@ -8,6 +8,7 @@ include("gbay/gui/cl_homepage.lua")
 include("gbay/gui/cl_updates.lua")
 include("gbay/shipment/cl_shipment.lua")
 include("gbay/service/cl_service.lua")
+include("gbay/entity/cl_entity.lua")
 
 local plymeta = FindMetaTable("Player")
 
@@ -73,9 +74,29 @@ function GBaySelectWeapon(DFrame, thebutton)
 	end )
 end
 
+function GBaySelectEntity(DFrame, thebutton)
+	DFrame:SetVisible(false)
+	LocalPlayer().GBayIsSelectingEntity = true
+
+	hook.Add( "KeyPress", "GBaySelectedWeapon", function( ply, key )
+		if key == IN_SPEED and LocalPlayer().GBayIsSelectingEntity then
+			LocalPlayer().GBayIsSelectingEntity = false
+			local gunpicked = false
+			DFrame:SetVisible(true)
+			thebutton.Entity = LocalPlayer():GetEyeTrace().Entity
+			thebutton:SetText(LocalPlayer():GetEyeTrace().Entity:GetClass().." (click button again to change)")
+			gunpicked = true
+		elseif key == IN_DUCK and LocalPlayer().GBayIsSelectingEntity then
+			LocalPlayer().GBayIsSelectingEntity = false
+			DFrame:SetVisible(true)
+		end
+	end )
+end
+
 hook.Add("HUDPaint","GBaySelBound",function()
 	if LocalPlayer().GBayIsSelectingWeapon then
-
+		draw.SimpleText("Press Shift when item is in crosshair or press CTRL to cancel!","GBayLabelFont",ScrW()/2,ScrH()/2 - 80,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
+	elseif LocalPlayer().GBayIsSelectingEntity then
 		draw.SimpleText("Press Shift when item is in crosshair or press CTRL to cancel!","GBayLabelFont",ScrW()/2,ScrH()/2 - 80,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
 	end
 end)
@@ -154,7 +175,7 @@ net.Receive("GBayOpenMenu",function()
 			GBayShipmentsPageSmall(DFrame, data)
 		else
 			GBayShipmentsPageFull(DFrame, data)
-		end 
+		end
 	end
 
 	EntitiesBTN = vgui.Create("DButton", DFrame)
