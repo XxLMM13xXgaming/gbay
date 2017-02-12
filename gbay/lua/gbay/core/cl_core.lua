@@ -1,5 +1,6 @@
 include("gbay/config/gbay_config.lua")
 include("gbay/gui/cl_fonts.lua")
+include("gbay/mysql/cl_mysql.lua")
 include("gbay/gui/cl_bases.lua")
 include("gbay/gui/cl_loading.lua")
 include("gbay/gui/cl_sidebar.lua")

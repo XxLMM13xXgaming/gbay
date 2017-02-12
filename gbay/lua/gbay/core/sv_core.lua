@@ -5,6 +5,7 @@ include("gbay/mysql/sv_mysql.lua")
 include("gbay/shipment/sv_shipment.lua")
 include("gbay/service/sv_service.lua")
 include("gbay/entity/sv_entity.lua")
+AddCSLuaFile("gbay/mysql/cl_mysql.lua")
 AddCSLuaFile("gbay/gui/cl_fonts.lua")
 AddCSLuaFile("gbay/gui/cl_bases.lua")
 AddCSLuaFile("gbay/gui/cl_loading.lua")
@@ -26,6 +27,8 @@ resource.AddSingleFile("materials/gbay/Neutral.png")
 resource.AddSingleFile("materials/gbay/Star128.png")
 resource.AddSingleFile("materials/gbay/Services_Small.png")
 resource.AddSingleFile("materials/gbay/Services_Large.png")
+util.AddNetworkString("GBaySetMySQL")
+util.AddNetworkString("GBayCloseSetMySQL")
 util.AddNetworkString("GBayNotify")
 util.AddNetworkString("GBayOpenLoading")
 util.AddNetworkString("GBayCloseLoading")
@@ -54,10 +57,6 @@ util.AddNetworkString("GBaySetprep")
 util.AddNetworkString("GBaySetnrep")
 util.AddNetworkString("GBaySetmrep")
 
--- If you change anything below you risk getting errors so please do not
-local StatsWebsite = "http://xxlmm13xxgaming.com/addons/data/serveradd.php" -- my stats website (DO NOT TOUCH)
-local UpdatesWebsite = "" -- place to get recent updates (DO NOT TOUCH)
-local GBayServerLogged = false
 local OwnerSID = nil
 
 local plymeta = FindMetaTable("Player")
@@ -96,42 +95,38 @@ function plymeta:GBayNotify(type, message)
 end
 
 hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
-  if !GBayServerLogged then
-    MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Logging Server...\n")
-    http.Post(StatsWebsite,{sid = "gbay", sip = game.GetIPAddress(), sdate=tostring(os.time()), soid = "76561198141863800"},function(body)
-      print(body)
-      GBayServerLogged = true
-    end,function(error)
-      print(error)
-    end)
-  end
-  GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
-    if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
-    if result[1].affected > 0 then
-      GBayMySQL:Query("SELECT * FROM players WHERE sid = "..ply:SteamID64(), function(checkifexists)
-        if checkifexists[1].status == false then print('GBay MySQL Error: '..checkifexists[1].error) end
-        if checkifexists[1].affected == 0 then
-          GBayMySQL:Query("INSERT INTO players (sid,	rank,	rep) VALUES ('"..ply:SteamID64().."', 'User', '0', '0', '0')", function(result2)
-            MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] "..ply:Nick().."'s gbay account has been created!\n")
-          end)
-        end
-      end)
-      GBayMySQL:Query("SELECT * FROM bans WHERE bid="..ply:SteamID64(), function(bansresult)
-        if bansresult[1].status == false then print('GBay MySQL Error: '..bansresult[1].error) end
-        if bansresult[1].affected > 0 then
-          local bandata = bansresult[1].data[1]
-          if os.time() > bandata.time then
-            GBayMySQL:Query("DELETE FROM bans WHERE bid="..ply:SteamID64(), function(unbansresult)
-              if unbansresult[1].status == false then print('GBay MySQL Error: '..unbansresult[1].error) end
-              timer.Simple(20, function()
-                ply:GBayNotify("generic", "You have been unbanned!")
-              end)
+  if GBayMySQL == nil then
+    net.Start("GBaySetMySQL")
+    net.Send(ply)
+  else
+    GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
+      if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
+      if result[1].affected > 0 then
+        GBayMySQL:Query("SELECT * FROM players WHERE sid = "..ply:SteamID64(), function(checkifexists)
+          if checkifexists[1].status == false then print('GBay MySQL Error: '..checkifexists[1].error) end
+          if checkifexists[1].affected == 0 then
+            GBayMySQL:Query("INSERT INTO players (sid,	rank,	rep) VALUES ('"..ply:SteamID64().."', 'User', '0', '0', '0')", function(result2)
+              MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] "..ply:Nick().."'s gbay account has been created!\n")
             end)
           end
-        end
-      end)
-    end
-  end)
+        end)
+        GBayMySQL:Query("SELECT * FROM bans WHERE bid="..ply:SteamID64(), function(bansresult)
+          if bansresult[1].status == false then print('GBay MySQL Error: '..bansresult[1].error) end
+          if bansresult[1].affected > 0 then
+            local bandata = bansresult[1].data[1]
+            if os.time() > bandata.time then
+              GBayMySQL:Query("DELETE FROM bans WHERE bid="..ply:SteamID64(), function(unbansresult)
+                if unbansresult[1].status == false then print('GBay MySQL Error: '..unbansresult[1].error) end
+                timer.Simple(20, function()
+                  ply:GBayNotify("generic", "You have been unbanned!")
+                end)
+              end)
+            end
+          end
+        end)
+      end
+    end)
+  end
 end)
 
 hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
@@ -518,5 +513,6 @@ net.Receive("GBaySetmrep",function(len, ply)
 end)
 
 concommand.Add("gbaytest",function(ply)
-  PrintTable(CustomShipments[ply:GetEyeTrace().Entity:Getcontents()])
+  net.Start("GBaySetMySQL")
+  net.Send(ply)
 end)
