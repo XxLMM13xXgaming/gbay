@@ -1,7 +1,7 @@
 net.Receive("GBaySetMySQL",function()
   local DFrame = vgui.Create( "DFrame" )
   DFrame:SetSize( 300, 185 )
-  DFrame:SetTitle( "My new Derma frame" )
+  DFrame:SetTitle( "GBay MySQL info!" )
   DFrame:Center()
   DFrame:SetDraggable( true )
   DFrame:ShowCloseButton(true)
