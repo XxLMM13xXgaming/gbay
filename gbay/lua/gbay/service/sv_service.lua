@@ -23,7 +23,7 @@ net.Receive("GBaySubmitService",function(len, ply)
 end)
 
 net.Receive("GBayEditService",function(len, ply)
-  local serv = net.ReadTable()
+  local serv = GBayEscapeString(net.ReadTable())
   local servname = GBayEscapeString(net.ReadString())
   local servdesc = GBayEscapeString(net.ReadString())
   local servprice = GBayEscapeString(net.ReadFloat())
@@ -50,7 +50,7 @@ net.Receive("GBayEditService",function(len, ply)
 end)
 
 net.Receive("GBayRemoveService",function(len, ply)
-  item = net.ReadFloat()
+  item = GBayEscapeString(net.ReadFloat())
   GBayMySQL:Query("SELECT * FROM service WHERE id="..item, function(serv)
     if serv[1].status == false then print('GBay MySQL Error: '..serv[1].error) end
     GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)

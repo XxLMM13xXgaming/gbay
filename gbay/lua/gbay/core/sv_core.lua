@@ -239,7 +239,7 @@ end)
 
 net.Receive("GBayUpdateSettings",function(len, ply)
   local customrankstable = {{"User", false, false, false, false, false, false, false, false}, {"Superadmin", true, true, true, true, true, true, true, true}}
-  local settings = net.ReadTable()
+  local settings = GBayEscapeString(net.ReadTable())
   local servername = settings[1]
   local ads = settings[2]
   local service = settings[3]
@@ -262,9 +262,9 @@ net.Receive("GBayUpdateSettings",function(len, ply)
 end)
 
 net.Receive("GBayPurchaseItem",function(len, ply)
-  local type = net.ReadString()
-  local quantity = net.ReadFloat()
-  local item = net.ReadTable()
+  local type = GBayEscapeString(net.ReadString())
+  local quantity = GBayEscapeString(net.ReadFloat())
+  local item = GBayEscapeString(net.ReadTable())
   if type == "Shipment" then
     GBayMySQL:Query("SELECT * FROM shipments WHERE id="..item[1], function(shipmentinfo)
       if shipmentinfo[1].status == false then print('GBay MySQL Error: '..shipmentinfo[1].error) end
@@ -408,8 +408,8 @@ net.Receive("GBayPurchaseItem",function(len, ply)
 end)
 
 net.Receive("GBayBanPlayer",function(len, ply)
-  days = net.ReadFloat()
-  victim = net.ReadFloat()
+  days = GBayEscapeString(net.ReadFloat())
+  victim = GBayEscapeString(net.ReadFloat())
 
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
     if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
@@ -435,8 +435,8 @@ net.Receive("GBayBanPlayer",function(len, ply)
 end)
 
 net.Receive("GBaySetPlayerRank",function(len, ply)
-  rank = net.ReadString()
-  victim = net.ReadFloat()
+  rank = GBayEscapeString(net.ReadString())
+  victim = GBayEscapeString(net.ReadFloat())
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
     if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
     if GBayIsSuperadmin(adminplayersresult[1].data[1]) then
@@ -454,8 +454,8 @@ net.Receive("GBaySetPlayerRank",function(len, ply)
 end)
 
 net.Receive("GBaySetprep",function(len, ply)
-  rep = net.ReadFloat()
-  victim = net.ReadFloat()
+  rep = GBayEscapeString(net.ReadFloat())
+  victim = GBayEscapeString(net.ReadFloat())
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
     if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
     if GBayIsAdmin(adminplayersresult[1].data[1]) then
@@ -473,8 +473,8 @@ net.Receive("GBaySetprep",function(len, ply)
 end)
 
 net.Receive("GBaySetnrep",function(len, ply)
-  rep = net.ReadFloat()
-  victim = net.ReadFloat()
+  rep = GBayEscapeString(net.ReadFloat())
+  victim = GBayEscapeString(net.ReadFloat())
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
     if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
     if GBayIsAdmin(adminplayersresult[1].data[1]) then
@@ -492,8 +492,8 @@ net.Receive("GBaySetnrep",function(len, ply)
 end)
 
 net.Receive("GBaySetmrep",function(len, ply)
-  rep = net.ReadFloat()
-  victim = net.ReadFloat()
+  rep = GBayEscapeString(net.ReadFloat())
+  victim = GBayEscapeString(net.ReadFloat())
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
     if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
     if GBayIsAdmin(adminplayersresult[1].data[1]) then

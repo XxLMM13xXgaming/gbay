@@ -26,7 +26,7 @@ net.Receive("GBaySubmitEntity",function(len, ply)
 end)
 
 net.Receive("GBayEditEntity",function(len, ply)
-  local entent = net.ReadTable()
+  local entent = GBayEscapeString(net.ReadTable())
   local entname = GBayEscapeString(net.ReadString())
   local entdesc = GBayEscapeString(net.ReadString())
   local entprice = GBayEscapeString(net.ReadFloat())
@@ -53,7 +53,7 @@ net.Receive("GBayEditEntity",function(len, ply)
 end)
 
 net.Receive("GBayRemoveEntity",function(len, ply)
-  item = net.ReadFloat()
+  item = GBayEscapeString(net.ReadFloat())
   GBayMySQL:Query("SELECT * FROM entities WHERE id="..item, function(ententr)
     if ententr[1].status == false then print('GBay MySQL Error: '..ententr[1].error) end
     GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)

@@ -26,7 +26,7 @@ net.Receive("GBaySubmitShipment",function(len, ply)
 end)
 
 net.Receive("GBayEditShipment",function(len, ply)
-  local shipwep = net.ReadTable()
+  local shipwep = GBayEscapeString(net.ReadTable())
   local shipname = GBayEscapeString(net.ReadString())
   local shipdesc = GBayEscapeString(net.ReadString())
   local shipprice = GBayEscapeString(net.ReadFloat())
@@ -53,7 +53,7 @@ net.Receive("GBayEditShipment",function(len, ply)
 end)
 
 net.Receive("GBayRemoveShipment",function(len, ply)
-  item = net.ReadFloat()
+  item = GBayEscapeString(net.ReadFloat())
   GBayMySQL:Query("SELECT * FROM shipments WHERE id="..item, function(shipwepr)
     if shipwepr[1].status == false then print('GBay MySQL Error: '..shipwepr[1].error) end
     GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
@@ -61,7 +61,7 @@ net.Receive("GBayRemoveShipment",function(len, ply)
       if GBayIsAdmin(adminplayersresult[1].data[1]) then
         GBayMySQL:Query("DELETE FROM shipments WHERE id="..item, function(deleteshipment)
           if deleteshipment[1].status == false then print('GBay MySQL Error: '..deleteshipment[1].error) end
-          ply:GBayNotify("generic", "You have deleted this shipment! Please restart GBay to remove it!")          
+          ply:GBayNotify("generic", "You have deleted this shipment! Please restart GBay to remove it!")
         end)
       end
     end)
