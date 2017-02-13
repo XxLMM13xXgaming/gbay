@@ -1,11 +1,12 @@
 require("tmysql4")
-if file.Exists("gbay/mysql.txt","DATA") then
-  local GBayMySQLInfo = util.JSONToTable(file.Read("gbay/mysql.txt", "DATA" ))
-  local GBayMySQLHost = GBayMySQLInfo.host
-  local GBayMySQLUsername = GBayMySQLInfo.username
-  local GBayMySQLPassword = GBayMySQLInfo.password
-  local GBayMySQLDatabase = GBayMySQLInfo.database
-  local GBayMySQLPort = GBayMySQLInfo.port
+local GBayMySQLInfo = sql.Query("SELECT * FROM gbaymysqlinfo")
+if GBayMySQLInfo then
+  local GBayMySQLInfo = sql.Query("SELECT * FROM gbaymysqlinfo")
+  local GBayMySQLHost = GBayMySQLInfo[1].hostname
+  local GBayMySQLUsername = GBayMySQLInfo[1].username
+  local GBayMySQLPassword = GBayMySQLInfo[1].password
+  local GBayMySQLDatabase = GBayMySQLInfo[1].database
+  local GBayMySQLPort = GBayMySQLInfo[1].port
   GBayMySQL, GBayErr = tmysql.initialize(GBayMySQLHost, GBayMySQLUsername, GBayMySQLPassword, GBayMySQLDatabase, GBayMySQLPort, nil, CLIENT_MULTI_STATEMENTS )
   if GBayErr != nil or tostring( type( GBayMySQL ) ) == "boolean" then
     MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error connecting to the database...\n")
@@ -13,33 +14,31 @@ if file.Exists("gbay/mysql.txt","DATA") then
   else
     GBayMySQL:Query("SELECT * FROM players", function(result)
       MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Connected to database... Currently stores "..#result[1].data.." players!\n")
+      GBayRefreashSettings()
     end)
   end
 end
 
 net.Receive("GBaySetMySQL",function(len, ply)
-  local HostEntry = net.ReadString()
-  local UsernameEntry = net.ReadString()
-  local PasswordEntry = net.ReadString()
-  local DatabaseEntry = net.ReadString()
-  local PortEntry = net.ReadFloat()
+  local HostEntry = SQLStr(net.ReadString())
+  local UsernameEntry = SQLStr(net.ReadString())
+  local PasswordEntry = SQLStr(net.ReadString())
+  local DatabaseEntry = SQLStr(net.ReadString())
+  local PortEntry = SQLStr(net.ReadFloat())
 
-  local GBayMySQLInfo = {}
-  GBayMySQLInfo['host'] = HostEntry
-  GBayMySQLInfo['username'] = UsernameEntry
-  GBayMySQLInfo['password'] = PasswordEntry
-  GBayMySQLInfo['database'] = DatabaseEntry
-  GBayMySQLInfo['port'] = PortEntry
-
-  if !file.Exists("gbay","DATA") then
-    file.CreateDir("gbay")
+  if GBayMySQLInfo != false then
+    sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
+    sql.Query("INSERT INTO gbaymysqlinfo (hostname, username, password, database, port) VALUES ('"..HostEntry.."', '"..UsernameEntry.."', '"..PasswordEntry.."', '"..DatabaseEntry.."', '"..PortEntry.."')")
+  else
+    sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
+    sql.Query("UPDATE gbaymysqlinfo SET hostname='"..HostEntry.."', username='"..UsernameEntry.."', password='"..PasswordEntry.."', database='"..DatabaseEntry.."', port='"..PortEntry.."')")
   end
-  file.Write("gbay/mysql.txt", util.TableToJSON(GBayMySQLInfo))
-  local GBayMySQLHost = GBayMySQLInfo.host
-  local GBayMySQLUsername = GBayMySQLInfo.username
-  local GBayMySQLPassword = GBayMySQLInfo.password
-  local GBayMySQLDatabase = GBayMySQLInfo.database
-  local GBayMySQLPort = GBayMySQLInfo.port
+
+  local GBayMySQLHost = HostEntry
+  local GBayMySQLUsername = UsernameEntry
+  local GBayMySQLPassword = PasswordEntry
+  local GBayMySQLDatabase = DatabaseEntry
+  local GBayMySQLPort = PortEntry
   GBayMySQL, GBayErr = tmysql.initialize(GBayMySQLHost, GBayMySQLUsername, GBayMySQLPassword, GBayMySQLDatabase, GBayMySQLPort, nil, CLIENT_MULTI_STATEMENTS )
   if GBayErr != nil or tostring( type( GBayMySQL ) ) == "boolean" then
     MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error connecting to the database...\n")

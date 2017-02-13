@@ -403,17 +403,17 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
 			draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
 			if playerisadmin then
-				draw.SimpleText("Whats your server name?","GBayLabelFont",w / 2,140,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
-				draw.RoundedBox(0,0,200,w,2,Color(221,221,221))
-				draw.SimpleText("Can people pay for ads?","GBayLabelFont",w / 2,210,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
-				draw.RoundedBox(0,0,300,w,2,Color(221,221,221))
-				draw.SimpleText("Can people sell services?","GBayLabelFont",w / 2,310,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
-				draw.RoundedBox(0,0,400,w,2,Color(221,221,221))
-				draw.SimpleText("Can people create coupons?","GBayLabelFont",w / 2,410,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
-				draw.RoundedBox(0,0,500,w,2,Color(221,221,221))
-				draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
-				draw.SimpleText("Check updates tab often","GBayLabelFont",w / 2,590,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
-				draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,610,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+--				draw.SimpleText("Whats your server name?","GBayLabelFont",w / 2,140,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+--				draw.RoundedBox(0,0,200,w,2,Color(221,221,221))
+--				draw.SimpleText("Can people pay for ads?","GBayLabelFont",w / 2,210,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+--				draw.RoundedBox(0,0,300,w,2,Color(221,221,221))
+--				draw.SimpleText("Can people sell services?","GBayLabelFont",w / 2,310,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+--				draw.RoundedBox(0,0,400,w,2,Color(221,221,221))
+--				draw.SimpleText("Can people create coupons?","GBayLabelFont",w / 2,410,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+--				draw.RoundedBox(0,0,500,w,2,Color(221,221,221))
+--				draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+--				draw.SimpleText("Check updates tab often","GBayLabelFont",w / 2,590,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+--				draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,610,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			else
 				draw.SimpleText("Get outta here!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 				draw.SimpleText("Currently there are no user settings","GBayLabelFont",w / 2,h/2 - 30,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
@@ -422,168 +422,142 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 		end
 
 		if playerisadmin then
-			ServerNameTE = vgui.Create("DTextEntry",SideBarOpened)
-			ServerNameTE:SetPos(20, 170)
-			ServerNameTE:SetSize(SideBarOpened:GetWide() - 40, 20 )
-			if !firstjoined then
-				ServerNameTE:SetText(data[2][1][2])
+			local ScrollList = vgui.Create( "DPanelList", SideBarOpened )
+			ScrollList:SetPos( 0, 140 )
+			ScrollList:SetSize( SideBarOpened:GetWide(), SideBarOpened:GetTall() - 190 )
+			ScrollList:EnableHorizontal(false)
+			ScrollList:SetSpacing( 20 )
+			ScrollList:EnableVerticalScrollbar( false )
+
+			if data[2][1][1] == nil then
+				servername = "Server Name"
+				adsyon = false
+				servsyon = false
+				coupsyon = false
+				ffpi = 0
+				mpfpi = 0
+				itfpi = 0
 			else
-				ServerNameTE:SetText("Server Name")
+				servername = data[2][1][2]
+				adsyon = data[2][1][3]
+				servsyon = data[2][1][4]
+				coupsyon = data[2][1][5]
+				ffpi = data[2][1][6]
+				mpfpi = data[2][1][7]
+				itfpi = data[2][1][8]
 			end
-			ServerNameTE.OnTextChanged = function(s)
-				if string.len(s:GetValue()) > 15 then
-					local timeleftforrestriction = 5
-					s:SetText("Server name must be < 15 characters... ("..timeleftforrestriction..")")
-					s:SetEditable(false)
-					timer.Create("GBayUnlockServerNameEntry",1, 5, function()
-						timeleftforrestriction = timeleftforrestriction - 1
-						if timeleftforrestriction <= 0 then
-							s:SetText("Server Name")
-							s:SetEditable(true)
-							return
+
+			local configs = {
+				{"Whats your server name?", "text:15:Server Name", servername},
+				{"Can people pay for ads?", "bool", adsyon},
+				{"Can people sell services?", "bool", servsyon},
+				{"Can people create coupons?", "bool", coupsyon},
+				{"What is the fee for posting items?", "numb:Posting Fee", ffpi},
+				{"What is the max price for items?", "numb:Max price", mpfpi},
+				{"Item tax (%)", "numb:Tax (for 8% just type 8)", itfpi},
+			}
+
+			for k, v in pairs(configs) do
+				if string.Left(v[2],4) == "text" or string.Left(v[2],4) == "numb" then
+					sizey = 65
+				elseif string.Left(v[2],4) == "bool" then
+					sizey = 85
+				end
+
+				local ItemMain = vgui.Create("DFrame")
+				ItemMain:SetSize( ScrollList:GetWide(0), sizey )
+				ItemMain:SetDraggable( false )
+				ItemMain:SetTitle( "" )
+				ItemMain:ShowCloseButton( false )
+				ItemMain.Paint = function(s, w, h)
+					draw.SimpleText(v[1],"GBayLabelFont",w / 2,0,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+					draw.RoundedBox(0,0,h - 2,w,2,Color(221,221,221))
+				end
+
+				if string.Left(v[2],4) == "text" then
+					local text = string.Explode(':',v[2])
+					local ItemMainTE = vgui.Create("DTextEntry",ItemMain)
+					ItemMainTE:SetPos(20, 25)
+					ItemMainTE:SetSize(SideBarOpened:GetWide() - 40, 20 )
+					ItemMainTE:SetText(text[3].." ("..v[3]..")")
+					ItemMainTE.OnTextChanged = function(s)
+						if string.len(s:GetValue()) > tonumber(text[2]) then
+							local timeleftforrestriction = 5
+							s:SetText(text[3].." must be < "..text[2].." characters... ("..timeleftforrestriction..")")
+							s:SetEditable(false)
+							timer.Create("GBayUnlockServerNameEntry",1, 5, function()
+								timeleftforrestriction = timeleftforrestriction - 1
+								if timeleftforrestriction <= 0 then
+									s:SetText(text[3])
+									s:SetEditable(true)
+									return
+								end
+								s:SetText(text[3].." must be < "..text[2].." characters... ("..timeleftforrestriction..")")
+							end)
+						else
+							v[3] = s:GetValue()
 						end
-						s:SetText("Server name must be < 15 characters... ("..timeleftforrestriction..")")
-					end)
-				end
-			end
-
-			AdsCheckBoxYes = vgui.Create( "DCheckBoxLabel", SideBarOpened )
-			AdsCheckBoxYes:SetPos( 20, 240 )
-			if data != nil then
-				if data[2][1][3] == 1 then
-					AdsCheckBoxYes:SetValue( 1 )
-				else
-					AdsCheckBoxYes:SetValue( 0 )
-				end
-			else
-				AdsCheckBoxYes:SetValue( 0 )
-			end
-			AdsCheckBoxYes:SetText("Yes")
-			AdsCheckBoxYes:SetFont("GBayLabelFont")
-			AdsCheckBoxYes:SetTextColor(Color(137, 137, 137))
-			AdsCheckBoxYes.OnChange = function(value)
-				if value then
-					if AdsCheckBoxNo:GetChecked() then
-						AdsCheckBoxNo:SetValue(0)
-						return
 					end
-				end
-			end
-
-			AdsCheckBoxNo = vgui.Create( "DCheckBoxLabel", SideBarOpened )
-			AdsCheckBoxNo:SetPos( 20, 270 )
-			if data != nil then
-				if data[2][1][3] == 1 then
-					AdsCheckBoxNo:SetValue( 0 )
-				else
-					AdsCheckBoxNo:SetValue( 1 )
-				end
-			else
-				AdsCheckBoxNo:SetValue( 0 )
-			end
-			AdsCheckBoxNo:SetText("No")
-			AdsCheckBoxNo:SetFont("GBayLabelFont")
-			AdsCheckBoxNo:SetTextColor(Color(137, 137, 137))
-			AdsCheckBoxNo.OnChange = function(value)
-				if value then
-					if AdsCheckBoxYes:GetChecked() then
-						AdsCheckBoxYes:SetValue(0)
-						return
+				elseif string.Left(v[2],4) == "bool" then
+					local CheckBoxYes = vgui.Create( "DCheckBoxLabel", ItemMain )
+					CheckBoxYes:SetPos( 20, 30 )
+					if data != nil then
+						if v[3] == 1 then
+							CheckBoxYes:SetValue( 1 )
+						else
+							CheckBoxYes:SetValue( 0 )
+						end
+					else
+						CheckBoxYes:SetValue( 0 )
+					end
+					CheckBoxYes:SetText("Yes")
+					CheckBoxYes:SetFont("GBayLabelFont")
+					CheckBoxYes:SetTextColor(Color(137, 137, 137))
+					CheckBoxYes.OnChange = function(value)
+						v[3] = value:GetChecked()
+						if value then
+							if CheckBoxNo:GetChecked() then
+								CheckBoxNo:SetValue(0)
+								return
+							end
+						end
 					end
 
-				end
-			end
+					local CheckBoxNo = vgui.Create( "DCheckBoxLabel", ItemMain )
+					CheckBoxNo:SetPos( 20, 55 )
+					if data != nil then
+						if v[3] == 0 then
+							CheckBoxNo:SetValue( 1 )
+						else
+							CheckBoxNo:SetValue( 0 )
+						end
+					else
+						CheckBoxNo:SetValue( 0 )
+					end
+					CheckBoxNo:SetText("No")
+					CheckBoxNo:SetFont("GBayLabelFont")
+					CheckBoxNo:SetTextColor(Color(137, 137, 137))
+					CheckBoxNo.OnChange = function(value)
+						if value then
+							if CheckBoxYes:GetChecked() then
+								CheckBoxYes:SetValue(0)
+								return
+							end
 
-			ServiceCheckBoxYes = vgui.Create( "DCheckBoxLabel", SideBarOpened)
-			ServiceCheckBoxYes:SetPos(20, 340)
-			if data != nil then
-				if data[2][1][4] == 1 then
-					ServiceCheckBoxYes:SetValue( 1 )
-				else
-					ServiceCheckBoxYes:SetValue( 0 )
-				end
-			else
-				ServiceCheckBoxYes:SetValue( 0 )
-			end
-			ServiceCheckBoxYes:SetText("Yes")
-			ServiceCheckBoxYes:SetFont("GBayLabelFont")
-			ServiceCheckBoxYes:SetTextColor(Color(137, 137, 137))
-			ServiceCheckBoxYes.OnChange = function(value)
-				if value then
-					if ServiceCheckBoxNo:GetChecked() then
-						ServiceCheckBoxNo:SetValue(0)
-						return
+						end
+					end
+				elseif string.Left(v[2],4) == "numb" then
+					local text = string.Explode(':',v[2])
+					local ItemMainTE = vgui.Create("DTextEntry",ItemMain)
+					ItemMainTE:SetPos(20, 25)
+					ItemMainTE:SetSize(SideBarOpened:GetWide() - 40, 20 )
+					ItemMainTE:SetText(v[3])
+					ItemMainTE:SetNumeric(true)
+					ItemMainTE.OnTextChanged = function(s)
+						v[3] = s:GetValue()
 					end
 				end
-			end
-
-			ServiceCheckBoxNo = vgui.Create( "DCheckBoxLabel", SideBarOpened)
-			ServiceCheckBoxNo:SetPos(20, 370)
-			if data != nil then
-				if data[2][1][4] == 1 then
-					ServiceCheckBoxNo:SetValue( 0 )
-				else
-					ServiceCheckBoxNo:SetValue( 1 )
-				end
-			else
-				ServiceCheckBoxNo:SetValue( 0 )
-			end
-			ServiceCheckBoxNo:SetText("No")
-			ServiceCheckBoxNo:SetFont("GBayLabelFont")
-			ServiceCheckBoxNo:SetTextColor(Color(137, 137, 137))
-			ServiceCheckBoxNo.OnChange = function(value)
-				if value then
-					if ServiceCheckBoxYes:GetChecked() then
-						ServiceCheckBoxYes:SetValue(0)
-						return
-					end
-				end
-			end
-
-			CouponCheckBoxYes = vgui.Create( "DCheckBoxLabel", SideBarOpened)
-			CouponCheckBoxYes:SetPos(20, 440)
-			if data != nil then
-				if data[2][1][5] == 1 then
-					CouponCheckBoxYes:SetValue( 1 )
-				else
-					CouponCheckBoxYes:SetValue( 0 )
-				end
-			else
-				CouponCheckBoxYes:SetValue( 0 )
-			end
-			CouponCheckBoxYes:SetText("Yes")
-			CouponCheckBoxYes:SetFont("GBayLabelFont")
-			CouponCheckBoxYes:SetTextColor(Color(137, 137, 137))
-			CouponCheckBoxYes.OnChange = function(value)
-				if value then
-					if CouponCheckBoxNo:GetChecked() then
-						CouponCheckBoxNo:SetValue(0)
-						return
-					end
-				end
-			end
-
-			CouponCheckBoxNo = vgui.Create( "DCheckBoxLabel", SideBarOpened)
-			CouponCheckBoxNo:SetPos(20, 470)
-			if data != nil then
-				if data[2][1][5] == 1 then
-					CouponCheckBoxNo:SetValue( 0 )
-				else
-					CouponCheckBoxNo:SetValue( 1 )
-				end
-			else
-				CouponCheckBoxNo:SetValue( 0 )
-			end
-			CouponCheckBoxNo:SetText("No")
-			CouponCheckBoxNo:SetFont("GBayLabelFont")
-			CouponCheckBoxNo:SetTextColor(Color(137, 137, 137))
-			CouponCheckBoxNo.OnChange = function(value)
-				if value then
-					if CouponCheckBoxYes:GetChecked() then
-						CouponCheckBoxYes:SetValue(0)
-						return
-					end
-				end
+				ScrollList:AddItem(ItemMain)
 			end
 
 			SaveSettingsBtn = vgui.Create("DButton", SideBarOpened)
@@ -595,38 +569,14 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
 			end
 			SaveSettingsBtn.DoClick = function()
-				if AdsCheckBoxYes:GetChecked() or AdsCheckBoxNo:GetChecked() then
-					if ServiceCheckBoxYes:GetChecked() or ServiceCheckBoxNo:GetChecked() then
-						if CouponCheckBoxYes:GetChecked() or CouponCheckBoxNo:GetChecked() then
-							if firstjoined then
-								net.Start("GBayFinishSettingUpServer")
-									net.WriteString(ServerNameTE:GetValue())
-									net.WriteBool(AdsCheckBoxYes:GetChecked())
-									net.WriteBool(ServiceCheckBoxYes:GetChecked())
-									net.WriteBool(CouponCheckBoxYes:GetChecked())
-								net.SendToServer()
-								SideBarOpened:Close()
-								GBaySideBarOpened(DFrame, "PleaseRefresh", false, {}, firstjoined)
-							else
-								print("Aye")
-								net.Start("GBayUpdateSettings")
-									net.WriteString(ServerNameTE:GetValue())
-									net.WriteBool(AdsCheckBoxYes:GetChecked())
-									net.WriteBool(ServiceCheckBoxYes:GetChecked())
-									net.WriteBool(CouponCheckBoxYes:GetChecked())
-								net.SendToServer()
-								SideBarOpened:Close()
-								GBaySideBarOpened(DFrame, "PleaseRefresh", false, data, false)
-							end
-						else
-							GBayErrorMessage("Please check either yes or no ALL the sections that require it!")
-						end
-					else
-						GBayErrorMessage("Please check either yes or no ALL the sections that require it!")
-					end
-				else
-					GBayErrorMessage("Please check either yes or no ALL the sections that require it!")
+				local datatosend = {}
+				for k, v in pairs(configs) do
+					table.insert(datatosend,#datatosend + 1, v[3])
 				end
+				net.Start("GBayUpdateSettings")
+					net.WriteTable(datatosend)
+				net.SendToServer()
+				GBaySideBarOpened(DFrame, "PleaseRefresh", false, {}, firstjoined)
 			end
 		end
 	elseif tab == "Dashboard" then

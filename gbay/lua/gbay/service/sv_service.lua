@@ -3,18 +3,22 @@ net.Receive("GBaySubmitService",function(len, ply)
   local servdesc = GBayEscapeString(net.ReadString())
   local servprice = GBayEscapeString(net.ReadFloat())
 
-  if string.len(servname) <= 27 then
-    if string.len(servdesc) <= 81 then
-      if servprice <= GBayConfig.MaxPrice then
-        GBayMySQL:Query("INSERT INTO service ( sidmerchant,	name,	description, price, buyers ) VALUES ('"..ply:SteamID64().."', '"..servname.."', '"..servdesc.."', '"..servprice.."', '[]')", function(createservice)
-          if createservice[1].status == false then print('GBay MySQL Error: '..createservice[1].error) end
-          net.Start("GBayDoneLoading")
-            net.WriteString("Service")
-            net.WriteTable({createservice[1].lastid, ply:SteamID64(), servname, servdesc, servprice})
-          net.Send(ply)
-        end)
+  if GBayConfig.ServiceToggle then
+    if string.len(servname) <= 27 then
+      if string.len(servdesc) <= 81 then
+        if servprice <= GBayConfig.MaxPrice then
+          GBayMySQL:Query("INSERT INTO service ( sidmerchant,	name,	description, price, buyers ) VALUES ('"..ply:SteamID64().."', '"..servname.."', '"..servdesc.."', '"..servprice.."', '[]')", function(createservice)
+            if createservice[1].status == false then print('GBay MySQL Error: '..createservice[1].error) end
+            net.Start("GBayDoneLoading")
+              net.WriteString("Service")
+              net.WriteTable({createservice[1].lastid, ply:SteamID64(), servname, servdesc, servprice})
+            net.Send(ply)
+          end)
+        end
       end
     end
+  else
+    ply:GBayNotify("error", "Services are NOT allowed on "..GBayConfig.ServerName)
   end
 end)
 

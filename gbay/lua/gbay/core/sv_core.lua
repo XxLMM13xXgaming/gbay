@@ -1,6 +1,3 @@
-AddCSLuaFile("gbay/config/gbay_config.lua")
-include("gbay/config/gbay_mysql_config.lua")
-include("gbay/config/gbay_config.lua")
 include("gbay/mysql/sv_mysql.lua")
 include("gbay/shipment/sv_shipment.lua")
 include("gbay/service/sv_service.lua")
@@ -33,7 +30,6 @@ util.AddNetworkString("GBayNotify")
 util.AddNetworkString("GBayOpenLoading")
 util.AddNetworkString("GBayCloseLoading")
 util.AddNetworkString("GBayOpenCreateServer")
-util.AddNetworkString("GBayFinishSettingUpServer")
 util.AddNetworkString("GBayUpdateSettings")
 util.AddNetworkString("GBayOpenLoadingSettingUpServer")
 util.AddNetworkString("GBaySubmitShipment")
@@ -56,6 +52,7 @@ util.AddNetworkString("GBaySetPlayerRank")
 util.AddNetworkString("GBaySetprep")
 util.AddNetworkString("GBaySetnrep")
 util.AddNetworkString("GBaySetmrep")
+GBayConfig = {}
 
 local OwnerSID = nil
 
@@ -92,6 +89,19 @@ function plymeta:GBayNotify(type, message)
     net.WriteString(type)
     net.WriteString(message)
   net.Send(self)
+end
+
+function GBayRefreashSettings()
+  GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
+    local data = result[1].data[1]
+    GBayConfig.ServerName = data.servername
+    GBayConfig.AdsToggle = data.ads
+    GBayConfig.ServiceToggle = data.aservicesds
+    GBayConfig.CouponToggle = data.coupons
+    GBayConfig.PriceToPayToSell = data.feepost
+    GBayConfig.MaxPrice = data.maxprice
+    GBayConfig.TaxToMultiplyBy = data.taxpercent / 100
+  end)
 end
 
 hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
@@ -155,11 +165,15 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
               if checkifexists[1].affected == 0 then
                 GBayMySQL:Query("INSERT INTO players (sid,	rank,	positiverep, neutralrep, negativerep) VALUES ('"..ply:SteamID64().."', 'Superadmin', '0', '0', '0')", function(result2)
                   if result2[1].status == false then print('GBay MySQL Error: '..result2[1].error) end
-                  timer.Simple(2,function()
-                    net.Start("GBayOpenCreateServer")
-                    net.Send(ply)
-                    net.Start("GBayCloseLoading")
-                    net.Send(ply)
+                  GBayMySQL:Query("INSERT INTO serverinfo (servername) VALUES ('Server name')", function(insertingresult)
+                    if insertingresult[1].status == false then print('GBay MySQL Error: '..insertingresult[1].error) end
+                    PrintTable(insertingresult)
+                    timer.Simple(2,function()
+                      net.Start("GBayOpenCreateServer")
+                      net.Send(ply)
+                      net.Start("GBayCloseLoading")
+                      net.Send(ply)
+                    end)
                   end)
                 end)
               else
@@ -180,7 +194,7 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
               GBayMySQL:Query("SELECT * FROM serverinfo", function(serverinfo)
                 if serverinfo[1].status == false then print('GBay MySQL Error: '..serverinfo[1].error) end
                 for k, v in pairs(serverinfo[1].data) do
-                  table.insert(serverinfotable,{v.id, v.servername, v.ads, v.services, v.coupons, v.ranks})
+                  table.insert(serverinfotable,{v.id, v.servername, v.ads, v.services, v.coupons, v.feepost, v.maxprice, v.taxpercent, v.ranks})
                 end
                 GBayMySQL:Query("SELECT * FROM shipments", function(shipmentsinfo)
                   if shipmentsinfo[1].status == false then print('GBay MySQL Error: '..shipmentsinfo[1].error) end
@@ -223,41 +237,25 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
   end
 end)
 
-net.Receive("GBayFinishSettingUpServer",function(len, ply)
-  local customrankstable = {{"User", false, false, false, false, false, false, false, false}, {"Superadmin", true, true, true, true, true, true, true, true}}
-  local servername = net.ReadString()
-  local ads = net.ReadBool()
-  local service = net.ReadBool()
-  local coupon = net.ReadBool()
-  if ads then adst = 1 else adst = 0 end
-  if service then servicet = 1 else servicet = 0 end
-  if coupon then coupont = 1 else coupont = 0 end
-  if OwnerSID == ply:SteamID64() then
-    GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
-      if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
-      if result[1].affected == 0 then
-        GBayMySQL:Query("INSERT INTO serverinfo (	servername,	ads,	services,	coupons,ranks) VALUES ('"..servername.."', '"..adst.."', '"..servicet.."', '"..coupont.."', '"..util.TableToJSON(customrankstable).."')", function(sentinfo)
-          if sentinfo[1].status == false then print('GBay MySQL Error: '..sentinfo[1].error) end
-        end)
-      end
-    end)
-  end
-end)
-
 net.Receive("GBayUpdateSettings",function(len, ply)
   local customrankstable = {{"User", false, false, false, false, false, false, false, false}, {"Superadmin", true, true, true, true, true, true, true, true}}
-  local servername = net.ReadString()
-  local ads = net.ReadBool()
-  local service = net.ReadBool()
-  local coupon = net.ReadBool()
+  local settings = net.ReadTable()
+  local servername = settings[1]
+  local ads = settings[2]
+  local service = settings[3]
+  local coupon = settings[4]
+  local postingfee = settings[5]
+  local maxpricetosell = settings[6]
+  local taxtocharge = settings[7]
   if ads then adst = 1 else adst = 0 end
   if service then servicet = 1 else servicet = 0 end
   if coupon then coupont = 1 else coupont = 0 end
   GBayMySQL:Query("SELECT * FROM players", function(playerinfo)
     if playerinfo[1].status == false then print('GBay MySQL Error: '..playerinfo[1].error) end
     if playerinfo[1].data[1].rank == "Superadmin" or playerinfo[1].data[1].rank == "Admin" then
-      GBayMySQL:Query("UPDATE serverinfo SET servername='"..servername.."', ads='"..adst.."', services='"..servicet.."', coupons='"..coupont.."'", function(result)
+      GBayMySQL:Query("UPDATE serverinfo SET servername='"..servername.."', ads='"..adst.."', services='"..servicet.."', coupons='"..coupont.."', feepost='"..postingfee.."', maxprice='"..maxpricetosell.."', taxpercent='"..taxtocharge.."'", function(result)
         if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
+        GBayRefreashSettings()
       end)
     end
   end)
@@ -513,6 +511,5 @@ net.Receive("GBaySetmrep",function(len, ply)
 end)
 
 concommand.Add("gbaytest",function(ply)
-  net.Start("GBaySetMySQL")
-  net.Send(ply)
+  GBayRefreashSettings()
 end)

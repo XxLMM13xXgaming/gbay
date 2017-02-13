@@ -1,4 +1,3 @@
-include("gbay/config/gbay_config.lua")
 include("gbay/gui/cl_fonts.lua")
 include("gbay/mysql/cl_mysql.lua")
 include("gbay/gui/cl_bases.lua")
@@ -286,4 +285,8 @@ net.Receive("GBayOpenMenu",function()
 		StaffBTN:SetPos(700, 130)
 		SettingsBTN:SetPos(770, 130)
 	end)
+end)
+
+concommand.Add("gbaytestcl",function()
+	print(GBayConfig.ServerName)
 end)
