@@ -1,3 +1,4 @@
+print("Aye we loaded!")
 include("gbay/mysql/sv_mysql.lua")
 include("gbay/shipment/sv_shipment.lua")
 include("gbay/service/sv_service.lua")
