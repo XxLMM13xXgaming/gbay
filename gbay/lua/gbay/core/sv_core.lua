@@ -140,6 +140,7 @@ hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
 end)
 
 hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
+  ply:ChatPrint("MOM IT WORKS!")
   local text = string.lower(text)
   local playerinfotable = {}
   local serverinfotable = {}
