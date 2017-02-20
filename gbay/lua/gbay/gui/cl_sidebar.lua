@@ -44,7 +44,9 @@ function GBaySideBarClosed(DFrame, tab, settingbtnclicked, data, firstjoined)
 end
 
 function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
-	hook.Call( "GBaySideBarOpened" )
+	if !firstjoined then
+		hook.Call( "GBaySideBarOpened" )
+	end
 	LocalPlayer().GBayOpenMenuTabStatus = true
 	if IsValid(GBayDFrameLogo) then GBayDFrameLogo:Remove() end
 	GBayDFrameLogo = vgui.Create("DImage", DFrame)
@@ -429,7 +431,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			ScrollList:SetSpacing( 20 )
 			ScrollList:EnableVerticalScrollbar( false )
 
-			if data[2][1][1] == nil then
+			if firstjoined then
 				servername = "Server Name"
 				adsyon = false
 				servsyon = false
@@ -437,7 +439,23 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				ffpi = 0
 				mpfpi = 0
 				itfpi = 0
-			else
+				ttnoo = 10
+				npcposn = 0
+				npcangn = 0
+				npcmodels = ""
+			elseif data == nil then
+				servername = "Server Name"
+				adsyon = false
+				servsyon = false
+				coupsyon = false
+				ffpi = 0
+				mpfpi = 0
+				itfpi = 0
+				ttnoo = 10
+				npcposn = 0
+				npcangn = 0
+				npcmodels = ""
+			elseif data != nil then
 				servername = data[2][1][2]
 				adsyon = data[2][1][3]
 				servsyon = data[2][1][4]
@@ -445,9 +463,14 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				ffpi = data[2][1][6]
 				mpfpi = data[2][1][7]
 				itfpi = data[2][1][8]
+				ttnoo = data[2][1][9]
+				npcposn = data[2][1][10]
+				npcangn = data[2][1][11]
+				npcmodels = data[2][1][12]
 			end
 
 			local configs = {
+				{"Please enter your MySQL Info!", "bttn:Submit MySQL Data", [[function GBayConfigsButtonFunction() net.Start("GBaySetMySQLFromConfig") net.SendToServer() end]]},
 				{"Whats your server name?", "text:15:Server Name", servername},
 				{"Can people pay for ads?", "bool", adsyon},
 				{"Can people sell services?", "bool", servsyon},
@@ -455,6 +478,10 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				{"What is the fee for posting items?", "numb:Posting Fee", ffpi},
 				{"What is the max price for items?", "numb:Max price", mpfpi},
 				{"Item tax (%)", "numb:Tax (for 8% just type 8)", itfpi},
+				{"Time to notify players of orders", "numb:Time in minutes to notify players", ttnoo},
+				{"Mail NPC pos", "text:255:100.0, 100.0, 100.0", npcposn},
+				{"Mail NPC ang", "text:255:100.0, 100.0, 100.0", npcangn},
+				{"Input Mail NPC's Model?", "text:255:NPC Model", npcmodels},
 			}
 
 			for k, v in pairs(configs) do
@@ -474,7 +501,21 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 					draw.RoundedBox(0,0,h - 2,w,2,Color(221,221,221))
 				end
 
-				if string.Left(v[2],4) == "text" then
+				if string.Left(v[2],4) == "bttn" then
+					local text = string.Explode(':',v[2])
+					local ItemMainBTN = vgui.Create("DButton", ItemMain)
+					ItemMainBTN:SetPos(20, 25)
+					ItemMainBTN:SetSize(SideBarOpened:GetWide() - 40, 20 )
+					ItemMainBTN:SetText(text[2])
+					ItemMainBTN:SetTextColor(Color(255,255,255))
+					ItemMainBTN.Paint = function(s, w, h)
+						draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+					end
+					ItemMainBTN.DoClick = function()
+						RunString(v[3])
+						GBayConfigsButtonFunction()
+					end
+				elseif string.Left(v[2],4) == "text" then
 					local text = string.Explode(':',v[2])
 					local ItemMainTE = vgui.Create("DTextEntry",ItemMain)
 					ItemMainTE:SetPos(20, 25)

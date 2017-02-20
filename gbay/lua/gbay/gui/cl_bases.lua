@@ -138,6 +138,18 @@ net.Receive("GBayOpenCreateServer", function()
 	DFrameClose.Paint = function(s, w, h)
 	end
 
-	GBaySideBarOpened(DFrame, "Settings", false, nil, true)
+  local DFrameMin = vgui.Create("DButton", DFrame)
+	DFrameMin:SetPos(DFrame:GetWide() - 60, 10)
+	DFrameMin:SetSize(25, 25)
+	DFrameMin:SetText("_")
+	DFrameMin:SetFont("GBayCloseFont")
+	DFrameMin:SetTextColor(Color(214, 214, 214))
+	DFrameMin.DoClick = function()
+		GBayMenuMin(DFrame)
+	end
+	DFrameMin.Paint = function(s, w, h)
+	end
+  
+	GBaySideBarOpened(DFrame, "Settings", false, {}, true)
 
 end)

@@ -209,11 +209,7 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
               GBayMySQL:Query("SELECT * FROM serverinfo", function(serverinfo)
                 if serverinfo[1].status == false then print('GBay MySQL Error: '..serverinfo[1].error) end
                 for k, v in pairs(serverinfo[1].data) do
-<<<<<<< HEAD
-                  table.insert(serverinfotable,{v.id, v.servername, v.ads, v.services, v.coupons, v.feepost, v.maxprice, v.taxpercent, v.ranks})
-=======
                   table.insert(serverinfotable,{v.id, v.servername, v.ads, v.services, v.coupons, v.feepost, v.maxprice, v.taxpercent, v.ttnoo, v.npcpos, v.npcang, v.npcmodel, v.ranks})
->>>>>>> origin/master
                 end
                 GBayMySQL:Query("SELECT * FROM shipments", function(shipmentsinfo)
                   if shipmentsinfo[1].status == false then print('GBay MySQL Error: '..shipmentsinfo[1].error) end
