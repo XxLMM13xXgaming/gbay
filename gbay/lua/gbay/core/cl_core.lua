@@ -46,21 +46,6 @@ function GBayErrorMessage(msg)
 	chat.AddText(Color(255,0,0), msg)
 end
 
-function GBayMenuMin(DFrame)
-	DFrame:SetVisible(false)
-	LocalPlayer().GBayIsInMenuMinMode = true
-
-	hook.Add( "KeyPress", "GBayIsInMenuMinModeKeyPress", function( ply, key )
-		if key == IN_SPEED and LocalPlayer().GBayIsInMenuMinMode then
-			LocalPlayer().GBayIsInMenuMinMode = false
-			DFrame:SetVisible(true)
-		elseif key == IN_DUCK and LocalPlayer().GBayIsInMenuMinMode then
-			LocalPlayer().GBayIsInMenuMinMode = false
-			DFrame:SetVisible(true)
-		end
-	end )
-end
-
 function GBaySelectWeapon(DFrame, thebutton)
 	DFrame:SetVisible(false)
 	LocalPlayer().GBayIsSelectingWeapon = true
@@ -113,8 +98,6 @@ hook.Add("HUDPaint","GBaySelBound",function()
 		draw.SimpleText("Press Shift when item is in crosshair or press CTRL to cancel!","GBayLabelFont",ScrW()/2,ScrH()/2 - 80,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
 	elseif LocalPlayer().GBayIsSelectingEntity then
 		draw.SimpleText("Press Shift when item is in crosshair or press CTRL to cancel!","GBayLabelFont",ScrW()/2,ScrH()/2 - 80,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
-	elseif LocalPlayer().GBayIsInMenuMinMode then
-		draw.SimpleText("Press Shift or CTRL when you would like to reopen gbay!","GBayLabelFontLarge",ScrW()/2,20,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
 	end
 end)
 
@@ -153,18 +136,6 @@ net.Receive("GBayOpenMenu",function()
 		DFrame:Close()
 	end
 	DFrameClose.Paint = function(s, w, h)
-	end
-
-	local DFrameMin = vgui.Create("DButton", DFrame)
-	DFrameMin:SetPos(DFrame:GetWide() - 60, 10)
-	DFrameMin:SetSize(25, 25)
-	DFrameMin:SetText("_")
-	DFrameMin:SetFont("GBayCloseFont")
-	DFrameMin:SetTextColor(Color(214, 214, 214))
-	DFrameMin.DoClick = function()
-		GBayMenuMin(DFrame)
-	end
-	DFrameMin.Paint = function(s, w, h)
 	end
 
 	HomeBTN = vgui.Create("DButton", DFrame)
@@ -314,4 +285,8 @@ net.Receive("GBayOpenMenu",function()
 		StaffBTN:SetPos(700, 130)
 		SettingsBTN:SetPos(770, 130)
 	end)
+end)
+
+concommand.Add("gbaytestcl",function()
+	print(GBayConfig.ServerName)
 end)
