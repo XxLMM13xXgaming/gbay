@@ -293,8 +293,12 @@ function GBayHomePageFull(DFrame, data)
 		UserRatingText:SetFont("GBayLabelFontSmall")
 
 		for playerid, player in pairs(data[1]) do
+			print("Player: "..player[2])
+			print("Pack: "..v[2])
 			if player[2] == v[2] then
+				print("Ran")
 				playerdata = player
+				print("PlayerFound: "..v[2])
 			end
 		end
 

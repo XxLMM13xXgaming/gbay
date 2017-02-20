@@ -26,6 +26,7 @@ resource.AddSingleFile("materials/gbay/Services_Small.png")
 resource.AddSingleFile("materials/gbay/Services_Large.png")
 util.AddNetworkString("GBaySetMySQL")
 util.AddNetworkString("GBayCloseSetMySQL")
+util.AddNetworkString("GBaySetMySQLFromConfig")
 util.AddNetworkString("GBayNotify")
 util.AddNetworkString("GBayOpenLoading")
 util.AddNetworkString("GBayCloseLoading")
@@ -101,6 +102,20 @@ function GBayRefreashSettings()
     GBayConfig.PriceToPayToSell = data.feepost
     GBayConfig.MaxPrice = data.maxprice
     GBayConfig.TaxToMultiplyBy = data.taxpercent / 100
+    npcpost = string.Explode(",",data.npcpos)
+    npcangt = string.Explode(",",data.npcang)
+    GBayConfig.NPCPos = Vector(npcpost[1], npcpost[2], npcpost[3])
+    GBayConfig.NPCAng = Vector(npcangt[1], npcangt[2], npcangt[3])
+    GBayConfig.NPCModel = data.npcmodel
+    local entfound = false
+    for k, v in pairs(ents.GetAll()) do
+      if v:GetClass() == "gbay_mail" then
+        entfound = true
+      end
+    end
+    if entfound == false then
+      SpawnGBayMailNPC()
+    end
   end)
 end
 
@@ -194,7 +209,7 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
               GBayMySQL:Query("SELECT * FROM serverinfo", function(serverinfo)
                 if serverinfo[1].status == false then print('GBay MySQL Error: '..serverinfo[1].error) end
                 for k, v in pairs(serverinfo[1].data) do
-                  table.insert(serverinfotable,{v.id, v.servername, v.ads, v.services, v.coupons, v.feepost, v.maxprice, v.taxpercent, v.ranks})
+                  table.insert(serverinfotable,{v.id, v.servername, v.ads, v.services, v.coupons, v.feepost, v.maxprice, v.taxpercent, v.ttnoo, v.npcpos, v.npcang, v.npcmodel, v.ranks})
                 end
                 GBayMySQL:Query("SELECT * FROM shipments", function(shipmentsinfo)
                   if shipmentsinfo[1].status == false then print('GBay MySQL Error: '..shipmentsinfo[1].error) end
@@ -247,13 +262,17 @@ net.Receive("GBayUpdateSettings",function(len, ply)
   local postingfee = settings[5]
   local maxpricetosell = settings[6]
   local taxtocharge = settings[7]
+  local npcpos = settings[8]
+  local npcang = settings[9]
+  local npcmodel = settings[10]
+
   if ads then adst = 1 else adst = 0 end
   if service then servicet = 1 else servicet = 0 end
   if coupon then coupont = 1 else coupont = 0 end
   GBayMySQL:Query("SELECT * FROM players", function(playerinfo)
     if playerinfo[1].status == false then print('GBay MySQL Error: '..playerinfo[1].error) end
     if playerinfo[1].data[1].rank == "Superadmin" or playerinfo[1].data[1].rank == "Admin" then
-      GBayMySQL:Query("UPDATE serverinfo SET servername='"..servername.."', ads='"..adst.."', services='"..servicet.."', coupons='"..coupont.."', feepost='"..postingfee.."', maxprice='"..maxpricetosell.."', taxpercent='"..taxtocharge.."'", function(result)
+      GBayMySQL:Query("UPDATE serverinfo SET servername='"..servername.."', ads='"..adst.."', services='"..servicet.."', coupons='"..coupont.."', feepost='"..postingfee.."', maxprice='"..maxpricetosell.."', taxpercent='"..taxtocharge.."', npcpos='"..npcpos.."', npcang='"..npcang.."', npcmodel='"..npcmodel.."'", function(result)
         if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
         GBayRefreashSettings()
       end)
@@ -280,7 +299,7 @@ net.Receive("GBayPurchaseItem",function(len, ply)
               if quantity == data.amount then
                 GBayMySQL:Query("DELETE FROM shipments WHERE id="..data.id, function(removeshipment)
                   if removeshipment[1].status == false then print('GBay MySQL Error: '..removeshipment[1].error) end
-                  GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer,	type,	weapon,	quantity) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Shipment', '"..data.wep.."', '"..tonumber(quantity).."')", function(addtoorder)
+                  GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer,	type,	weapon,	quantity, timestamp) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Shipment', '"..data.wep.."', '"..tonumber(quantity).."', '"..tonumber(os.time()).."')", function(addtoorder)
                     if addtoorder[1].status == false then print('GBay MySQL Error: '..addtoorder[1].error) end
                     ply:addMoney(-totalprice)
                     net.Start("GBayTransErrorReport")
@@ -291,7 +310,7 @@ net.Receive("GBayPurchaseItem",function(len, ply)
               else
                 GBayMySQL:Query("UPDATE shipments SET amount='"..data.amount - quantity.."' WHERE id="..data.id, function(removeshipment)
                   if removeshipment[1].status == false then print('GBay MySQL Error: '..removeshipment[1].error) end
-                  GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer,	type,	weapon,	quantity) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Shipment', '"..data.wep.."', '"..tonumber(quantity).."')", function(addtoorder)
+                  GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer,	type,	weapon,	quantity, timestamp) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Shipment', '"..data.wep.."', '"..tonumber(quantity).."', '"..data.price.."', '"..tonumber(os.time()).."')", function(addtoorder)
                     if addtoorder[1].status == false then print('GBay MySQL Error: '..addtoorder[1].error) end
                     ply:addMoney(-totalprice)
                     net.Start("GBayTransErrorReport")
@@ -376,7 +395,7 @@ net.Receive("GBayPurchaseItem",function(len, ply)
           if ply:getDarkRPVar("money") >= totalprice then
             GBayMySQL:Query("DELETE FROM entities WHERE id="..data.id, function(removeentity)
               if removeentity[1].status == false then print('GBay MySQL Error: '..removeentity[1].error) end
-              GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer, type, weapon, quantity) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Entity', '"..data.ent.."', '"..tonumber(quantity).."')", function(addtoorder)
+              GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer, type, weapon, quantity, pricepaid, timestamp) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Entity', '"..data.ent.."', '"..tonumber(quantity).."', '"..data.price.."', '"..tonumber(os.time()).."')", function(addtoorder)
                 if addtoorder[1].status == false then print('GBay MySQL Error: '..addtoorder[1].error) end
                 ply:addMoney(-totalprice)
                 net.Start("GBayTransErrorReport")
@@ -506,6 +525,16 @@ net.Receive("GBaySetmrep",function(len, ply)
           end
         end)
       end)
+    end
+  end)
+end)
+
+net.Receive("GBaySetMySQLFromConfig",function(len, ply)
+  GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
+    if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
+    if GBayIsSuperadmin(adminplayersresult[1].data[1]) then
+      net.Start("GBaySetMySQL")
+      net.Send(ply)
     end
   end)
 end)
