@@ -269,7 +269,7 @@ net.Receive("GBayOpenPlayerOrdersShip",function()
 	ScrollList:EnableVerticalScrollbar( true )
 
   for k, v in pairs(thetable) do
-    if !v.completed then
+    if tonumber(v.completed) == 0 then
       local ItemMain = vgui.Create("DFrame")
       ItemMain:SetSize( ScrollList:GetWide() - 20, 130 )
       ItemMain:SetDraggable( false )
@@ -329,6 +329,7 @@ net.Receive("GBayOpenPlayerOrdersShip",function()
   end
 
   net.Receive("GBayNPCShiped",function()
-    DFrame:SetVisible(true)
+--    DFrame:SetVisible(true)
+    DFrame:Close()
   end)
 end)

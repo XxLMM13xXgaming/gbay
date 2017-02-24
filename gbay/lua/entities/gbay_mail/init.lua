@@ -74,9 +74,20 @@ net.Receive("GBayCheckOrder",function(len, ply)
 			net.Start("GBayCloseNPCLoading")
 			net.Send(ply)
 			ply:GBayNotify("error", "Sorry no orders found!")
+			for k, v in pairs(ents.GetAll()) do
+				if v:GetClass() == "gbay_mail" then
+					v.PlayerWorkingWith = nil
+				end
+			end
 		end
 	end)
 end)
+
+--for k, v in pairs(ents.GetAll()) do
+--	if v:GetClass() == "gbay_mail" then
+--		v.PlayerWorkingWith = nil
+--	end
+--end
 
 net.Receive("GBayShipOrder",function(len, ply)
 	net.Start("GBayOpenNPCLoading")
@@ -93,6 +104,11 @@ net.Receive("GBayShipOrder",function(len, ply)
 			net.Start("GBayCloseNPCLoading")
 			net.Send(ply)
 			ply:GBayNotify("error", "Sorry no orders found!")
+			for k, v in pairs(ents.GetAll()) do
+				if v:GetClass() == "gbay_mail" then
+					v.PlayerWorkingWith = nil
+				end
+			end
 		end
 	end)
 end)
@@ -120,39 +136,59 @@ net.Receive("GBayShipItem",function(len, ply)
 						ply.GBayNPCNeedsItem = false
 					end
 				end)
-				for k, v in pairs(ents.GetAll()) do
-					if ( thenpc:GetPos():Distance(v:GetPos()) < 100)  then
-						if itemresult[1].data[1].type == "shipment" then
-							if v:GetClass() == "spawned_shipment" then
-								if CustomShipments[v:Getcontents()].entity == itemresult[1].data[1].weapon then
-									if CustomShipments[v:Getcontents()].amount >= itemresult[1].data[1].quantity then
-										v:Remove()
-										ply:addMoney(itemresult[1].data[1].pricepaid)
-										net.Start("GBayNPCShiped")
-										net.Send(ply)
-										ply.GBayNPCNeedsItem = false
-										GBayMySQL:Query("UPDATE orders SET completed=1 WHERE id="..itemid, function(updatingorder)
-											if updatingorder[1].status == false then print('GBay MySQL Error: '..updatingorder[1].error) end
-										end)
-									else
-										ply:GBayNotify("error", "Not enough in this shipment!")
+				timer.Create("GBayItemCheckTimer",1,10,function()
+					for k, v in pairs(ents.GetAll()) do
+						if ( thenpc:GetPos():Distance(v:GetPos()) < 100)  then
+							if itemresult[1].data[1].type == "Shipment" then
+								if v:GetClass() == "spawned_shipment" then
+									if CustomShipments[v:Getcontents()].entity == itemresult[1].data[1].weapon then
+										if v:Getcount() == itemresult[1].data[1].quantity then
+											timer.Remove("GBayItemCheckTimer")
+											v:Remove()
+											ply:addMoney(itemresult[1].data[1].pricepaid)
+											net.Start("GBayNPCShiped")
+											net.Send(ply)
+											ply.GBayNPCNeedsItem = false
+											thenpc.PlayerWorkingWith = nil
+											GBayMySQL:Query("UPDATE orders SET completed=1 WHERE id="..itemid, function(updatingorder)
+												if updatingorder[1].status == false then print('GBay MySQL Error: '..updatingorder[1].error) end
+												ply:GBayNotify("generic", "I will be shipping your item soon!")
+											end)
+										elseif v:Getcount() > itemresult[1].data[1].quantity then
+											timer.Remove("GBayItemCheckTimer")
+											v:Setcount(v:Getcount() - itemresult[1].data[1].quantity)
+											ply:addMoney(itemresult[1].data[1].pricepaid)
+											net.Start("GBayNPCShiped")
+											net.Send(ply)
+											ply.GBayNPCNeedsItem = false
+											thenpc.PlayerWorkingWith = nil
+											GBayMySQL:Query("UPDATE orders SET completed=1 WHERE id="..itemid, function(updatingorder)
+												if updatingorder[1].status == false then print('GBay MySQL Error: '..updatingorder[1].error) end
+												ply:GBayNotify("generic", "I will be shipping your item soon!")
+											end)
+										else
+											ply:GBayNotify("error", "Not enough in this shipment!")
+										end
 									end
 								end
-							end
-						elseif itemresult[1].data[1].type == "Entity" then
-							if v:GetClass() == itemresult[1].data[1].weapon then
-								v:Remove()
-								ply:addMoney(itemresult[1].data[1].pricepaid)
-								net.Start("GBayNPCShiped")
-								net.Send(ply)
-								ply.GBayNPCNeedsItem = false
-								GBayMySQL:Query("UPDATE orders SET completed=1 WHERE id="..itemid, function(updatingorder)
-									if updatingorder[1].status == false then print('GBay MySQL Error: '..itemresult[1].error) end
-								end)
+							elseif itemresult[1].data[1].type == "Entity" then
+								if v:GetClass() == itemresult[1].data[1].weapon then
+									timer.Remove("GBayItemCheckTimer")
+									v:Remove()
+									ply:addMoney(itemresult[1].data[1].pricepaid)
+									net.Start("GBayNPCShiped")
+									net.Send(ply)
+									ply.GBayNPCNeedsItem = false
+									thenpc.PlayerWorkingWith = nil
+									GBayMySQL:Query("UPDATE orders SET completed=1 WHERE id="..itemid, function(updatingorder)
+										if updatingorder[1].status == false then print('GBay MySQL Error: '..updatingorder[1].error) end
+										ply:GBayNotify("generic", "I will be shipping your item soon!")
+									end)
+								end
 							end
 						end
 					end
-				end
+				end)
 			else
 				ply:GBayNotify("error", "You dont own this item!")
 			end
@@ -164,6 +200,12 @@ end)
 
 net.Receive("GBayRetriveItem",function(len, ply)
 	local itemid = net.ReadFloat()
+	local thenpc = nil
+	for k, v in pairs(ents.GetAll()) do
+		if v:GetClass() == "gbay_mail" then
+			thenpc = v
+		end
+	end
 
 	GBayMySQL:Query("SELECT * FROM orders WHERE id="..itemid, function(itemresult)
 		if itemresult[1].status == false then print('GBay MySQL Error: '..itemresult[1].error) end
@@ -172,11 +214,56 @@ net.Receive("GBayRetriveItem",function(len, ply)
 				for k, v in pairs(ents.GetAll()) do
 					if v:GetClass() == "gbay_mail" then
 						local pos = v:GetPos() + Vector(10,0,20)
-						--continue
+						if itemresult[1].data[1].type == "Shipment" then
+
+					    local found, foundKey = DarkRP.getShipmentByName(itemresult[1].data[1].weaponshipname)
+
+					    local crate = ents.Create(found.shipmentClass or "spawned_shipment")
+					    crate.SID = ply.SID
+					    crate:Setowning_ent(ply)
+					    crate:SetContents(foundKey, itemresult[1].data[1].quantity)
+
+					    crate:SetPos(pos)
+					    crate.nodupe = true
+					    crate.ammoadd = found.spareammo
+					    crate.clip1 = found.clip1
+					    crate.clip2 = found.clip2
+					    crate:Spawn()
+					    crate:SetPlayer(ply)
+
+					    local phys = crate:GetPhysicsObject()
+					    phys:Wake()
+					    if found.weight then
+					        phys:SetMass(found.weight)
+					    end
+
+					    if IsValid(crate) then
+								GBayMySQL:Query("DELETE FROM orders WHERE id="..itemresult[1].data[1].id, function(deleteitem)
+									if deleteitem[1].status == false then print('GBay MySQL Error: '..deleteitem[1].error) end
+								end)
+					    else
+								ply:GBayNotify("error", "Woah.. Something went wrong!")
+					    end
+							thenpc.PlayerWorkingWith = nil
+						elseif itemresult[1].data[1].type == "Entity" then
+							local SpawnedEnt = ents.Create(itemresult[1].data[1].weapon)
+							SpawnedEnt:Spawn()
+							SpawnedEnt:SetPos(pos)
+							SpawnedEnt:DropToFloor()
+							if IsValid(SpawnedEnt) then
+								GBayMySQL:Query("DELETE FROM orders WHERE id="..itemresult[1].data[1].id, function(deleteitem)
+									if deleteitem[1].status == false then print('GBay MySQL Error: '..deleteitem[1].error) end
+								end)
+					    else
+								ply:GBayNotify("error", "Woah.. Something went wrong!")
+					    end
+							thenpc.PlayerWorkingWith = nil
+						end
 					end
 				end
 			end
 		end
+	end)
 end)
 
 net.Receive("GBayMailNPCReturn",function(len, ply)

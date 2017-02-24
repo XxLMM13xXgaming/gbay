@@ -439,7 +439,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				ffpi = 0
 				mpfpi = 0
 				itfpi = 0
-				ttnoo = 10
+				ttnoo = 0
 				npcposn = 0
 				npcangn = 0
 				npcmodels = ""
@@ -451,7 +451,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				ffpi = 0
 				mpfpi = 0
 				itfpi = 0
-				ttnoo = 10
+				ttnoo = 0
 				npcposn = 0
 				npcangn = 0
 				npcmodels = ""
@@ -520,7 +520,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 					local ItemMainTE = vgui.Create("DTextEntry",ItemMain)
 					ItemMainTE:SetPos(20, 25)
 					ItemMainTE:SetSize(SideBarOpened:GetWide() - 40, 20 )
-					ItemMainTE:SetText(text[3].." ("..v[3]..")")
+					ItemMainTE:SetText(v[3])
 					ItemMainTE.OnTextChanged = function(s)
 						if string.len(s:GetValue()) > tonumber(text[2]) then
 							local timeleftforrestriction = 5
