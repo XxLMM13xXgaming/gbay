@@ -4,24 +4,29 @@ net.Receive("GBaySubmitEntity",function(len, ply)
   local ent = GBayEscapeString(net.ReadEntity())
   local entprice = GBayEscapeString(net.ReadFloat())
 
-  if string.len(entname) <= 27 then
-    if string.len(entdesc) <= 81 then
-      for k, v in pairs(ents.GetAll()) do
-        if v == ent then
-          if ( ply:GetPos():Distance(v:GetPos()) < 100)  then
-            if entprice <= GBayConfig.MaxPrice then
-              GBayMySQL:Query("INSERT INTO entities ( sidmerchant, name,	description, ent, price ) VALUES ('"..ply:SteamID64().."', '"..entname.."', '"..entdesc.."', '"..v:GetClass().."', '"..entprice.."')", function(createentity)
-                if createentity[1].status == false then print('GBay MySQL Error: '..createentity[1].error) end
-                net.Start("GBayDoneLoading")
-                  net.WriteString("Entity")
-                  net.WriteTable({createentity[1].lastid, ply:SteamID64(), entname, entdesc, v:GetClass(), entprice})
-                net.Send(ply)
-              end)
+  if ply:getDarkRPVar('money') >= GBayConfig.PriceToPayToSell then
+    if string.len(entname) <= 27 then
+      if string.len(entdesc) <= 81 then
+        for k, v in pairs(ents.GetAll()) do
+          if v == ent then
+            if ( ply:GetPos():Distance(v:GetPos()) < 100)  then
+              if entprice <= GBayConfig.MaxPrice then
+                GBayMySQL:Query("INSERT INTO entities ( sidmerchant, name,	description, ent, price ) VALUES ('"..ply:SteamID64().."', '"..entname.."', '"..entdesc.."', '"..v:GetClass().."', '"..entprice.."')", function(createentity)
+                  if createentity[1].status == false then print('GBay MySQL Error: '..createentity[1].error) end
+                  net.Start("GBayDoneLoading")
+                    net.WriteString("Entity")
+                    net.WriteTable({createentity[1].lastid, ply:SteamID64(), entname, entdesc, v:GetClass(), entprice})
+                  net.Send(ply)
+                  ply:addMoney(-GBayConfig.PriceToPayToSell)
+                end)
+              end
             end
           end
         end
       end
     end
+  else
+    ply:GBayNotify("error", "You do not have enough money to post this item! (you need "..DarkRP.formatMoney(GBayConfig.PriceToPayToSell - ply:getDarkRPVar('money'))..")")
   end
 end)
 

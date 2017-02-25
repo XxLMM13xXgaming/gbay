@@ -121,6 +121,30 @@ end)
 net.Receive("GBayOpenMenu",function()
 	LocalPlayer().GBayOpenMenuTabStatus = false
 	data = net.ReadTable()
+	torate = net.ReadTable()
+	for k, v in pairs(torate) do
+		if IsValid(player.GetBySteamID64(v[1])) then
+			thequerytext = "What would you rate "..v[1].." ("..player.GetBySteamID64(v[1]):Nick()..") for the item '"..v[2].."'"
+		else
+			thequerytext = "What would you rate "..v[1].." for the item '"..v[2].."'"
+		end
+		Derma_Query( thequerytext, "GBay Rate Player!", "Positive", function()
+			net.Start("GBayPlayerRatingWorker")
+				net.WriteString(v[1])
+				net.WriteString("Positive")
+			net.SendToServer()
+		end, "Neutral", function()
+			net.Start("GBayPlayerRatingWorker")
+				net.WriteString(v[1])
+				net.WriteString("Neutral")
+			net.SendToServer()
+		end, "Negative", function()
+			net.Start("GBayPlayerRatingWorker")
+				net.WriteString(v[1])
+				net.WriteString("Negative")
+			net.SendToServer()
+		end, "Close", function() end )
+	end
 	PrintTable(data)
 	DFrame = vgui.Create( "DFrame" )
 	DFrame:SetSize( 1000, 700 )

@@ -421,6 +421,20 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 
 				end)
 			end
+
+			local ManageBTN = vgui.Create("DButton",HomePanel)
+			ManageBTN:SetPos(330, 260)
+			ManageBTN:SetSize(PurchaseBtn:GetWide(), 20)
+			ManageBTN:SetText("Manage")
+			ManageBTN:SetTextColor(Color(255,0,0))
+			ManageBTN.Paint = function(s, w, h)
+				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
+				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+			end
+			ManageBTN.DoClick = function()
+				LocalPlayer().GBayIsEditing = item[1]
+				GBaySideBarOpened(DFrame, "ManageServ", false, data, false)
+			end
 		end
 	elseif type == "Entity" then
 		if file.Exists("materials/vgui/entities/"..item[5]..".vmt","GAME") then
@@ -1132,6 +1146,20 @@ function GBayViewMoreItemSmall(type, DFrame, data, item)
 				end, "No", function()
 
 				end)
+			end
+
+			local ManageBTN = vgui.Create("DButton",HomePanel2)
+			ManageBTN:SetPos(330, 260)
+			ManageBTN:SetSize(PurchaseBtn:GetWide(), 20)
+			ManageBTN:SetText("Manage")
+			ManageBTN:SetTextColor(Color(255,0,0))
+			ManageBTN.Paint = function(s, w, h)
+				draw.RoundedBox(0,0,0,w,h,Color(238,238,238))
+				draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
+			end
+			ManageBTN.DoClick = function()
+				LocalPlayer().GBayIsEditing = item[1]
+				GBaySideBarOpened(DFrame, "ManageServ", false, data, false)
 			end
 		end
 	elseif type == "Entity" then

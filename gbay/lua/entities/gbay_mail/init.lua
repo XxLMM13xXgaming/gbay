@@ -49,6 +49,16 @@ function ENT:AcceptInput( Name, Activator, Caller )
 	end
 end
 
+hook.Add("PlayerDisconnected","GBayPlayerLeaveResetNPC",function(ply)
+	for k, v in pairs(ents.GetAll()) do
+		if v:GetClass() == "gbay_mail" then
+			if v.PlayerWorkingWith == ply then
+				v.PlayerWorkingWith = nil
+			end
+		end
+	end
+end)
+
 net.Receive("GBayNPCClosed",function(len, ply)
 	for k, v in pairs(ents.GetAll()) do
 		if v:GetClass() == "gbay_mail" then
@@ -240,6 +250,14 @@ net.Receive("GBayRetriveItem",function(len, ply)
 					    if IsValid(crate) then
 								GBayMySQL:Query("DELETE FROM orders WHERE id="..itemresult[1].data[1].id, function(deleteitem)
 									if deleteitem[1].status == false then print('GBay MySQL Error: '..deleteitem[1].error) end
+									GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(playerdata)
+										if playerdata[1].status == false then print('GBay MySQL Error: '..playerdata[1].error) end
+										newrating = util.JSONToTable(playerdata[1].data[1].rating)
+										table.insert(newrating,#newrating + 1,{itemresult[1].data[1].sidmerchant, itemresult[1].data[1].weaponshipname})
+										GBayMySQL:Query("UPDATE players SET rating='"..util.TableToJSON(newrating).."' WHERE sid="..ply:SteamID64(), function(result)
+											ply:GBayNotify("generic", "Open GBay to rate this player!")
+										end)
+									end)
 								end)
 					    else
 								ply:GBayNotify("error", "Woah.. Something went wrong!")

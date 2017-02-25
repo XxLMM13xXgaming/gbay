@@ -4,24 +4,29 @@ net.Receive("GBaySubmitShipment",function(len, ply)
   local ship = GBayEscapeString(net.ReadEntity())
   local shipprice = GBayEscapeString(net.ReadFloat())
 
-  if string.len(shipname) <= 27 then
-    if string.len(shipdesc) <= 81 then
-      for k, v in pairs(ents.GetAll()) do
-        if v == ship then
-          if ( ply:GetPos():Distance(v:GetPos()) < 100)  then
-            if shipprice <= GBayConfig.MaxPrice then
-              GBayMySQL:Query("INSERT INTO shipments ( sidmerchant,	name,	description,	wep, wepname, price, amount ) VALUES ('"..ply:SteamID64().."', '"..shipname.."', '"..shipdesc.."', '"..CustomShipments[v:Getcontents()].entity.."', '"..CustomShipments[v:Getcontents()].name.."', '"..shipprice.."', '"..CustomShipments[v:Getcontents()].amount.."')", function(createshipment)
-                if createshipment[1].status == false then print('GBay MySQL Error: '..createshipment[1].error) end
-                net.Start("GBayDoneLoading")
-                  net.WriteString("Shipment")
-                  net.WriteTable({createshipment[1].lastid, ply:SteamID64(), shipname, shipdesc, CustomShipments[v:Getcontents()].entity, shipprice, CustomShipments[v:Getcontents()].amount})
-                net.Send(ply)
-              end)
+  if ply:getDarkRPVar('money') >= GBayConfig.PriceToPayToSell then
+    if string.len(shipname) <= 27 then
+      if string.len(shipdesc) <= 81 then
+        for k, v in pairs(ents.GetAll()) do
+          if v == ship then
+            if ( ply:GetPos():Distance(v:GetPos()) < 100)  then
+              if shipprice <= GBayConfig.MaxPrice then
+                GBayMySQL:Query("INSERT INTO shipments ( sidmerchant,	name,	description,	wep, wepname, price, amount ) VALUES ('"..ply:SteamID64().."', '"..shipname.."', '"..shipdesc.."', '"..CustomShipments[v:Getcontents()].entity.."', '"..CustomShipments[v:Getcontents()].name.."', '"..shipprice.."', '"..CustomShipments[v:Getcontents()].amount.."')", function(createshipment)
+                  if createshipment[1].status == false then print('GBay MySQL Error: '..createshipment[1].error) end
+                  net.Start("GBayDoneLoading")
+                    net.WriteString("Shipment")
+                    net.WriteTable({createshipment[1].lastid, ply:SteamID64(), shipname, shipdesc, CustomShipments[v:Getcontents()].entity, shipprice, CustomShipments[v:Getcontents()].amount})
+                  net.Send(ply)
+                  ply:addMoney(-GBayConfig.PriceToPayToSell)
+                end)
+              end
             end
           end
         end
       end
     end
+  else
+    ply:GBayNotify("error", "You do not have enough money to post this item! (you need "..DarkRP.formatMoney(GBayConfig.PriceToPayToSell - ply:getDarkRPVar('money'))..")")
   end
 end)
 

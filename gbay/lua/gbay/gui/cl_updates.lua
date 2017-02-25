@@ -32,12 +32,17 @@ function GBayViewUpdatesFull(DFrame, data)
 	ScrollList:EnableVerticalScrollbar( true )
 
 	local version = "1.0.0"
+	local lversion = "1.0.3"
 
 	local versionstable = {
---		{'version', 'Title', {{"feature", "type"}, {"feature", "type"}}}
-		{'1.0.0', 'Initial Release', {"This is the FIRST release of GBay!"}, "https://github.com/XxLMM13xXgaming/GBay/releases/tag/1.0.0"}
+--		{'version', 'Title', {{"feature", "type"}, {"feature", "type"}}, link}
+		{'1.0.3', 'Initial Release2', {"This is the THIRD release of GBay!"}, "https://github.com/XxLMM13xXgaming/GBay/releases/tag/1.0.0"},
+		{'1.0.2', 'Initial Release1', {"This is the SEC release of GBay!"}, "https://github.com/XxLMM13xXgaming/GBay/releases/tag/1.0.0"},
+		{'1.0.1', 'Initial Release1', {"This is the SEC release of GBay!"}, "https://github.com/XxLMM13xXgaming/GBay/releases/tag/1.0.0"},
+		{'1.0.0', 'Initial Release0', {"This is the FIRST release of GBay!"}, "https://github.com/XxLMM13xXgaming/GBay/releases/tag/1.0.0"},
 	}
 
+	local latest = true
 	for k, v in pairs(versionstable) do
 		local posforvn = 50
 	  UpdatesLU = vgui.Create("DFrame", HomePanel)
@@ -49,9 +54,13 @@ function GBayViewUpdatesFull(DFrame, data)
 	    surface.SetDrawColor(255,255,255, 255)
 	    surface.DrawRect(0, 0, w, h)
 			if version != v[1] then
-	    	draw.SimpleText("GBay "..v[1].." is here!","GBayLabelFontBold",w / 2,10,Color( 255, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				if v[1] == lversion then
+	    		draw.SimpleText("GBay "..v[1].." is here!","GBayLabelFontBold",w / 2,10,Color( 255, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				else
+					draw.SimpleText("GBay "..v[1].." is here!","GBayLabelFontBold",w / 2,10,Color( 137, 137, 255, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				end
 			else
-				draw.SimpleText("GBay "..v[1].." is here!","GBayLabelFontBold",w / 2,10,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("GBay "..v[1].." is here! (current)","GBayLabelFontBold",w / 2,10,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end
 	    draw.SimpleText("Heres some quick info!","GBayLabelFont",w / 2,30,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			draw.SimpleText(v[2],"GBayLabelFontBold",w / 2,50,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)

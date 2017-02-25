@@ -440,9 +440,9 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				mpfpi = 0
 				itfpi = 0
 				ttnoo = 0
-				npcposn = 0
-				npcangn = 0
-				npcmodels = ""
+				npcposn = "100.0, 100.0, 100.0"
+				npcangn = "100.0, 100.0, 100.0"
+				npcmodels = "model"
 			elseif data == nil then
 				servername = "Server Name"
 				adsyon = false
@@ -452,9 +452,9 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				mpfpi = 0
 				itfpi = 0
 				ttnoo = 0
-				npcposn = 0
-				npcangn = 0
-				npcmodels = ""
+				npcposn = "100.0, 100.0, 100.0"
+				npcangn = "100.0, 100.0, 100.0"
+				npcmodels = "model"
 			elseif data != nil then
 				servername = data[2][1][2]
 				adsyon = data[2][1][3]
@@ -472,9 +472,9 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			local configs = {
 				{"Please enter your MySQL Info!", "bttn:Submit MySQL Data", [[function GBayConfigsButtonFunction() net.Start("GBaySetMySQLFromConfig") net.SendToServer() end]]},
 				{"Whats your server name?", "text:15:Server Name", servername},
-				{"Can people pay for ads?", "bool", adsyon},
-				{"Can people sell services?", "bool", servsyon},
-				{"Can people create coupons?", "bool", coupsyon},
+				{"Can people pay for ads?", "bool", adsyon, adsboolt, adsboolf},
+				{"Can people sell services?", "bool", servsyon, servboolt, servboolf},
+				{"Can people create coupons?", "bool", coupsyon, coupst, coupf},
 				{"What is the fee for posting items?", "numb:Posting Fee", ffpi},
 				{"What is the max price for items?", "numb:Max price", mpfpi},
 				{"Item tax (%)", "numb:Tax (for 8% just type 8)", itfpi},
@@ -540,48 +540,48 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 						end
 					end
 				elseif string.Left(v[2],4) == "bool" then
-					local CheckBoxYes = vgui.Create( "DCheckBoxLabel", ItemMain )
-					CheckBoxYes:SetPos( 20, 30 )
+					v[4] = vgui.Create( "DCheckBoxLabel", ItemMain )
+					v[4]:SetPos( 20, 30 )
 					if data != nil then
 						if v[3] == 1 then
-							CheckBoxYes:SetValue( 1 )
+							v[4]:SetValue( 1 )
 						else
-							CheckBoxYes:SetValue( 0 )
+							v[4]:SetValue( 0 )
 						end
 					else
-						CheckBoxYes:SetValue( 0 )
+						v[4]:SetValue( 0 )
 					end
-					CheckBoxYes:SetText("Yes")
-					CheckBoxYes:SetFont("GBayLabelFont")
-					CheckBoxYes:SetTextColor(Color(137, 137, 137))
-					CheckBoxYes.OnChange = function(value)
+					v[4]:SetText("Yes")
+					v[4]:SetFont("GBayLabelFont")
+					v[4]:SetTextColor(Color(137, 137, 137))
+					v[4].OnChange = function(value)
 						v[3] = value:GetChecked()
 						if value then
-							if CheckBoxNo:GetChecked() then
-								CheckBoxNo:SetValue(0)
+							if v[5]:GetChecked() then
+								v[5]:SetValue(0)
 								return
 							end
 						end
 					end
 
-					local CheckBoxNo = vgui.Create( "DCheckBoxLabel", ItemMain )
-					CheckBoxNo:SetPos( 20, 55 )
+					v[5] = vgui.Create( "DCheckBoxLabel", ItemMain )
+					v[5]:SetPos( 20, 55 )
 					if data != nil then
 						if v[3] == 0 then
-							CheckBoxNo:SetValue( 1 )
+							v[5]:SetValue( 1 )
 						else
-							CheckBoxNo:SetValue( 0 )
+							v[5]:SetValue( 0 )
 						end
 					else
-						CheckBoxNo:SetValue( 0 )
+						v[5]:SetValue( 0 )
 					end
-					CheckBoxNo:SetText("No")
-					CheckBoxNo:SetFont("GBayLabelFont")
-					CheckBoxNo:SetTextColor(Color(137, 137, 137))
-					CheckBoxNo.OnChange = function(value)
+					v[5]:SetText("No")
+					v[5]:SetFont("GBayLabelFont")
+					v[5]:SetTextColor(Color(137, 137, 137))
+					v[5].OnChange = function(value)
 						if value then
-							if CheckBoxYes:GetChecked() then
-								CheckBoxYes:SetValue(0)
+							if v[4]:GetChecked() then
+								v[4]:SetValue(0)
 								return
 							end
 
@@ -2153,6 +2153,84 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			GBaySideBarOpened(DFrame, "Loading", false, data, firstjoined)
 		end
 		usedservice = true
+	elseif tab == "ManageServ" then
+		local playerselected = false
+		local GBayLogoCreate = Material("gbay/Create_Logo.png")
+		SideBarOpened.Paint = function(s, w, h)
+			surface.SetDrawColor(255,255,255, 255)
+			surface.DrawRect(0, 0, w, h)
+			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetMaterial( GBayLogoCreate	)
+			surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
+			draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
+			draw.SimpleText("Manage buyers...","GBayLabelFont",w / 2,140,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			if playerselected then
+				draw.SimpleText("Finish this players service?","GBayLabelFont",w / 2,200,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			end
+			/*
+			draw.SimpleText("Description of the service?","GBayLabelFont",w / 2,260,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("What is the price of your shipment?","GBayLabelFont",w / 2,340,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Submit your Item??","GBayLabelFont",w / 2,400,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			*/
+			draw.RoundedBox(0,0,560,w,2,Color(221,221,221))
+			draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Check updates tab often","GBayLabelFont",w / 2,590,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,610,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+		end
+
+		local editingwep = nil
+
+		for k, v in pairs(data[4]) do
+			if v[1] == LocalPlayer().GBayIsEditing then
+				editingwep = v
+			end
+		end
+
+		local buyers = util.JSONToTable(editingwep[6])
+		local CreateItmType = vgui.Create( "DComboBox", SideBarOpened )
+		CreateItmType:SetPos(20, 170)
+		CreateItmType:SetSize(SideBarOpened:GetWide() - 40, 20 )
+		CreateItmType:SetValue( "Buyers" )
+		for k, v in pairs(buyers) do
+			if IsValid(player.GetBySteamID64(v)) then
+				CreateItmType:AddChoice( v.." ("..player.GetBySteamID64(v):Nick()..")", v  )
+			else
+				CreateItmType:AddChoice( v  )
+			end
+		end
+		CreateItmType.OnSelect = function( panel, index, value )
+			print( value .." was selected! ("..panel:GetOptionData(index)..")" )
+			playerselected = true
+			local SetDone = vgui.Create("DButton", SideBarOpened)
+			SetDone:SetPos(20, 230)
+			SetDone:SetSize(SideBarOpened:GetWide() - 40, 20)
+			SetDone:SetText("Mark As Done")
+			SetDone:SetTextColor(Color(255,255,255))
+			SetDone.Paint = function(s, w, h)
+				draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+			end
+			SetDone.DoClick = function()
+				Derma_Query( "How would you rate this player?", "GBay mark service as done!", "Positive", function()
+					net.Start("GBayMarkServiceAsDone")
+					net.WriteFloat(editingwep[1])
+						net.WriteString(panel:GetOptionData(index))
+						net.WriteString("Positive")
+					net.SendToServer()
+				end, "Neutral", function()
+					net.Start("GBayMarkServiceAsDone")
+						net.WriteFloat(editingwep[1])
+						net.WriteString(panel:GetOptionData(index))
+						net.WriteString("Positive")
+					net.SendToServer()
+				end, "Negative", function()
+					net.Start("GBayMarkServiceAsDone")
+						net.WriteFloat(editingwep[1])
+						net.WriteString(panel:GetOptionData(index))
+						net.WriteString("Positive")
+					net.SendToServer()
+				end, "Close", function() end )
+			end
+		end
 	elseif tab == "EditEnt" then
 		local GBayLogoCreate = Material("gbay/Create_Logo.png")
 		usedshipments = true
