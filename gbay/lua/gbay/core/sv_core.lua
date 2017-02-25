@@ -84,7 +84,10 @@ function GBayIsAdmin(data)
 end
 
 function GBayIsBanned(data)
-  if data[1].affected > 1 then return true else return false end
+  if data[1].affected > 1 then
+    return true
+  end
+  return false
 end
 
 function plymeta:GBayNotify(type, message)
