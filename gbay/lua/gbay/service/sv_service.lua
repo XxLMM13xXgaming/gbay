@@ -1,6 +1,6 @@
 net.Receive("GBaySubmitService",function(len, ply)
-  local servname = GBayEscapeString(net.ReadString())
   local servdesc = GBayEscapeString(net.ReadString())
+  local servname = GBayEscapeString(net.ReadString())
   local servprice = GBayEscapeString(net.ReadFloat())
 
   if GBayConfig.ServiceToggle then
@@ -72,8 +72,8 @@ end)
 
 net.Receive("GBayMarkServiceAsDone",function(len, ply)
   local service = net.ReadFloat()
-  local playersid = net.ReadString()
-  local rate = net.ReadString()
+  local playersid = GBayEscapeString(net.ReadString())
+  local rate = GBayEscapeString(net.ReadString())
 
   GBayMySQL:Query("SELECT * FROM service WHERE id="..service, function(servr)
     if servr[1].status == false then print('GBay MySQL Error: '..servr[1].error) end

@@ -589,8 +589,8 @@ net.Receive("GBaySetMySQLFromConfig",function(len, ply)
 end)
 
 net.Receive("GBayPlayerRatingWorker",function(len, ply)
-  local playertorate = net.ReadString()
-  local rate = net.ReadString()
+  local playertorate = GBayEscapeString(net.ReadString())
+  local rate = GBayEscapeString(net.ReadString())
 
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(playersdata)
     if playersdata[1].status == false then print('GBay MySQL Error: '..playersdata[1].error) end
