@@ -3,6 +3,7 @@ include("gbay/shipment/sv_shipment.lua")
 include("gbay/service/sv_service.lua")
 include("gbay/entity/sv_entity.lua")
 AddCSLuaFile("gbay/mysql/cl_mysql.lua")
+AddCSLuaFile("gbay/gui/cl_adminpanel.lua")
 AddCSLuaFile("gbay/gui/cl_fonts.lua")
 AddCSLuaFile("gbay/gui/cl_bases.lua")
 AddCSLuaFile("gbay/gui/cl_loading.lua")
@@ -24,6 +25,7 @@ resource.AddSingleFile("materials/gbay/Neutral.png")
 resource.AddSingleFile("materials/gbay/Star128.png")
 resource.AddSingleFile("materials/gbay/Services_Small.png")
 resource.AddSingleFile("materials/gbay/Services_Large.png")
+util.AddNetworkString("GBayOpenAdminPanel")
 util.AddNetworkString("GBaySetMySQL")
 util.AddNetworkString("GBayCloseSetMySQL")
 util.AddNetworkString("GBaySetMySQLFromConfig")
@@ -50,6 +52,7 @@ util.AddNetworkString("GBayPurchaseItem")
 util.AddNetworkString("GBayTransErrorReport")
 util.AddNetworkString("GBayRemoveItem")
 util.AddNetworkString("GBayBanPlayer")
+util.AddNetworkString("GBayUnBanPlayer")
 util.AddNetworkString("GBaySetPlayerRank")
 util.AddNetworkString("GBaySetprep")
 util.AddNetworkString("GBaySetnrep")
@@ -299,6 +302,22 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
       end
     end)
     return ''
+  elseif text:lower():match('[!/:.]gadmin') then
+    GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(playerresult)
+      if playerresult[1].status == false then print('GBay MySQL Error: '..playerresult[1].error) end
+      if GBayIsAdmin(playerresult[1].data[1]) then
+        GBayMySQL:Query("SELECT * FROM players", function(allplayerresult)
+          if allplayerresult[1].status == false then print('GBay MySQL Error: '..allplayerresult[1].error) end
+          ply:GBayNotify("generic", "Loading players...")
+          net.Start("GBayOpenAdminPanel")
+            net.WriteTable(allplayerresult[1].data)
+          net.Send(ply)
+        end)
+      else
+        ply:GBayNotify("error", "Get outta here!")
+      end
+    end)
+    return ''
   end
 end)
 
@@ -480,22 +499,28 @@ end)
 
 net.Receive("GBayBanPlayer",function(len, ply)
   days = GBayEscapeString(net.ReadFloat())
-  victim = GBayEscapeString(net.ReadFloat())
-
+  victim = GBayEscapeString(net.ReadString())
+  print(victim)
+  print("Ran")
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
     if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
     if GBayIsAdmin(adminplayersresult[1].data[1]) then
+      print("Ran1")
       GBayMySQL:Query("SELECT * FROM players WHERE id="..victim, function(victimplayersresult)
         if victimplayersresult[1].status == false then print('GBay MySQL Error: '..victimplayersresult[1].error) end
-        GBayMySQL:Query("SELECT * FROM bans WHERE bid="..victimplayersresult[1].data[1].sid, function(bansresult)
+        GBayMySQL:Query("SELECT * FROM bans WHERE bid="..victim, function(bansresult)
+          print("Ran2")
           if bansresult[1].status == false then print('GBay MySQL Error: '..bansresult[1].error) end
           if bansresult[1].affected > 1 then
             ply:GBayNotify("error", "This player is already banned!")
           else
-            GBayMySQL:Query("INSERT INTO bans (bid, aid, time) VALUES ('"..victimplayersresult[1].data[1].sid.."', '"..ply:SteamID64().."', '"..os.time() + 60*60*24*days.."')", function(banresult)
+            print("Ran3")
+            GBayMySQL:Query("INSERT INTO bans (bid, aid, time) VALUES ('"..victim.."', '"..ply:SteamID64().."', '"..os.time() + 60*60*24*days.."')", function(banresult)
+              print("Ran4")
               if banresult[1].status == false then print('GBay MySQL Error: '..banresult[1].error) end
-              if IsValid(player.GetBySteamID64(victimplayersresult[1].data[1].sid)) then
-                player.GetBySteamID64(victimplayersresult[1].data[1].sid):GBayNotify("error", "You have been banned by "..player.GetBySteamID64(ply:SteamID64()):Nick().." for "..days.." day(s)!")
+              print("Ran5")
+              if IsValid(player.GetBySteamID64(victim)) then
+                player.GetBySteamID64(victim):GBayNotify("error", "You have been banned by "..player.GetBySteamID64(ply:SteamID64()):Nick().." for "..days.." day(s)!")
               end
             end)
           end
@@ -505,18 +530,43 @@ net.Receive("GBayBanPlayer",function(len, ply)
   end)
 end)
 
+net.Receive("GBayUnBanPlayer",function(len, ply)
+  victim = GBayEscapeString(net.ReadString())
+  GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
+    if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
+    if GBayIsAdmin(adminplayersresult[1].data[1]) then
+      GBayMySQL:Query("SELECT * FROM players WHERE id="..victim, function(victimplayersresult)
+        if victimplayersresult[1].status == false then print('GBay MySQL Error: '..victimplayersresult[1].error) end
+        GBayMySQL:Query("SELECT * FROM bans WHERE bid="..victim, function(bansresult)
+          if bansresult[1].status == false then print('GBay MySQL Error: '..bansresult[1].error) end
+          if bansresult[1].affected > 0 then
+            GBayMySQL:Query("DELETE FROM bans WHERE bid ="..ply:SteamID64(), function(banresult)
+              if banresult[1].status == false then print('GBay MySQL Error: '..banresult[1].error) end
+              if IsValid(player.GetBySteamID64(victim)) then
+                player.GetBySteamID64(victim):GBayNotify("generic", "You have been unbanned by "..player.GetBySteamID64(ply:SteamID64()):Nick().."!")
+              end
+            end)
+          else
+            ply:GBayNotify("error", "This player is not banned!")
+          end
+        end)
+      end)
+    end
+  end)
+end)
+
 net.Receive("GBaySetPlayerRank",function(len, ply)
   rank = GBayEscapeString(net.ReadString())
-  victim = GBayEscapeString(net.ReadFloat())
+  victim = GBayEscapeString(net.ReadString())
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
     if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
     if GBayIsSuperadmin(adminplayersresult[1].data[1]) then
       GBayMySQL:Query("SELECT * FROM players WHERE id="..victim, function(victimplayersresult)
         if victimplayersresult[1].status == false then print('GBay MySQL Error: '..victimplayersresult[1].error) end
-        GBayMySQL:Query("UPDATE players SET rank='"..rank.."' WHERE id="..victim, function(rankchangedresult)
+        GBayMySQL:Query("UPDATE players SET rank='"..rank.."' WHERE sid="..victim, function(rankchangedresult)
           if rankchangedresult[1].status == false then print('GBay MySQL Error: '..rankchangedresult[1].error) end
-          if IsValid(player.GetBySteamID64(victimplayersresult[1].data[1].sid)) then
-            player.GetBySteamID64(victimplayersresult[1].data[1].sid):GBayNotify("generic", "Your rank has been set by "..player.GetBySteamID64(ply:SteamID64()):Nick().." to "..rank.."!")
+          if IsValid(player.GetBySteamID64(victim)) then
+            player.GetBySteamID64(victim):GBayNotify("generic", "Your rank has been set by "..player.GetBySteamID64(ply:SteamID64()):Nick().." to "..rank.."!")
           end
         end)
       end)

@@ -1229,7 +1229,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 					function( text )
 						net.Start("GBayBanPlayer")
 							net.WriteFloat(tonumber(text))
-							net.WriteFloat(tonumber(playerdata[1]))
+							net.WriteString(playerdata[1])
 						net.SendToServer()
 					end,
 					function( text ) end
@@ -1253,7 +1253,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 					function( text )
 						net.Start("GBaySetPlayerRank")
 							net.WriteString(text)
-							net.WriteFloat(tonumber(playerdata[1]))
+							net.WriteString(playerdata[1])
 						net.SendToServer()
 					end,
 					function( text ) end
@@ -1335,7 +1335,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 						print("Ran")
 						net.Start("GBayBanPlayer")
 							net.WriteFloat(tonumber(text))
-							net.WriteFloat(tonumber(playerdata[1]))
+							net.WriteString(playerdata[1])
 						net.SendToServer()
 					end,
 					function( text ) end
