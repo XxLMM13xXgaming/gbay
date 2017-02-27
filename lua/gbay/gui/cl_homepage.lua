@@ -435,10 +435,12 @@ function GBayHomePageFull(DFrame, data)
 			theweaponpic = "entities/"..v[5]..".png"
 		end
 
-		local WeaponModel = vgui.Create("DImage", ItemMain)
-		WeaponModel:SetPos(0,0)
-		WeaponModel:SetSize(100, 100)
-		WeaponModel:SetImage(theweaponpic)
+		if theweaponpic then
+			local WeaponModel = vgui.Create("DImage", ItemMain)
+			WeaponModel:SetPos(0,0)
+			WeaponModel:SetSize(100, 100)
+			WeaponModel:SetImage(theweaponpic)
+		end
 
 		local ItemName = vgui.Create("DLabel", ItemMain)
 		ItemName:SetPos(110, 10)
@@ -943,11 +945,13 @@ function GBayHomePageSmall(DFrame, data)
 			theweaponpic = "entities/"..v[5]..".png"
 		end
 
-		local WeaponModel = vgui.Create("DImage", ItemMain)
-		WeaponModel:SetPos(0,0)
-		WeaponModel:SetSize(100, 100)
-		WeaponModel:SetImage(theweaponpic)
-
+		if theweaponpic then
+			local WeaponModel = vgui.Create("DImage", ItemMain)
+			WeaponModel:SetPos(0,0)
+			WeaponModel:SetSize(100, 100)
+			WeaponModel:SetImage(theweaponpic)
+		end
+		
 		local ItemName = vgui.Create("DLabel", ItemMain)
 		ItemName:SetPos(110, 10)
 		ItemName:SetSize(ItemMain:GetWide(), 20)
