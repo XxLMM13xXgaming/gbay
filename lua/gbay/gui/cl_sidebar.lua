@@ -8,7 +8,7 @@ function GBaySideBarClosed(DFrame, tab, settingbtnclicked, data, firstjoined)
 	GBayDFrameLogo = vgui.Create("DImage", DFrame)
 	GBayDFrameLogo:SetPos(DFrame:GetWide() / 2 - 129/2,20)
 	GBayDFrameLogo:SetSize(129, 59)
-	GBayDFrameLogo:SetImage("gbay/Logo.png")
+	GBayDFrameLogo:SetImage("gbay/Logo2.png")
 
 	SideBarClosed = vgui.Create("DFrame", DFrame)
 	SideBarClosed:SetPos(0,0)
@@ -52,7 +52,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 	GBayDFrameLogo = vgui.Create("DImage", DFrame)
 	GBayDFrameLogo:SetPos(DFrame:GetWide() / 2 - 129/2 +280/2,20)
 	GBayDFrameLogo:SetSize(129, 59)
-	GBayDFrameLogo:SetImage("gbay/Logo.png")
+	GBayDFrameLogo:SetImage("gbay/Logo2.png")
 
 	if IsValid(SideBarClosed) then SideBarClosed:Close() end
 	if IsValid(SideBarOpened) then SideBarOpened:Close() end
@@ -1919,6 +1919,61 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				end
 			end
 			used = true
+		end
+	elseif tab == "CreateAds" then
+		local GBayLogoCreate = Material("gbay/Create_AdsLogo.png")
+		local thepricetopay = 0
+		SideBarOpened.Paint = function(s, w, h)
+			surface.SetDrawColor(255,255,255, 255)
+			surface.DrawRect(0, 0, w, h)
+			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetMaterial( GBayLogoCreate	)
+			surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
+			draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
+			draw.SimpleText("Lets advertise your items!","GBayLabelFont",w / 2,140,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Please select an item!","GBayLabelFont",w / 2,170,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Advertise for: "..DarkRP.formatMoney(thepricetopay).."!","GBayLabelFont",w / 2,230,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+
+			draw.RoundedBox(0,0,520,w,2,Color(221,221,221))
+			draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Check updates tab often","GBayLabelFont",w / 2,590,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,610,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+		end
+
+		local PickItemToAd = vgui.Create( "DComboBox", SideBarOpened )
+		PickItemToAd:SetPos(20, 200)
+		PickItemToAd:SetSize(SideBarOpened:GetWide() - 40, 20 )
+		PickItemToAd:SetValue( "Item" )
+		for k, v in pairs(data[3]) do
+			if v[2] == LocalPlayer():SteamID64() then
+				PickItemToAd:AddChoice( v[3], v )
+			end
+		end
+		for k, v in pairs(data[4]) do
+			if v[2] == LocalPlayer():SteamID64() then
+				PickItemToAd:AddChoice( v[3], v )
+			end
+		end
+		for k, v in pairs(data[5]) do
+			if v[2] == LocalPlayer():SteamID64() then
+				PickItemToAd:AddChoice( v[3], v )
+			end
+		end
+		PickItemToAd.OnSelect = function( panel, index, value )
+			PrintTable(panel:GetOptionData(index))
+			thepricetopay = panel:GetOptionData(index)/2
+		end
+
+		local PurchaseItemAds = vgui.Create("DButton", SideBarOpened)
+		PurchaseItemAds:SetPos(20, 260)
+		PurchaseItemAds:SetSize(SideBarOpened:GetWide() - 40, 20)
+		PurchaseItemAds:SetText("Purchase Advertisment")
+		PurchaseItemAds:SetTextColor(Color(255,255,255))
+		PurchaseItemAds.Paint = function(s, w, h)
+			draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
+		end
+		PurchaseItemAds.DoClick = function()
+
 		end
 	elseif tab == "EditShip" then
 		local GBayLogoCreate = Material("gbay/Create_Logo.png")

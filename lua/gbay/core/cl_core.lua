@@ -7,6 +7,7 @@ include("gbay/gui/cl_sidebar.lua")
 include("gbay/gui/cl_orderpage.lua")
 include("gbay/gui/cl_homepage.lua")
 include("gbay/gui/cl_updates.lua")
+include("gbay/ads/cl_ads.lua")
 include("gbay/shipment/cl_shipment.lua")
 include("gbay/service/cl_service.lua")
 include("gbay/entity/cl_entity.lua")
@@ -270,7 +271,8 @@ net.Receive("GBayOpenMenu",function()
 	AdsBTN:SizeToContents()
 	AdsBTN.Paint = function() end
 	AdsBTN.DoClick = function()
-
+		GBayAdsPageFull(DFrame, data)
+		LocalPlayer().TabCurrentlyOn = "Ads"
 	end
 
 	StaffBTN = vgui.Create("DButton", DFrame)
