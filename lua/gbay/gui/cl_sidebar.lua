@@ -1933,6 +1933,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			draw.SimpleText("Lets advertise your items!","GBayLabelFont",w / 2,140,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			draw.SimpleText("Please select an item!","GBayLabelFont",w / 2,170,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			draw.SimpleText("Advertise for: "..DarkRP.formatMoney(thepricetopay).."!","GBayLabelFont",w / 2,230,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+			draw.SimpleText("Advertise for 1 day!","GBayLabelFont",w / 2,260,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 
 			draw.RoundedBox(0,0,520,w,2,Color(221,221,221))
 			draw.SimpleText("More content coming.","GBayLabelFontBold",w / 2,570,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
@@ -1940,32 +1941,37 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			draw.SimpleText(" to keep up to date!","GBayLabelFont",w / 2,610,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 		end
 
+		local theadtype = ""
+		local theadid = 0
+
 		local PickItemToAd = vgui.Create( "DComboBox", SideBarOpened )
 		PickItemToAd:SetPos(20, 200)
 		PickItemToAd:SetSize(SideBarOpened:GetWide() - 40, 20 )
 		PickItemToAd:SetValue( "Item" )
 		for k, v in pairs(data[3]) do
 			if v[2] == LocalPlayer():SteamID64() then
-				PickItemToAd:AddChoice( v[3], v )
+				PickItemToAd:AddChoice( v[3], {v, "Ship"} )
 			end
 		end
 		for k, v in pairs(data[4]) do
 			if v[2] == LocalPlayer():SteamID64() then
-				PickItemToAd:AddChoice( v[3], v )
+				PickItemToAd:AddChoice( v[3], {v, "Serv"} )
 			end
 		end
 		for k, v in pairs(data[5]) do
 			if v[2] == LocalPlayer():SteamID64() then
-				PickItemToAd:AddChoice( v[3], v )
+				PickItemToAd:AddChoice( v[3], {v, "Ent"} )
 			end
 		end
 		PickItemToAd.OnSelect = function( panel, index, value )
-			PrintTable(panel:GetOptionData(index))
-			thepricetopay = panel:GetOptionData(index)/2
+			if isnumber(panel:GetOptionData(index)[1][5]) then theprice = panel:GetOptionData(index)[1][5] else theprice = panel:GetOptionData(index)[1][6] end
+			theadtype = panel:GetOptionData(index)[2]
+			theadid = panel:GetOptionData(index)[1][1]
+			thepricetopay = theprice/2
 		end
 
 		local PurchaseItemAds = vgui.Create("DButton", SideBarOpened)
-		PurchaseItemAds:SetPos(20, 260)
+		PurchaseItemAds:SetPos(20, 290)
 		PurchaseItemAds:SetSize(SideBarOpened:GetWide() - 40, 20)
 		PurchaseItemAds:SetText("Purchase Advertisment")
 		PurchaseItemAds:SetTextColor(Color(255,255,255))
@@ -1973,7 +1979,12 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			draw.RoundedBox(3,0,0,w,h,Color(0, 95, 168))
 		end
 		PurchaseItemAds.DoClick = function()
-
+			if theadtype != "" then
+				net.Start("GBayPurchaseAd")
+					net.WriteString(theadtype)
+					net.WriteString(theadid)
+				net.SendToServer()
+			end
 		end
 	elseif tab == "EditShip" then
 		local GBayLogoCreate = Material("gbay/Create_Logo.png")
