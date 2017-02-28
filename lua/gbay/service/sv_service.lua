@@ -1,6 +1,6 @@
 net.Receive("GBaySubmitService",function(len, ply)
-  local servdesc = GBayEscapeString(net.ReadString())
   local servname = GBayEscapeString(net.ReadString())
+  local servdesc = GBayEscapeString(net.ReadString())
   local servprice = GBayEscapeString(net.ReadFloat())
 
   if GBayConfig.ServiceToggle then
