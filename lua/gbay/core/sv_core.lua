@@ -61,6 +61,7 @@ util.AddNetworkString("GBaySetprep")
 util.AddNetworkString("GBaySetnrep")
 util.AddNetworkString("GBaySetmrep")
 util.AddNetworkString("GBayPlayerRatingWorker")
+util.AddNetworkString("GBayPurchaseAd")
 GBayConfig = {}
 
 local OwnerSID = nil
@@ -166,6 +167,16 @@ hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
             end
           end
         end)
+        GBayMySQL:Query("SELECT * FROM ads", function(adsonserver)
+          if adsonserver[1].status == false then print('GBay MySQL Error: '..adsonserver[1].error) end
+          for k, v in pairs(adsonserver[1].data) do
+            if v.timetoexpire < os.time() then
+              GBayMySQL:Query("DELETE * FROM ads WHERE id="..v.id, function(removeads)
+                if removeads[1].status == false then print('GBay MySQL Error: '..removeads[1].error) end
+              end)
+            end
+          end
+        end)
         GBayMySQL:Query("SELECT * FROM orders WHERE sidmerchant ="..ply:SteamID64(), function(playersorders)
           if playersorders[1].status == false then print('GBay MySQL Error: '..playersorders[1].error) end
           if playersorders[1].affected > 0 then
@@ -210,6 +221,7 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
   local shipmentsinfotable = {}
   local serviceinfotable = {}
   local entityinfotable = {}
+  local adsinfotable = {}
   if text:lower():match('[!/:.]gbay') then
     net.Start("GBayOpenLoading")
     net.Send(ply)
@@ -282,19 +294,26 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
                       for k, v in pairs(entityinfo[1].data) do
                         table.insert(entityinfotable,{v.id, v.sidmerchant, v.name, v.description, v.ent, v.price})
                       end
-                    end)
-                    timer.Simple(2,function()
-                      table.insert(JammedTable,1,playerinfotable)
-                      table.insert(JammedTable,2,serverinfotable)
-                      table.insert(JammedTable,3,shipmentsinfotable)
-                      table.insert(JammedTable,4,serviceinfotable)
-                      table.insert(JammedTable,5,entityinfotable)
-                      net.Start("GBayOpenMenu")
-                        net.WriteTable(JammedTable)
-                        net.WriteTable(JammedTable2)
-                      net.Send(ply)
-                      net.Start("GBayCloseLoading")
-                      net.Send(ply)
+                      GBayMySQL:Query("SELECT * FROM ads", function(adsinfo)
+                        if adsinfo[1].status == false then print('GBay MySQL Error: '..adsinfo[1].error) end
+                        for k, v in pairs(adsinfo[1].data) do
+                          table.insert(adsinfotable,{v.id, v.asid, v.type, v.iid, v.timetoexpire})
+                        end
+                      end)
+                      timer.Simple(2,function()
+                        table.insert(JammedTable,1,playerinfotable)
+                        table.insert(JammedTable,2,serverinfotable)
+                        table.insert(JammedTable,3,shipmentsinfotable)
+                        table.insert(JammedTable,4,serviceinfotable)
+                        table.insert(JammedTable,5,entityinfotable)
+                        table.insert(JammedTable,6,adsinfotable)
+                        net.Start("GBayOpenMenu")
+                          net.WriteTable(JammedTable)
+                          net.WriteTable(JammedTable2)
+                        net.Send(ply)
+                        net.Start("GBayCloseLoading")
+                        net.Send(ply)
+                      end)
                     end)
                   end)
                 end)

@@ -271,18 +271,22 @@ net.Receive("GBayOpenMenu",function()
 	AdsBTN:SizeToContents()
 	AdsBTN.Paint = function() end
 	AdsBTN.DoClick = function()
-		GBayAdsPageFull(DFrame, data)
-		LocalPlayer().TabCurrentlyOn = "Ads"
+		LocalPlayer()TabCurrentlyOn = "Ads"
+		if LocalPlayer().GBayOpenMenuTabStatus then
+			GBayAdsPageSmall(DFrame, data)
+		else
+			GBayAdsPageFull(DFrame, data)
+		end
 	end
 
-	StaffBTN = vgui.Create("DButton", DFrame)
-	StaffBTN:SetPos(730, 130)
-	StaffBTN:SetText("Staff")
-	StaffBTN:SetFont("GBayLabelFontBold")
-	StaffBTN:SetTextColor(Color( 142, 142, 142, 255 ))
-	StaffBTN:SizeToContents()
-	StaffBTN.Paint = function() end
-	StaffBTN.DoClick = function()
+	HelpBTN = vgui.Create("DButton", DFrame)
+	HelpBTN:SetPos(730, 130)
+	HelpBTN:SetText("Help")
+	HelpBTN:SetFont("GBayLabelFontBold")
+	HelpBTN:SetTextColor(Color( 142, 142, 142, 255 ))
+	HelpBTN:SizeToContents()
+	HelpBTN.Paint = function() end
+	HelpBTN.DoClick = function()
 
 	end
 
@@ -301,10 +305,13 @@ net.Receive("GBayOpenMenu",function()
 	GBaySideBarClosed(DFrame, "Dashboard", false, data, false)
 	GBayHomePageFull(DFrame, data)
 	hook.Add("GBaySideBarClosed","CheckToSeeIfSidebarOpened",function()
+		print(LocalPlayer().TabCurrentlyOn)
 		if LocalPlayer().TabCurrentlyOn == "Home" then
 			GBayHomePageFull(DFrame, data)
 		elseif LocalPlayer().TabCurrentlyOn == "Order" then
 			GBayViewMoreItemFull(LocalPlayer().GBayOrderType, DFrame, data, LocalPlayer().GBayOrderItem)
+		elseif LocalPlayer().TabCurrentlyOn == "Ads" then
+			GBayAdsPageFull(DFrame, data)
 		else
 			GBayHomePageFull(DFrame, data)
 		end
@@ -317,7 +324,7 @@ net.Receive("GBayOpenMenu",function()
 		ServicesBTN:SetPos(500, 130)
 		AdsBTN:SetPos(590, 130)
 		AdsBTN:SetText("Advertisments")
-		StaffBTN:SetPos(730, 130)
+		HelpBTN:SetPos(730, 130)
 		SettingsBTN:SetPos(800, 130)
 	end)
 
@@ -326,6 +333,8 @@ net.Receive("GBayOpenMenu",function()
 			GBayHomePageSmall(DFrame, data)
 		elseif LocalPlayer().TabCurrentlyOn == "Order" then
 			GBayViewMoreItemSmall(LocalPlayer().GBayOrderType, DFrame, data, LocalPlayer().GBayOrderItem)
+		elseif LocalPlayer().TabCurrentlyOn == "Ads" then
+			GBayAdsPageSmall(DFrame, data)
 		else
 			GBayHomePageSmall(DFrame, data)
 		end
@@ -338,7 +347,7 @@ net.Receive("GBayOpenMenu",function()
 		ServicesBTN:SetPos(550, 130)
 		AdsBTN:SetPos(600, 130)
 		AdsBTN:SetText("Ads")
-		StaffBTN:SetPos(700, 130)
+		HelpBTN:SetPos(700, 130)
 		SettingsBTN:SetPos(770, 130)
 	end)
 end)
