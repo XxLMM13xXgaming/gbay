@@ -77,8 +77,10 @@ net.Receive("GBaySetMySQL",function(len, ply)
   end
 end)
 
---concommand.Add("gbayresetmysql",function()
---  sql.Query("DROP TABLE gbaymysqlinfo")
---  GBayMySQLInfo = sql.Query("SELECT * FROM gbaymysqlinfo")
---  print(GBayMySQLInfo)
---end)
+concommand.Add("gbayresetmysql",function(ply)
+  if ply:IsSuperAdmin() then
+    sql.Query("DROP TABLE gbaymysqlinfo")
+    GBayMySQLInfo = sql.Query("SELECT * FROM gbaymysqlinfo")
+    print(GBayMySQLInfo)
+  end
+end)

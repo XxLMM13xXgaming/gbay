@@ -3,6 +3,8 @@ net.Receive("GBayOpenLoading",function()
   local loadingtext = "Loading"
 	local GBayLogo = Material("gbay/Logo.png")
 
+  local loadingperc = 0
+
   local DFrame = vgui.Create( "DFrame" )
   DFrame:SetPos(-frame_w, ScrH()/2 - frame_h/2)
 	DFrame:SetSize( frame_w, frame_h )
@@ -23,12 +25,20 @@ net.Receive("GBayOpenLoading",function()
       if !IsValid(DFrame) then return end
       if loadingtext == "Loading" then loadingtext = "Loading." elseif loadingtext == "Loading." then loadingtext = "Loading.." elseif loadingtext == "Loading.." then loadingtext = "Loading..." elseif loadingtext == "Loading..." then loadingtext = "Loading" end
     end)
+    net.Receive("GBayGUILoadingPercLoad",function()
+      loadingperc = loadingperc + 142
+    end)
+    net.Receive("GBayGUILoadingPercLoad100",function()
+      loadingperc = 1000
+    end)
     DFrame.Paint = function(s, w, h)
 			surface.SetDrawColor(247,247,247)
 	    surface.DrawRect(0, 0, w, h)
 			surface.SetDrawColor( 255, 255, 255, 255 )
 			surface.SetMaterial( GBayLogo	)
 			surface.DrawTexturedRect(w / 2 - 129/2,20,129,59)
+
+      draw.RoundedBox(0,0,h-5,loadingperc,5,Color(255,0,0))
 
       for k, v in pairs(mf.fireworks) do
         if (not v.peaked) then
