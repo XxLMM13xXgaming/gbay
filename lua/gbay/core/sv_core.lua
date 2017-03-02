@@ -35,6 +35,8 @@ util.AddNetworkString("GBaySetMySQLFromConfig")
 util.AddNetworkString("GBayNotify")
 util.AddNetworkString("GBayOpenLoading")
 util.AddNetworkString("GBayCloseLoading")
+util.AddNetworkString("GBayGUILoadingPercLoad")
+util.AddNetworkString("GBayGUILoadingPercLoad100")
 util.AddNetworkString("GBayOpenCreateServer")
 util.AddNetworkString("GBayUpdateSettings")
 util.AddNetworkString("GBayOpenLoadingSettingUpServer")
@@ -266,6 +268,8 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
             local JammedTable2 = {}
             GBayMySQL:Query("SELECT * FROM players", function(playerinfo)
               if playerinfo[1].status == false then print('GBay MySQL Error: '..playerinfo[1].error) end
+              net.Start("GBayGUILoadingPercLoad")
+              net.Send(ply)
               for k, v in pairs(playerinfo[1].data) do
                 table.insert(playerinfotable,{v.id, v.sid, v.rank, v.positiverep, v.neutralrep, v.negativerep})
                 if v.sid == ply:SteamID64() then
@@ -276,43 +280,57 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
               end
               GBayMySQL:Query("SELECT * FROM serverinfo", function(serverinfo)
                 if serverinfo[1].status == false then print('GBay MySQL Error: '..serverinfo[1].error) end
+                net.Start("GBayGUILoadingPercLoad")
+                net.Send(ply)
                 for k, v in pairs(serverinfo[1].data) do
                   table.insert(serverinfotable,{v.id, v.servername, v.ads, v.services, v.coupons, v.feepost, v.maxprice, v.taxpercent, v.ttnoo, v.npcpos, v.npcang, v.npcmodel, v.ranks})
                 end
                 GBayMySQL:Query("SELECT * FROM shipments", function(shipmentsinfo)
                   if shipmentsinfo[1].status == false then print('GBay MySQL Error: '..shipmentsinfo[1].error) end
+                  net.Start("GBayGUILoadingPercLoad")
+                  net.Send(ply)
                   for k, v in pairs(shipmentsinfo[1].data) do
                     table.insert(shipmentsinfotable,{	v.id, v.sidmerchant, v.name, v.description, v.wep, v.price, v.amount})
                   end
                   GBayMySQL:Query("SELECT * FROM service", function(serviceinfo)
                     if serviceinfo[1].status == false then print('GBay MySQL Error: '..serviceinfo[1].error) end
+                    net.Start("GBayGUILoadingPercLoad")
+                    net.Send(ply)
                     for k, v in pairs(serviceinfo[1].data) do
                       table.insert(serviceinfotable,{v.id, v.sidmerchant, v.name, v.description, v.price, v.buyers})
                     end
                     GBayMySQL:Query("SELECT * FROM entities", function(entityinfo)
                       if entityinfo[1].status == false then print('GBay MySQL Error: '..entityinfo[1].error) end
+                      net.Start("GBayGUILoadingPercLoad")
+                      net.Send(ply)
                       for k, v in pairs(entityinfo[1].data) do
                         table.insert(entityinfotable,{v.id, v.sidmerchant, v.name, v.description, v.ent, v.price})
                       end
                       GBayMySQL:Query("SELECT * FROM ads", function(adsinfo)
                         if adsinfo[1].status == false then print('GBay MySQL Error: '..adsinfo[1].error) end
+                        net.Start("GBayGUILoadingPercLoad")
+                        net.Send(ply)
                         for k, v in pairs(adsinfo[1].data) do
                           table.insert(adsinfotable,{v.id, v.asid, v.type, v.iid, v.timetoexpire})
                         end
                       end)
                       timer.Simple(2,function()
-                        table.insert(JammedTable,1,playerinfotable)
-                        table.insert(JammedTable,2,serverinfotable)
-                        table.insert(JammedTable,3,shipmentsinfotable)
-                        table.insert(JammedTable,4,serviceinfotable)
-                        table.insert(JammedTable,5,entityinfotable)
-                        table.insert(JammedTable,6,adsinfotable)
-                        net.Start("GBayOpenMenu")
-                          net.WriteTable(JammedTable)
-                          net.WriteTable(JammedTable2)
+                        net.Start("GBayGUILoadingPercLoad100")
                         net.Send(ply)
-                        net.Start("GBayCloseLoading")
-                        net.Send(ply)
+                        timer.Simple(.2, function()
+                          table.insert(JammedTable,1,playerinfotable)
+                          table.insert(JammedTable,2,serverinfotable)
+                          table.insert(JammedTable,3,shipmentsinfotable)
+                          table.insert(JammedTable,4,serviceinfotable)
+                          table.insert(JammedTable,5,entityinfotable)
+                          table.insert(JammedTable,6,adsinfotable)
+                          net.Start("GBayOpenMenu")
+                            net.WriteTable(JammedTable)
+                            net.WriteTable(JammedTable2)
+                          net.Send(ply)
+                          net.Start("GBayCloseLoading")
+                          net.Send(ply)
+                        end)
                       end)
                     end)
                   end)
