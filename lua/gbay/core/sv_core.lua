@@ -46,6 +46,7 @@ util.AddNetworkString("GBayRemoveShipment")
 util.AddNetworkString("GBaySubmitEntity")
 util.AddNetworkString("GBayEditEntity")
 util.AddNetworkString("GBayRemoveEntity")
+util.AddNetworkString("GBayRemoveEnt")
 util.AddNetworkString("GBaySubmitService")
 util.AddNetworkString("GBayEditService")
 util.AddNetworkString("GBayRemoveService")
@@ -64,6 +65,7 @@ util.AddNetworkString("GBaySetnrep")
 util.AddNetworkString("GBaySetmrep")
 util.AddNetworkString("GBayPlayerRatingWorker")
 util.AddNetworkString("GBayPurchaseAd")
+util.AddNetworkString("GBaySendConfig")
 GBayConfig = {}
 
 local OwnerSID = nil
@@ -123,6 +125,15 @@ function GBayRefreashSettings()
       GBayConfig.NPCPos = Vector(npcpost[1], npcpost[2], npcpost[3])
       GBayConfig.NPCAng = Angle(npcangt[1], npcangt[2], npcangt[3])
       GBayConfig.NPCModel = data.npcmodel
+      net.Start("GBaySendConfig")
+        net.WriteString(data.servername)
+        net.WriteFloat(data.ads)
+        net.WriteFloat(data.services)
+        net.WriteFloat(data.coupons)
+        net.WriteFloat(data.feepost)
+        net.WriteFloat(data.maxprice)
+        net.WriteFloat(data.taxpercent / 100)
+      net.Broadcast()
       local entfound = false
       for k, v in pairs(ents.GetAll()) do
         if v:GetClass() == "gbay_mail" then
@@ -138,11 +149,24 @@ function GBayRefreashSettings()
   end)
 end
 
+function plymeta:GBayRefreashSettingsClient()
+  net.Start("GBaySendConfig")
+    net.WriteString(GBayConfig.ServerName)
+    net.WriteFloat(GBayConfig.AdsToggle)
+    net.WriteFloat(GBayConfig.ServiceToggle)
+    net.WriteFloat(GBayConfig.CouponToggle)
+    net.WriteFloat(GBayConfig.PriceToPayToSell)
+    net.WriteFloat(GBayConfig.MaxPrice)
+    net.WriteFloat(GBayConfig.TaxToMultiplyBy)
+  net.Send(self)
+end
+
 hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
   if GBayMySQL == nil then
     net.Start("GBaySetMySQL")
     net.Send(ply)
   else
+    ply:GBayRefreashSettingsClient()
     GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
       if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
       if result[1].affected > 0 then

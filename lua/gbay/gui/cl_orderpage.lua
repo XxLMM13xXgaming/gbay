@@ -18,7 +18,7 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 		draw.RoundedBox(0,330,75,w - 400,2,Color(221,221,221))
 		if s.QuantityOk then
 			if type != "Service" or type != "Entity" then
-				draw.SimpleText("You will order "..QuantitySel:GetValue().." "..item[3].."'s!","GBayLabelFont",600,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("You will order "..QuantitySel:GetValue() or 1 .." "..item[3].."'s!","GBayLabelFont",600,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			else
 				draw.SimpleText("You can only order one!","GBayLabelFont",560,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			end

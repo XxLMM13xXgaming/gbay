@@ -44,6 +44,16 @@ net.Receive("GBayNotify",function()
 	end
 end)
 
+net.Receive("GBaySendConfig",function()
+	GBayConfig.ServerName = net.ReadString()
+	GBayConfig.AdsToggle = net.ReadFloat()
+	GBayConfig.ServiceToggle = net.ReadFloat()
+	GBayConfig.CouponToggle = net.ReadFloat()
+	GBayConfig.PriceToPayToSell = net.ReadFloat()
+	GBayConfig.MaxPrice = net.ReadFloat()
+	GBayConfig.TaxToMultiplyBy = net.ReadFloat()
+end)
+
 function GBayErrorMessage(msg)
 	chat.AddText(Color(255,0,0), msg)
 end

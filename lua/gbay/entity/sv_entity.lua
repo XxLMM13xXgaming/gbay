@@ -4,14 +4,23 @@ net.Receive("GBaySubmitEntity",function(len, ply)
   local ent = GBayEscapeString(net.ReadEntity())
   local entprice = GBayEscapeString(net.ReadFloat())
 
+  print("logging")
   if ply:getDarkRPVar('money') >= GBayConfig.PriceToPayToSell then
+    print("logging2")
     if string.len(entname) <= 27 then
+      print("logging3")
       if string.len(entdesc) <= 81 then
+        print("logging4")
         for k, v in pairs(ents.GetAll()) do
+          print("logging5")
           if v == ent then
             if ( ply:GetPos():Distance(v:GetPos()) < 100)  then
+              print(entprice)
+              print(GBayConfig.MaxPrice)
               if entprice <= GBayConfig.MaxPrice then
+                print("logging6")
                 GBayMySQL:Query("INSERT INTO entities ( sidmerchant, name,	description, ent, price ) VALUES ('"..ply:SteamID64().."', '"..entname.."', '"..entdesc.."', '"..v:GetClass().."', '"..entprice.."')", function(createentity)
+                  print("logging7")
                   if createentity[1].status == false then print('GBay MySQL Error: '..createentity[1].error) end
                   net.Start("GBayDoneLoading")
                     net.WriteString("Entity")
