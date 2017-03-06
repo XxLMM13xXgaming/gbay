@@ -66,6 +66,7 @@ util.AddNetworkString("GBaySetmrep")
 util.AddNetworkString("GBayPlayerRatingWorker")
 util.AddNetworkString("GBayPurchaseAd")
 util.AddNetworkString("GBaySendConfig")
+util.AddNetworkString("GBayAddAllAdmins")
 GBayConfig = {}
 
 local OwnerSID = nil
@@ -564,25 +565,18 @@ end)
 net.Receive("GBayBanPlayer",function(len, ply)
   days = GBayEscapeString(net.ReadFloat())
   victim = GBayEscapeString(net.ReadString())
-  print(victim)
-  print("Ran")
   GBayMySQL:Query("SELECT * FROM players WHERE sid="..ply:SteamID64(), function(adminplayersresult)
     if adminplayersresult[1].status == false then print('GBay MySQL Error: '..adminplayersresult[1].error) end
     if GBayIsAdmin(adminplayersresult[1].data[1]) then
-      print("Ran1")
       GBayMySQL:Query("SELECT * FROM players WHERE id="..victim, function(victimplayersresult)
         if victimplayersresult[1].status == false then print('GBay MySQL Error: '..victimplayersresult[1].error) end
         GBayMySQL:Query("SELECT * FROM bans WHERE bid="..victim, function(bansresult)
-          print("Ran2")
           if bansresult[1].status == false then print('GBay MySQL Error: '..bansresult[1].error) end
           if bansresult[1].affected > 1 then
             ply:GBayNotify("error", "This player is already banned!")
           else
-            print("Ran3")
             GBayMySQL:Query("INSERT INTO bans (bid, aid, time) VALUES ('"..victim.."', '"..ply:SteamID64().."', '"..os.time() + 60*60*24*days.."')", function(banresult)
-              print("Ran4")
               if banresult[1].status == false then print('GBay MySQL Error: '..banresult[1].error) end
-              print("Ran5")
               if IsValid(player.GetBySteamID64(victim)) then
                 player.GetBySteamID64(victim):GBayNotify("error", "You have been banned by "..player.GetBySteamID64(ply:SteamID64()):Nick().." for "..days.." day(s)!")
               end
@@ -741,6 +735,19 @@ net.Receive("GBayPlayerRatingWorker",function(len, ply)
       end)
     end
   end)
+end)
+
+net.Receive("GBayAddAllAdmins",function(len, ply)
+  if ply:IsSuperAdmin() then
+    for k, v in pairs(player.GetAll()) do
+      if v:IsSuperAdmin() then
+        GBayMySQL:Query("UPDATE players SET rank='Superadmin' WHERE sid="..v:SteamID64(), function(rankchangedresult)
+          if rankchangedresult[1].status == false then print('GBay MySQL Error: '..rankchangedresult[1].error) end
+          v:GBayNotify("generic", "Your rank has been set by "..ply:Nick().." to Superadmin!")
+        end)
+      end
+    end
+  end
 end)
 
 concommand.Add("gbaytest",function(ply)

