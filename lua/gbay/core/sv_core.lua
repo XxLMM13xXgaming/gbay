@@ -441,6 +441,12 @@ net.Receive("GBayPurchaseItem",function(len, ply)
                     net.Start("GBayTransErrorReport")
                       net.WriteString('Success')
                     net.Send(ply)
+                    if IsValid(player.GetBySteamID64(data.sidmerchant)) then
+                      player.GetBySteamID64(data.sidmerchant):GBayNotify("error", "Looks like you have some orders to fill! Please visit the MailNPC ASAP!")
+                      timer.Create("GBayNotifyPlayerOfOrders",GBayConfig.TimeToNotify * 60,0,function()
+                        player.GetBySteamID64(data.sidmerchant):GBayNotify("error", "Looks like you have some orders to fill! Please visit the MailNPC ASAP!")
+                      end)
+                    end
                   end)
                 end)
               else
@@ -452,6 +458,12 @@ net.Receive("GBayPurchaseItem",function(len, ply)
                     net.Start("GBayTransErrorReport")
                       net.WriteString('Success')
                     net.Send(ply)
+                    if IsValid(player.GetBySteamID64(data.sidmerchant)) then
+                      player.GetBySteamID64(data.sidmerchant):GBayNotify("error", "Looks like you have some orders to fill! Please visit the MailNPC ASAP!")
+                      timer.Create("GBayNotifyPlayerOfOrders",GBayConfig.TimeToNotify * 60,0,function()
+                        player.GetBySteamID64(data.sidmerchant):GBayNotify("error", "Looks like you have some orders to fill! Please visit the MailNPC ASAP!")
+                      end)
+                    end
                   end)
                 end)
               end
@@ -537,6 +549,12 @@ net.Receive("GBayPurchaseItem",function(len, ply)
                 net.Start("GBayTransErrorReport")
                   net.WriteString('Success')
                 net.Send(ply)
+                if IsValid(player.GetBySteamID64(data.sidmerchant)) then
+                  player.GetBySteamID64(data.sidmerchant):GBayNotify("error", "Looks like you have some orders to fill! Please visit the MailNPC ASAP!")
+                  timer.Create("GBayNotifyPlayerOfOrders",GBayConfig.TimeToNotify * 60,0,function()
+                    player.GetBySteamID64(data.sidmerchant):GBayNotify("error", "Looks like you have some orders to fill! Please visit the MailNPC ASAP!")
+                  end)
+                end
               end)
             end)
           else
