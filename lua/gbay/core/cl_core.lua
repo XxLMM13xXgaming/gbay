@@ -7,6 +7,7 @@ include("gbay/gui/cl_sidebar.lua")
 include("gbay/gui/cl_orderpage.lua")
 include("gbay/gui/cl_homepage.lua")
 include("gbay/gui/cl_updates.lua")
+include("gbay/gui/cl_helppage.lua")
 include("gbay/ads/cl_ads.lua")
 include("gbay/shipment/cl_shipment.lua")
 include("gbay/service/cl_service.lua")
@@ -335,7 +336,12 @@ net.Receive("GBayOpenMenu",function()
 	HelpBTN:SizeToContents()
 	HelpBTN.Paint = function() end
 	HelpBTN.DoClick = function()
-
+		LocalPlayer()TabCurrentlyOn = "Help"
+		if LocalPlayer().GBayOpenMenuTabStatus then
+			GBayHelpPageSmall(DFrame, data)
+		else
+			GBayHelpPageFull(DFrame, data)
+		end
 	end
 
 	SettingsBTN = vgui.Create("DButton", DFrame)
@@ -360,6 +366,8 @@ net.Receive("GBayOpenMenu",function()
 			GBayViewMoreItemFull(LocalPlayer().GBayOrderType, DFrame, data, LocalPlayer().GBayOrderItem)
 		elseif LocalPlayer().TabCurrentlyOn == "Ads" then
 			GBayAdsPageFull(DFrame, data)
+		elseif LocalPlayer().TabCurrentlyOn == "Help" then
+			GBayHelpPageFull(DFrame, data)
 		else
 			GBayHomePageFull(DFrame, data)
 		end
@@ -383,6 +391,8 @@ net.Receive("GBayOpenMenu",function()
 			GBayViewMoreItemSmall(LocalPlayer().GBayOrderType, DFrame, data, LocalPlayer().GBayOrderItem)
 		elseif LocalPlayer().TabCurrentlyOn == "Ads" then
 			GBayAdsPageSmall(DFrame, data)
+		elseif LocalPlayer().TabCurrentlyOn == "Help" then
+			GBayHelpPageSmall(DFrame, data)
 		else
 			GBayHomePageSmall(DFrame, data)
 		end

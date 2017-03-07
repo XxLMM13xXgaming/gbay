@@ -12,6 +12,7 @@ AddCSLuaFile("gbay/gui/cl_sidebar.lua")
 AddCSLuaFile("gbay/gui/cl_orderpage.lua")
 AddCSLuaFile("gbay/gui/cl_homepage.lua")
 AddCSLuaFile("gbay/gui/cl_updates.lua")
+AddCSLuaFile("gbay/gui/cl_helppage.lua")
 AddCSLuaFile("gbay/shipment/cl_shipment.lua")
 AddCSLuaFile("gbay/ads/cl_ads.lua")
 AddCSLuaFile("gbay/service/cl_service.lua")
@@ -429,15 +430,15 @@ net.Receive("GBayPurchaseItem",function(len, ply)
     		local costofone = data.price / data.amount
         if data.sidmerchant != ply:SteamID64() then
           if quantity <= data.amount then
-            totalprice = costofone * quantity
-            totalprice = totalprice + totalprice * GBayConfig.TaxToMultiplyBy
-            if ply:getDarkRPVar("money") >= totalprice then
+            totalprice = math.Round(costofone * quantity)
+            totalprice = math.Round(totalprice + totalprice * GBayConfig.TaxToMultiplyBy)
+            if ply:getDarkRPVar("money") >= math.Round(totalprice) then
               if quantity == data.amount then
                 GBayMySQL:Query("DELETE FROM shipments WHERE id="..data.id, function(removeshipment)
                   if removeshipment[1].status == false then print('GBay MySQL Error: '..removeshipment[1].error) end
                   GBayMySQL:Query("INSERT INTO orders (sidmerchant,	sidcustomer,	type,	weapon,	weaponshipname, quantity, pricepaid, timestamp) VALUES ('"..data.sidmerchant.."', '"..ply:SteamID64().."', 'Shipment', '"..data.wep.."', '"..data.wepname.."', '"..tonumber(quantity).."', '"..data.price.."', '"..tonumber(os.time()).."')", function(addtoorder)
                     if addtoorder[1].status == false then print('GBay MySQL Error: '..addtoorder[1].error) end
-                    ply:addMoney(-totalprice)
+                    ply:addMoney(-math.Round(totalprice))
                     net.Start("GBayTransErrorReport")
                       net.WriteString('Success')
                     net.Send(ply)

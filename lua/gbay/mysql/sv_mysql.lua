@@ -161,10 +161,10 @@ end
 
 net.Receive("GBaySetMySQL",function(len, ply)
   if ply:IsSuperAdmin() then
-    local HostEntry = SQLStr(net.ReadString())
-    local UsernameEntry = SQLStr(net.ReadString())
-    local PasswordEntry = SQLStr(net.ReadString())
-    local DatabaseEntry = SQLStr(net.ReadString())
+    local HostEntry = SQLStr(net.ReadString(), true)
+    local UsernameEntry = SQLStr(net.ReadString(), true)
+    local PasswordEntry = SQLStr(net.ReadString(), true)
+    local DatabaseEntry = SQLStr(net.ReadString(), true)
     local PortEntry = net.ReadFloat()
 
     if GBayMySQLInfo != false then
@@ -172,7 +172,7 @@ net.Receive("GBaySetMySQL",function(len, ply)
       sql.Query("INSERT INTO gbaymysqlinfo (hostname, username, password, database, port) VALUES ('"..HostEntry.."', '"..UsernameEntry.."', '"..PasswordEntry.."', '"..DatabaseEntry.."', '"..PortEntry.."')")
     else
       sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
-      sql.Query("UPDATE gbaymysqlinfo SET hostname="..HostEntry..", username="..UsernameEntry..", password="..PasswordEntry..", database="..DatabaseEntry..", port='"..PortEntry.."')")
+      sql.Query("UPDATE gbaymysqlinfo SET hostname='"..HostEntry.."', username='"..UsernameEntry.."', password='"..PasswordEntry.."', database='"..DatabaseEntry.."', port='"..PortEntry.."')")
     end
 
     local GBayMySQLHost = HostEntry

