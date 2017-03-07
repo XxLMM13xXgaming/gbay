@@ -11,7 +11,6 @@ net.Receive("GBayPurchaseAd",function(len, ply)
           local timetoexpire = os.time() + 60*60*24*1
           GBayMySQL:Query("SELECT * FROM ads WHERE type='"..querytype.."' AND iid='"..adid.."'", function(adscheckexist)
             if adscheckexist[1].status == false then print('GBay MySQL Error: '..adscheckexist[1].error) end
-            PrintTable(adscheckexist)
             if adscheckexist[1].affected == 0 then
               GBayMySQL:Query("INSERT INTO ads (asid, type, iid, timetoexpire) VALUES ('"..ply:SteamID64().."', '"..querytype.."', '"..adid.."', '"..timetoexpire.."')", function(CreateAds)
                 if CreateAds[1].status == false then print('GBay MySQL Error: '..CreateAds[1].error) end

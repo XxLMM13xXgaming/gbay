@@ -1338,7 +1338,6 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 					"How many days should this ban be?",
 					"1",
 					function( text )
-						print("Ran")
 						net.Start("GBayBanPlayer")
 							net.WriteFloat(tonumber(text))
 							net.WriteString(playerdata[1])

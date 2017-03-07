@@ -1,6 +1,5 @@
 net.Receive("GBayOpenAdminPanel",function()
   local theplayers = net.ReadTable()
-  PrintTable(theplayers)
   local DFrame = vgui.Create("DFrame")
   DFrame:SetSize(300,300)
   DFrame:Center()

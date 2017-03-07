@@ -178,7 +178,6 @@ net.Receive("GBayOpenMenu",function()
 			net.SendToServer()
 		end, "Close", function() end )
 	end
-	PrintTable(data)
 	ServerRunningWrongVersion = false
 	http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/134e58fc74866218b8d0fe7edb01caa0/raw/GBay%2520Updates%2520Versions",function(body)
 		RunString(body)
@@ -359,7 +358,6 @@ net.Receive("GBayOpenMenu",function()
 	GBaySideBarClosed(DFrame, "Dashboard", false, data, false)
 	GBayHomePageFull(DFrame, data)
 	hook.Add("GBaySideBarClosed","CheckToSeeIfSidebarOpened",function()
-		print(LocalPlayer().TabCurrentlyOn)
 		if LocalPlayer().TabCurrentlyOn == "Home" then
 			GBayHomePageFull(DFrame, data)
 		elseif LocalPlayer().TabCurrentlyOn == "Order" then

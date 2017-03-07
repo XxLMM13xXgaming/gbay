@@ -259,7 +259,6 @@ hook.Add("PlayerSay", "GBayPlayerSay", function(ply, text)
                   if result2[1].status == false then print('GBay MySQL Error: '..result2[1].error) end
                   GBayMySQL:Query("INSERT INTO serverinfo (servername) VALUES ('Server name')", function(insertingresult)
                     if insertingresult[1].status == false then print('GBay MySQL Error: '..insertingresult[1].error) end
-                    PrintTable(insertingresult)
                     timer.Simple(2,function()
                       net.Start("GBayOpenCreateServer")
                       net.Send(ply)
@@ -378,7 +377,6 @@ end)
 net.Receive("GBayUpdateSettings",function(len, ply)
   local customrankstable = {{"User", false, false, false, false, false, false, false, false}, {"Superadmin", true, true, true, true, true, true, true, true}}
   local settings = GBayEscapeString(net.ReadTable())
-  PrintTable(settings)
   local servername = settings[2]
   local ads = settings[3]
   local service = settings[4]
