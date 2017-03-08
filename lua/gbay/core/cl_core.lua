@@ -64,10 +64,7 @@ function GBayMenuMin(DFrame)
 	LocalPlayer().GBayIsInMenuMinMode = true
 
 	hook.Add( "KeyPress", "GBayIsInMenuMinModeKeyPress", function( ply, key )
-		if key == IN_SPEED and LocalPlayer().GBayIsInMenuMinMode then
-			LocalPlayer().GBayIsInMenuMinMode = false
-			DFrame:SetVisible(true)
-		elseif key == IN_DUCK and LocalPlayer().GBayIsInMenuMinMode then
+		if key == IN_DUCK and LocalPlayer().GBayIsInMenuMinMode then
 			LocalPlayer().GBayIsInMenuMinMode = false
 			DFrame:SetVisible(true)
 		end
@@ -131,7 +128,7 @@ hook.Add("HUDPaint","GBaySelBound",function()
 	elseif LocalPlayer().GBayIsSelectingEntity then
 		draw.SimpleText("Press Shift when item is in crosshair or press CTRL to cancel!","GBayLabelFont",ScrW()/2,ScrH()/2 - 80,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
 	elseif LocalPlayer().GBayIsInMenuMinMode then
-		draw.SimpleText("Press Shift or CTRL when you would like to reopen gbay!","GBayLabelFontLarge",ScrW()/2,20,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
+		draw.SimpleText("Press CTRL when you would like to reopen gbay!","GBayLabelFontLarge",ScrW()/2,20,Color( 255, 255, 255, 255 ),TEXT_ALIGN_CENTER)
 	end
 end)
 

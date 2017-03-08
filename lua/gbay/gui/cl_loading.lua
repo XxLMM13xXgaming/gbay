@@ -1,7 +1,7 @@
 net.Receive("GBayOpenLoading",function()
   local frame_w, frame_h = 1000, 700
   local loadingtext = "Loading"
-	local GBayLogo = Material("gbay/Logo.png")
+	local GBayLogo = Material("gbay/Logo2.png")
 
   local loadingperc = 0
 

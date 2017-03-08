@@ -639,6 +639,9 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 		else
 			playerdatanick = "Unknown"
 		end
+		if tostring(percent) == "nan" then
+			percent = "0"
+		end
 		SideBarOpened.Paint = function(s, w, h)
 			surface.SetDrawColor(255,255,255, 255)
 			surface.DrawRect(0, 0, w, h)
@@ -1195,6 +1198,9 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			playerdatanick = player.GetBySteamID64(playerdata[2]):Nick()
 		else
 			playerdatanick = "Unknown"
+		end
+		if tostring(percent) == "nan" then
+			percent = "0"
 		end
 		SideBarOpened.Paint = function(s, w, h)
 			surface.SetDrawColor(255,255,255, 255)
