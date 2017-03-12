@@ -149,7 +149,7 @@ if GBayMySQLInfo then
       MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Connected to database...\n")
       MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Currently stores...\n")
       MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] "..#result[1].data.." players\n")
-      GBayRefreashSettings()
+      GBayRefreshSettings()
     end)
   end
 

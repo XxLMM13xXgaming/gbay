@@ -65,6 +65,16 @@ local plymeta = FindMetaTable("Player")
 function GBayEscapeString(string)
   if isstring(string) then
     return GBayMySQL:Escape(string)
+  elseif istable(string) then
+    local returntable = {}
+    for k, v in pairs(string) do
+      if isstring(v) then
+        table.insert(returntable,k,GBayMySQL:Escape(v))
+      else
+        table.insert(returntable,k,v)
+      end
+    end
+    return returntable
   else
     return string
   end
@@ -98,7 +108,7 @@ function plymeta:GBayNotify(type, message)
   net.Send(self)
 end
 
-function GBayRefreashSettings()
+function GBayRefreshSettings()
   GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
     if result[1].affected > 0 then
       local data = result[1].data[1]
@@ -125,10 +135,8 @@ function GBayRefreashSettings()
         net.WriteFloat(data.taxpercent / 100)
       net.Broadcast()
       local entfound = false
-      for k, v in pairs(ents.GetAll()) do
-        if v:GetClass() == "gbay_mail" then
-          entfound = true
-        end
+      for k, v in pairs(ents.FindByClass("gbay_mail")) do
+        entfound = true
       end
       if entfound == false then
         SpawnGBayMailNPC()
@@ -139,7 +147,7 @@ function GBayRefreashSettings()
   end)
 end
 
-function plymeta:GBayRefreashSettingsClient()
+function plymeta:GBayRefreshSettingsClient()
   net.Start("GBaySendConfig")
     net.WriteString(GBayConfig.ServerName)
     net.WriteFloat(GBayConfig.AdsToggle)
@@ -156,7 +164,7 @@ hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
     net.Start("GBaySetMySQL")
     net.Send(ply)
   else
-    ply:GBayRefreashSettingsClient()
+    ply:GBayRefreshSettingsClient()
     GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
       if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
       if result[1].affected > 0 then
@@ -187,7 +195,7 @@ hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
           if adsonserver[1].status == false then print('GBay MySQL Error: '..adsonserver[1].error) end
           for k, v in pairs(adsonserver[1].data) do
             if v.timetoexpire < os.time() then
-              GBayMySQL:Query("DELETE * FROM ads WHERE id="..v.id, function(removeads)
+              GBayMySQL:Query("DELETE FROM ads WHERE id="..v.id, function(removeads)
                 if removeads[1].status == false then print('GBay MySQL Error: '..removeads[1].error) end
               end)
             end
@@ -397,7 +405,7 @@ net.Receive("GBayUpdateSettings",function(len, ply)
     if playerinfo[1].data[1].rank == "Superadmin" or playerinfo[1].data[1].rank == "Admin" then
       GBayMySQL:Query("UPDATE serverinfo SET servername='"..servername.."', ads='"..adst.."', services='"..servicet.."', coupons='"..coupont.."', feepost='"..postingfee.."', maxprice='"..maxpricetosell.."', taxpercent='"..taxtocharge.."', ttnoo='"..thetimetonot.."', npcpos='"..npcpos.."', npcang='"..npcang.."', npcmodel='"..npcmodel.."'", function(result)
         if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
-        GBayRefreashSettings()
+        GBayRefreshSettings()
       end)
     end
   end)
@@ -756,5 +764,5 @@ net.Receive("GBayAddAllAdmins",function(len, ply)
 end)
 
 concommand.Add("gbaytest",function(ply)
---  GBayRefreashSettings()
+--  GBayRefreshSettings()
 end)
