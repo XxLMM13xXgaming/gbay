@@ -15,22 +15,22 @@ include("gbay/entity/cl_entity.lua")
 
 local plymeta = FindMetaTable("Player")
 
-function plymeta:GBayIsSuperAdmin(data)
-	for k, v in pairs(data[1]) do
+function plymeta:GBayIsSuperAdmin(datatable)
+	for k, v in pairs(datatable[1]) do
 		if v[2] == self:SteamID64() then
-			playerdata = v
+			playerdatatable = v
 		end
 	end
-	if playerdata[3] == "Superadmin" then return true else return false end
+	if playerdatatable[3] == "Superadmin" then return true else return false end
 end
 
-function plymeta:GBayIsAdmin(data)
-	for k, v in pairs(data[1]) do
+function plymeta:GBayIsAdmin(datatable)
+	for k, v in pairs(datatable[1]) do
 		if v[2] == self:SteamID64() then
-			playerdata = v
+			playerdatatable = v
 		end
 	end
-	if playerdata[3] == "Admin" or playerdata[3] == "Superadmin" then return true else return false end
+	if playerdatatable[3] == "Admin" or playerdatatable[3] == "Superadmin" then return true else return false end
 end
 
 net.Receive("GBayNotify",function()
@@ -150,8 +150,9 @@ end
 net.Receive("GBayOpenMenu",function()
 	GBayVersion = "1.0.5"
 	LocalPlayer().GBayOpenMenuTabStatus = false
-	data = net.ReadTable()
+	datatable = net.ReadTable()
 	torate = net.ReadTable()
+	PrintTable(datatable)
 	for k, v in pairs(torate) do
 		if IsValid(player.GetBySteamID64(v[1])) then
 			thequerytext = "What would you rate "..v[1].." ("..player.GetBySteamID64(v[1]):Nick()..") for the item '"..v[2].."'"
@@ -246,9 +247,9 @@ net.Receive("GBayOpenMenu",function()
 	HomeBTN:SizeToContents()
 	HomeBTN.Paint = function() end
 	HomeBTN.DoClick = function()
-		GBayHomePageFull(DFrame, data)
+		GBayHomePageFull(DFrame, datatable)
 		LocalPlayer().TabCurrentlyOn = "Home"
-		GBaySideBarClosed(DFrame, "Dashboard", false, data, false)
+		GBaySideBarClosed(DFrame, "Dashboard", false, datatable, false)
 	end
 
 	UpdatesBTN = vgui.Create("DButton", DFrame)
@@ -259,7 +260,7 @@ net.Receive("GBayOpenMenu",function()
 	UpdatesBTN:SizeToContents()
 	UpdatesBTN.Paint = function() end
 	UpdatesBTN.DoClick = function()
-		GBayViewUpdatesFull(DFrame, data)
+		GBayViewUpdatesFull(DFrame, datatable)
 		LocalPlayer().TabCurrentlyOn = "Updates"
 	end
 
@@ -272,9 +273,9 @@ net.Receive("GBayOpenMenu",function()
 	ShipmentsBTN.Paint = function() end
 	ShipmentsBTN.DoClick = function()
 		if LocalPlayer().GBayOpenMenuTabStatus then
-			GBayShipmentsPageSmall(DFrame, data)
+			GBayShipmentsPageSmall(DFrame, datatable)
 		else
-			GBayShipmentsPageFull(DFrame, data)
+			GBayShipmentsPageFull(DFrame, datatable)
 		end
 	end
 
@@ -287,9 +288,9 @@ net.Receive("GBayOpenMenu",function()
 	EntitiesBTN.Paint = function() end
 	EntitiesBTN.DoClick = function()
 		if LocalPlayer().GBayOpenMenuTabStatus then
-			GBayEntityPageSmall(DFrame, data)
+			GBayEntityPageSmall(DFrame, datatable)
 		else
-			GBayEntityPageFull(DFrame, data)
+			GBayEntityPageFull(DFrame, datatable)
 		end
 	end
 
@@ -302,9 +303,9 @@ net.Receive("GBayOpenMenu",function()
 	ServicesBTN.Paint = function() end
 	ServicesBTN.DoClick = function()
 		if LocalPlayer().GBayOpenMenuTabStatus then
-			GBayServicePageSmall(DFrame, data)
+			GBayServicePageSmall(DFrame, datatable)
 		else
-			GBayServicePageFull(DFrame, data)
+			GBayServicePageFull(DFrame, datatable)
 		end
 	end
 
@@ -318,9 +319,9 @@ net.Receive("GBayOpenMenu",function()
 	AdsBTN.DoClick = function()
 		LocalPlayer()TabCurrentlyOn = "Ads"
 		if LocalPlayer().GBayOpenMenuTabStatus then
-			GBayAdsPageSmall(DFrame, data)
+			GBayAdsPageSmall(DFrame, datatable)
 		else
-			GBayAdsPageFull(DFrame, data)
+			GBayAdsPageFull(DFrame, datatable)
 		end
 	end
 
@@ -334,9 +335,9 @@ net.Receive("GBayOpenMenu",function()
 	HelpBTN.DoClick = function()
 		LocalPlayer()TabCurrentlyOn = "Help"
 		if LocalPlayer().GBayOpenMenuTabStatus then
-			GBayHelpPageSmall(DFrame, data)
+			GBayHelpPageSmall(DFrame, datatable)
 		else
-			GBayHelpPageFull(DFrame, data)
+			GBayHelpPageFull(DFrame, datatable)
 		end
 	end
 
@@ -348,23 +349,23 @@ net.Receive("GBayOpenMenu",function()
 	SettingsBTN:SizeToContents()
 	SettingsBTN.Paint = function() end
 	SettingsBTN.DoClick = function()
-		GBaySideBarOpened(DFrame, "Dashboard", true, data, false)
+		GBaySideBarOpened(DFrame, "Dashboard", true, datatable, false)
 	end
 
 	LocalPlayer().TabCurrentlyOn = "Home"
-	GBaySideBarClosed(DFrame, "Dashboard", false, data, false)
-	GBayHomePageFull(DFrame, data)
+	GBaySideBarClosed(DFrame, "Dashboard", false, datatable, false)
+	GBayHomePageFull(DFrame, datatable)
 	hook.Add("GBaySideBarClosed","CheckToSeeIfSidebarOpened",function()
 		if LocalPlayer().TabCurrentlyOn == "Home" then
-			GBayHomePageFull(DFrame, data)
+			GBayHomePageFull(DFrame, datatable)
 		elseif LocalPlayer().TabCurrentlyOn == "Order" then
-			GBayViewMoreItemFull(LocalPlayer().GBayOrderType, DFrame, data, LocalPlayer().GBayOrderItem)
+			GBayViewMoreItemFull(LocalPlayer().GBayOrderType, DFrame, datatable, LocalPlayer().GBayOrderItem)
 		elseif LocalPlayer().TabCurrentlyOn == "Ads" then
-			GBayAdsPageFull(DFrame, data)
+			GBayAdsPageFull(DFrame, datatable)
 		elseif LocalPlayer().TabCurrentlyOn == "Help" then
-			GBayHelpPageFull(DFrame, data)
+			GBayHelpPageFull(DFrame, datatable)
 		else
-			GBayHomePageFull(DFrame, data)
+			GBayHomePageFull(DFrame, datatable)
 		end
 		HomeBTN:SetDisabled( false )
 		HomeBTN:SetText("Home")
@@ -379,17 +380,19 @@ net.Receive("GBayOpenMenu",function()
 		SettingsBTN:SetPos(800, 130)
 	end)
 
+	print("hello")
 	hook.Add("GBaySideBarOpened","CheckToSeeIfSidebarOpened",function()
+		PrintTable(datatable)
 		if LocalPlayer().TabCurrentlyOn == "Home" then
-			GBayHomePageSmall(DFrame, data)
+			GBayHomePageSmall(DFrame, datatable)
 		elseif LocalPlayer().TabCurrentlyOn == "Order" then
-			GBayViewMoreItemSmall(LocalPlayer().GBayOrderType, DFrame, data, LocalPlayer().GBayOrderItem)
+			GBayViewMoreItemSmall(LocalPlayer().GBayOrderType, DFrame, datatable, LocalPlayer().GBayOrderItem)
 		elseif LocalPlayer().TabCurrentlyOn == "Ads" then
-			GBayAdsPageSmall(DFrame, data)
+			GBayAdsPageSmall(DFrame, datatable)
 		elseif LocalPlayer().TabCurrentlyOn == "Help" then
-			GBayHelpPageSmall(DFrame, data)
+			GBayHelpPageSmall(DFrame, datatable)
 		else
-			GBayHomePageSmall(DFrame, data)
+			GBayHomePageSmall(DFrame, datatable)
 		end
 		HomeBTN:SetDisabled( true )
 		HomeBTN:SetText("")

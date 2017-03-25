@@ -62,6 +62,15 @@ local OwnerSID = nil
 
 local plymeta = FindMetaTable("Player")
 
+concommand.Add("gbayresetmysql",function(ply)
+  if ply:IsSuperAdmin() then
+    sql.Query("DROP TABLE gbaymysqlinfo")
+    GBayMySQLInfo = sql.Query("SELECT * FROM gbaymysqlinfo")
+    print(GBayMySQLInfo)
+    ply:ChatPrint("Done")
+  end
+end)
+
 function GBayEscapeString(string)
   if isstring(string) then
     return GBayMySQL:Escape(string)
@@ -161,8 +170,10 @@ end
 
 hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
   if GBayMySQL == nil then
-    net.Start("GBaySetMySQL")
-    net.Send(ply)
+    if ply:IsSuperAdmin() then
+      net.Start("GBaySetMySQL")
+      net.Send(ply)
+    end
   else
     ply:GBayRefreshSettingsClient()
     GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
@@ -171,6 +182,7 @@ hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
         GBayMySQL:Query("SELECT * FROM players WHERE sid = "..ply:SteamID64(), function(checkifexists)
           if checkifexists[1].status == false then print('GBay MySQL Error: '..checkifexists[1].error) end
           if checkifexists[1].affected == 0 then
+            print("Aye")
             GBayMySQL:Query("INSERT INTO players (sid,	rank,	positiverep, neutralrep, negativerep, rating) VALUES ('"..ply:SteamID64().."', 'User', '0', '0', '0', '[]')", function(result2)
               if result2[1].status == false then print('GBay MySQL Error: '..result2[1].error) end
               MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] "..ply:Nick().."'s gbay account has been created!\n")
