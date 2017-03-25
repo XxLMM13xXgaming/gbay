@@ -148,7 +148,7 @@ function draw.Circle( x, y, radius, seg )
 end
 
 net.Receive("GBayOpenMenu",function()
-	GBayVersion = "1.0.5"
+	GBayVersion = "1.0.7"
 	LocalPlayer().GBayOpenMenuTabStatus = false
 	datatable = net.ReadTable()
 	torate = net.ReadTable()
