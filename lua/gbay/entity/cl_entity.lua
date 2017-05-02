@@ -104,10 +104,10 @@ function GBayEntityPageFull(DFrame, data)
 
 		local theweaponpic = false
 
-		if file.Exists("materials/vgui/entities/"..v[5]..".vmt","GAME") then
-			theweaponpic = "vgui/entities/"..v[5]..".vmt"
-		elseif file.Exists("materials/entities/"..v[5]..".png","GAME") then
-			theweaponpic = "entities/"..v[5]..".png"
+		if file.Exists("materials/vgui/entities/" .. v[5] .. ".vmt","GAME") then
+			theweaponpic = "vgui/entities/" .. v[5] .. ".vmt"
+		elseif file.Exists("materials/entities/" .. v[5] .. ".png","GAME") then
+			theweaponpic = "entities/" .. v[5] .. ".png"
 		end
 
 		local WeaponModel = vgui.Create("DImage", ItemMain)
@@ -142,7 +142,7 @@ function GBayEntityPageFull(DFrame, data)
 		    sum = sum + numbers[i]
 		    total = total + math.abs(numbers[i])
 		end
-		local percent = math.Round(numbers[1]/total * 100, 1)
+		local percent = math.Round(numbers[1] / total * 100, 1)
 
 		if percent <= 20 then
 			thestars = 1
@@ -157,7 +157,7 @@ function GBayEntityPageFull(DFrame, data)
 		end
 
 		local theposforstars = 185
-		for i=1, thestars do
+		for i = 1, thestars do
 			local RatingStars = vgui.Create("DImage", ItemMain)
 			RatingStars:SetPos(theposforstars,35)
 			RatingStars:SetSize(10, 10)
@@ -168,7 +168,7 @@ function GBayEntityPageFull(DFrame, data)
 		local UserRatingText = vgui.Create("DLabel", ItemMain)
 		UserRatingText:SetPos(110, 50)
 		UserRatingText:SetSize(ItemMain:GetWide(), 20)
-		UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[6]))
+		UserRatingText:SetText("Price: " .. DarkRP.formatMoney(v[6]))
 		UserRatingText:SetTextColor(Color(0,0,0))
 		UserRatingText:SetFont("GBayLabelFontSmall")
 
@@ -287,10 +287,10 @@ function GBayEntityPageSmall(DFrame, data)
 
 		local theweaponpic = false
 
-		if file.Exists("materials/vgui/entities/"..v[5]..".vmt","GAME") then
-			theweaponpic = "vgui/entities/"..v[5]..".vmt"
-		elseif file.Exists("materials/entities/"..v[5]..".png","GAME") then
-			theweaponpic = "entities/"..v[5]..".png"
+		if file.Exists("materials/vgui/entities/" .. v[5] .. ".vmt","GAME") then
+			theweaponpic = "vgui/entities/" .. v[5] .. ".vmt"
+		elseif file.Exists("materials/entities/" .. v[5] .. ".png","GAME") then
+			theweaponpic = "entities/" .. v[5] .. ".png"
 		end
 
 		local WeaponModel = vgui.Create("DImage", ItemMain)
@@ -325,7 +325,7 @@ function GBayEntityPageSmall(DFrame, data)
 		    sum = sum + numbers[i]
 		    total = total + math.abs(numbers[i])
 		end
-		local percent = math.Round(numbers[1]/total * 100, 1)
+		local percent = math.Round(numbers[1] / total * 100, 1)
 
 		if percent <= 20 then
 			thestars = 1
@@ -340,7 +340,7 @@ function GBayEntityPageSmall(DFrame, data)
 		end
 
 		local theposforstars = 185
-		for i=1, thestars do
+		for i = 1, thestars do
 			local RatingStars = vgui.Create("DImage", ItemMain)
 			RatingStars:SetPos(theposforstars,35)
 			RatingStars:SetSize(10, 10)
@@ -351,7 +351,7 @@ function GBayEntityPageSmall(DFrame, data)
 		local UserRatingText = vgui.Create("DLabel", ItemMain)
 		UserRatingText:SetPos(110, 50)
 		UserRatingText:SetSize(ItemMain:GetWide(), 20)
-		UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[6]))
+		UserRatingText:SetText("Price: " .. DarkRP.formatMoney(v[6]))
 		UserRatingText:SetTextColor(Color(0,0,0))
 		UserRatingText:SetFont("GBayLabelFontSmall")
 

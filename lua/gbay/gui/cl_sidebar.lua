@@ -6,7 +6,7 @@ function GBaySideBarClosed(DFrame, tab, settingbtnclicked, data, firstjoined)
 	if IsValid(SideBarClosed) then SideBarClosed:Close() end
 	if IsValid(SideBarOpened) then SideBarOpened:Close() end
 	GBayDFrameLogo = vgui.Create("DImage", DFrame)
-	GBayDFrameLogo:SetPos(DFrame:GetWide() / 2 - 129/2,20)
+	GBayDFrameLogo:SetPos(DFrame:GetWide() / 2 - 129 / 2,20)
 	GBayDFrameLogo:SetSize(129, 59)
 	GBayDFrameLogo:SetImage("gbay/Logo2.png")
 
@@ -17,9 +17,9 @@ function GBaySideBarClosed(DFrame, tab, settingbtnclicked, data, firstjoined)
 	SideBarClosed:SetTitle('')
 	SideBarClosed:ShowCloseButton(false)
 	SideBarClosed.Paint = function(s, w, h)
-    surface.SetDrawColor(255,255,255)
-    surface.DrawRect(0, 0, w, h)
-  end
+	    surface.SetDrawColor(255,255,255)
+	    surface.DrawRect(0, 0, w, h)
+	end
 
 	local SideBarOpenBtn = vgui.Create("DButton", SideBarClosed)
 	SideBarOpenBtn:SetPos(10, 10)
@@ -50,7 +50,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 	LocalPlayer().GBayOpenMenuTabStatus = true
 	if IsValid(GBayDFrameLogo) then GBayDFrameLogo:Remove() end
 	GBayDFrameLogo = vgui.Create("DImage", DFrame)
-	GBayDFrameLogo:SetPos(DFrame:GetWide() / 2 - 129/2 +280/2,20)
+	GBayDFrameLogo:SetPos(DFrame:GetWide() / 2 - 129 / 2 + 280 / 2,20)
 	GBayDFrameLogo:SetSize(129, 59)
 	GBayDFrameLogo:SetImage("gbay/Logo2.png")
 
@@ -85,27 +85,27 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			surface.DrawRect(0, 0, w, h)
 			surface.SetDrawColor( 255, 255, 255, 255 )
 			surface.SetMaterial( GBayLogoSettings	)
-			surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
+			surface.DrawTexturedRect(w / 2 - 129 / 2,45,129,52)
 			draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
 			if firstjoined then
-				draw.SimpleText("Server settings saved!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Please close this whole page","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("and reopen to use GBay!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Server settings saved!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Please close this whole page","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("and reopen to use GBay!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			else
-				draw.SimpleText("Server settings saved!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Please close this sidebar to go to the","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("dashboard... Server settings will","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("not display diffrent untill you","GBayLabelFont",w / 2,h/2 +60,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("restart GBay!","GBayLabelFont",w / 2,h/2 +80,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Server settings saved!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Please close this sidebar to go to the","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("dashboard... Server settings will","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("not display diffrent untill you","GBayLabelFont",w / 2,h / 2 + 60,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("restart GBay!","GBayLabelFont",w / 2,h / 2 + 80,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end
 		end
 	elseif tab == "PleaseRefreshOther" then
 		SideBarOpened.Paint = function(s, w, h)
 			surface.SetDrawColor(255,255,255, 255)
 			surface.DrawRect(0, 0, w, h)
-			draw.SimpleText("Please Refresh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-			draw.SimpleText("GBay needs to be refreshed!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-			draw.SimpleText("Close and then re-open!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("Please Refresh!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("GBay needs to be refreshed!","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("Close and then re-open!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 	elseif tab == "Loading" then
 		net.Receive("GBayDoneLoading",function()
@@ -126,17 +126,17 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 		SideBarOpened.Paint = function(s, w, h)
 			surface.SetDrawColor(255,255,255, 255)
 			surface.DrawRect(0, 0, w, h)
-			draw.SimpleText("Saving data to database!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-			draw.SimpleText("Please wait while we process","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-			draw.SimpleText("and refresh all data on GBay!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("Saving data to database!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("Please wait while we process","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("and refresh all data on GBay!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			for k, v in pairs(mf.fireworks) do
-        if (not v.peaked) then
+        if (!v.peaked) then
           draw.RoundedBox(mf.size / 2, v.pos[1], v.pos[2], mf.size, mf.size, v.color)
         else
           local part = v.particles
 
           for i = 1, #part do
-            draw.RoundedBox(mf.particlesize/2, part[i].pos[1], part[i].pos[2], mf.particlesize, mf.particlesize, v.color)
+            draw.RoundedBox(mf.particlesize / 2, part[i].pos[1], part[i].pos[2], mf.particlesize, mf.particlesize, v.color)
           end
         end
       end
@@ -152,7 +152,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
           continue
         end
 
-        if (not v.peaked) then
+        if (!v.peaked) then
           v.pos[2] = Lerp(mf.speed * FrameTime(), v.pos[2], s:GetTall() / v.peak)
         else
           if (v.particlenum ~= #v.particles) then
@@ -213,42 +213,42 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			surface.SetDrawColor(255,255,255, 255)
 			surface.DrawRect(0, 0, w, h)
 			if nomoney then
-				draw.SimpleText("No money!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("It looks like you do not have the funds","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("To purchase this item!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("No money!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("It looks like you do not have the funds","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("To purchase this item!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			elseif wronginfo then
-				draw.SimpleText("Ugh oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Item was not found!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Ugh oh!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Item was not found!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			elseif error then
-				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Close GBay and try again!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Close GBay and try again!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			elseif samep then
-				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Do not buy your own item!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Do not buy your own item!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			elseif bought then
-				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Do not buy this twice!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Uh Oh!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Something went wrong!","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Do not buy this twice!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			elseif success then
-				draw.SimpleText("Transaction Successful!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Your order has now been sent! ","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Please wait for the delivery","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Transaction Successful!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Your order has now been sent! ","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Please wait for the delivery","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			else
-				draw.SimpleText("Transaction Pending!","GBayLabelFontBold",w / 2,h/2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Please wait while we process...","GBayLabelFont",w / 2,h/2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Errors will be reported below!","GBayLabelFont",w / 2,h/2 +40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Transaction Pending!","GBayLabelFontBold",w / 2,h / 2,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Please wait while we process...","GBayLabelFont",w / 2,h / 2 + 20,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Errors will be reported below!","GBayLabelFont",w / 2,h / 2 + 40,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end
 			for k, v in pairs(mf.fireworks) do
-        if (not v.peaked) then
+        if (!v.peaked) then
           draw.RoundedBox(mf.size / 2, v.pos[1], v.pos[2], mf.size, mf.size, v.color)
         else
           local part = v.particles
 
           for i = 1, #part do
-            draw.RoundedBox(mf.particlesize/2, part[i].pos[1], part[i].pos[2], mf.particlesize, mf.particlesize, v.color)
+            draw.RoundedBox(mf.particlesize / 2, part[i].pos[1], part[i].pos[2], mf.particlesize, mf.particlesize, v.color)
           end
         end
       end
@@ -322,7 +322,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 			draw.SimpleText("sure you deliver the item to the ","GBayLabelFont",w / 2,423,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			draw.SimpleText("customer!","GBayLabelFont",w / 2,443,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			for k, v in pairs(mf.fireworks) do
-        if (not v.peaked) then
+        if (!v.peaked) then
           draw.RoundedBox(mf.size / 2, v.pos[1], v.pos[2], mf.size, mf.size, v.color)
         else
           local part = v.particles
@@ -2615,18 +2615,18 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				surface.DrawRect(0, 0, w, h)
 				surface.SetDrawColor( 255, 255, 255, 255 )
 				surface.SetMaterial( GBayLogoCheckOut	)
-				surface.DrawTexturedRect(w / 2 - 129/2,45,129,52)
+				surface.DrawTexturedRect(w / 2 - 129 / 2,45,129,52)
 				draw.RoundedBox(0,0,130,w,2,Color(221,221,221))
-				draw.SimpleText(LocalPlayer().GBayBuyingItem[3] .." Purchase","GBayLabelFontBold",w / 2,150,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("Quantity to purchase: "..LocalPlayer().GBayBuyingItemQ,"GBayLabelFont",w / 2,170,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText(LocalPlayer().GBayBuyingItem[3] .. " Purchase","GBayLabelFontBold",w / 2,150,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("Quantity to purchase: " .. LocalPlayer().GBayBuyingItemQ,"GBayLabelFont",w / 2,170,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end
 
-			for i=1, LocalPlayer().GBayBuyingItemQ do
+			for i = 1, LocalPlayer().GBayBuyingItemQ do
 				if i > 10 then
 					if keepgoing then
 						local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
 						TheLabelForItems:SetPos(20, postoputtext)
-						TheLabelForItems:SetText("+"..LocalPlayer().GBayBuyingItemQ - i.." "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone * LocalPlayer().GBayBuyingItemQ -i ))
+						TheLabelForItems:SetText("+" .. LocalPlayer().GBayBuyingItemQ - i .. " " .. LocalPlayer().GBayBuyingItem[3] .. " - " .. DarkRP.formatMoney(costofone * LocalPlayer().GBayBuyingItemQ -i ))
 						TheLabelForItems:SetFont("GBayLabelFont")
 						TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
 						TheLabelForItems:SizeToContents()
@@ -2636,7 +2636,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 				else
 					local TheLabelForItems = vgui.Create("DLabel", SideBarOpened)
 					TheLabelForItems:SetPos(20, postoputtext)
-					TheLabelForItems:SetText("+1 "..LocalPlayer().GBayBuyingItem[3].." - "..DarkRP.formatMoney(costofone))
+					TheLabelForItems:SetText("+1 " .. LocalPlayer().GBayBuyingItem[3] .. " - " .. DarkRP.formatMoney(costofone))
 					TheLabelForItems:SetFont("GBayLabelFont")
 					TheLabelForItems:SetTextColor(Color( 137, 137, 137, 255 ))
 					TheLabelForItems:SizeToContents()
@@ -2647,21 +2647,21 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 
 			local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
 			TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 160)
-			TheTaxRate:SetText("Price: "..DarkRP.formatMoney(totalprice))
+			TheTaxRate:SetText("Price: " .. DarkRP.formatMoney(totalprice))
 			TheTaxRate:SetFont("GBayLabelFont")
 			TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
 			TheTaxRate:SizeToContents()
 
 			local TheTaxRate = vgui.Create("DLabel", SideBarOpened)
 			TheTaxRate:SetPos(20, SideBarOpened:GetTall() - 140)
-			TheTaxRate:SetText("Tax Rate: "..GBayConfig.TaxToMultiplyBy * 100 .. "%")
+			TheTaxRate:SetText("Tax Rate: " .. GBayConfig.TaxToMultiplyBy * 100 .. "%")
 			TheTaxRate:SetFont("GBayLabelFont")
 			TheTaxRate:SetTextColor(Color( 137, 137, 137, 255 ))
 			TheTaxRate:SizeToContents()
 
 			local TheTaxPrice = vgui.Create("DLabel", SideBarOpened)
 			TheTaxPrice:SetPos(20, SideBarOpened:GetTall() - 120)
-			TheTaxPrice:SetText("Tax: "..DarkRP.formatMoney(totalprice * GBayConfig.TaxToMultiplyBy))
+			TheTaxPrice:SetText("Tax: " .. DarkRP.formatMoney(totalprice * GBayConfig.TaxToMultiplyBy))
 			TheTaxPrice:SetFont("GBayLabelFont")
 			TheTaxPrice:SetTextColor(Color( 137, 137, 137, 255 ))
 			TheTaxPrice:SizeToContents()
@@ -2670,7 +2670,7 @@ function GBaySideBarOpened(DFrame, tab, settingbtnclicked, data, firstjoined)
 
 			local TheFinalPrice = vgui.Create("DLabel", SideBarOpened)
 			TheFinalPrice:SetPos(20, SideBarOpened:GetTall() - 100)
-			TheFinalPrice:SetText("Subtotal: "..DarkRP.formatMoney(totalprice))
+			TheFinalPrice:SetText("Subtotal: " .. DarkRP.formatMoney(totalprice))
 			TheFinalPrice:SetFont("GBayLabelFont")
 			TheFinalPrice:SetTextColor(Color( 137, 137, 137, 255 ))
 			TheFinalPrice:SizeToContents()

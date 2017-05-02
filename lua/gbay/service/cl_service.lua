@@ -102,9 +102,8 @@ function GBayServicePageFull(DFrame, data)
 			end
 		end
 
-		local theweaponpic = false
 
-    local ServModel = vgui.Create("DImage", ItemMain)
+		local ServModel = vgui.Create("DImage", ItemMain)
 		ServModel:SetPos(0,0)
 		ServModel:SetSize(100, 100)
 		ServModel:SetImage("gbay/Services_Small.png")
@@ -136,9 +135,9 @@ function GBayServicePageFull(DFrame, data)
 		    sum = sum + numbers[i]
 		    total = total + math.abs(numbers[i])
 		end
-		local percent = math.Round(numbers[1]/total * 100, 1)
+		local percent = math.Round(numbers[1] / total * 100, 1)
 
-    if percent <= 20 then
+		if percent <= 20 then
 			thestars = 1
 		elseif percent <= 40 then
 			thestars = 2
@@ -151,7 +150,7 @@ function GBayServicePageFull(DFrame, data)
 		end
 
 		local theposforstars = 185
-		for i=1, thestars do
+		for i = 1, thestars do
 			local RatingStars = vgui.Create("DImage", ItemMain)
 			RatingStars:SetPos(theposforstars,35)
 			RatingStars:SetSize(10, 10)
@@ -159,12 +158,12 @@ function GBayServicePageFull(DFrame, data)
 			theposforstars = theposforstars + 15
 		end
 
-		local UserRatingText = vgui.Create("DLabel", ItemMain)
-		UserRatingText:SetPos(110, 50)
-		UserRatingText:SetSize(ItemMain:GetWide(), 20)
-		UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[5]))
-		UserRatingText:SetTextColor(Color(0,0,0))
-		UserRatingText:SetFont("GBayLabelFontSmall")
+		local UserPriceText = vgui.Create("DLabel", ItemMain)
+		UserPriceText:SetPos(110, 50)
+		UserPriceText:SetSize(ItemMain:GetWide(), 20)
+		UserPriceText:SetText("Price: " .. DarkRP.formatMoney(v[5]))
+		UserPriceText:SetTextColor(Color(0,0,0))
+		UserPriceText:SetFont("GBayLabelFontSmall")
 
 		local PlayerAvatar = vgui.Create("EnhancedAvatarImage", ItemMain)
 		PlayerAvatar:SetPos( ItemMain:GetWide() - 40, 60 )
@@ -279,7 +278,7 @@ function GBayServicePageSmall(DFrame, data)
 			end
 		end
 
-    local ServModel = vgui.Create("DImage", ItemMain)
+		local ServModel = vgui.Create("DImage", ItemMain)
 		ServModel:SetPos(0,0)
 		ServModel:SetSize(100, 100)
 		ServModel:SetImage("gbay/Services_Small.png")
@@ -311,9 +310,9 @@ function GBayServicePageSmall(DFrame, data)
 		    sum = sum + numbers[i]
 		    total = total + math.abs(numbers[i])
 		end
-		local percent = math.Round(numbers[1]/total * 100, 1)
+		local percent = math.Round(numbers[1] / total * 100, 1)
 
-    if percent <= 20 then
+		if percent <= 20 then
 			thestars = 1
 		elseif percent <= 40 then
 			thestars = 2
@@ -326,7 +325,7 @@ function GBayServicePageSmall(DFrame, data)
 		end
 
 		local theposforstars = 185
-		for i=1, thestars do
+		for i = 1, thestars do
 			local RatingStars = vgui.Create("DImage", ItemMain)
 			RatingStars:SetPos(theposforstars,35)
 			RatingStars:SetSize(10, 10)
@@ -334,12 +333,12 @@ function GBayServicePageSmall(DFrame, data)
 			theposforstars = theposforstars + 15
 		end
 
-		local UserRatingText = vgui.Create("DLabel", ItemMain)
-		UserRatingText:SetPos(110, 50)
-		UserRatingText:SetSize(ItemMain:GetWide(), 20)
-		UserRatingText:SetText("Price: "..DarkRP.formatMoney(v[5]))
-		UserRatingText:SetTextColor(Color(0,0,0))
-		UserRatingText:SetFont("GBayLabelFontSmall")
+		local UserPriceText = vgui.Create("DLabel", ItemMain)
+		UserPriceText:SetPos(110, 50)
+		UserPriceText:SetSize(ItemMain:GetWide(), 20)
+		UserPriceText:SetText("Price: " .. DarkRP.formatMoney(v[5]))
+		UserPriceText:SetTextColor(Color(0,0,0))
+		UserPriceText:SetFont("GBayLabelFontSmall")
 
 		local PlayerAvatar = vgui.Create("EnhancedAvatarImage", ItemMain)
 		PlayerAvatar:SetPos( ItemMain:GetWide() - 40, 60 )

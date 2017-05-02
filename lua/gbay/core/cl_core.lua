@@ -47,9 +47,9 @@ end)
 
 net.Receive("GBaySendConfig",function()
 	GBayConfig.ServerName = net.ReadString()
-	GBayConfig.AdsToggle = net.ReadFloat()
-	GBayConfig.ServiceToggle = net.ReadFloat()
-	GBayConfig.CouponToggle = net.ReadFloat()
+	GBayConfig.AdsToggle = net.ReadBool()
+	GBayConfig.ServiceToggle = net.ReadBool()
+	GBayConfig.CouponToggle = net.ReadBool()
 	GBayConfig.PriceToPayToSell = net.ReadFloat()
 	GBayConfig.MaxPrice = net.ReadFloat()
 	GBayConfig.TaxToMultiplyBy = net.ReadFloat()
@@ -148,7 +148,7 @@ function draw.Circle( x, y, radius, seg )
 end
 
 net.Receive("GBayOpenMenu",function()
-	GBayVersion = "1.0.7"
+	GBayVersion = "1.1.0"
 	LocalPlayer().GBayOpenMenuTabStatus = false
 	datatable = net.ReadTable()
 	torate = net.ReadTable()
@@ -423,5 +423,111 @@ concommand.Add("gbay_addalladmins",function()
 		net.SendToServer()
 	else
 		chat.AddText(Color(255,0,0), "Superadmins only please!")
+	end
+end)
+
+
+surface.CreateFont( "GBayReviewGUITitleFont", {
+	font = "Arial",
+	size = 20,
+	weight = 5000,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+})
+
+surface.CreateFont( "GBayReviewGUIFontClose", {
+	font = "Arial",
+	size = 15,
+	weight = 5000,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+})
+
+function GBayReviewGUIDarkThemeMain(DFrame, title)
+  DFrame.Paint = function( self, w, h )
+		draw.RoundedBox(2, 0, 0, DFrame:GetWide(), DFrame:GetTall(), Color(35, 35, 35, 250))
+		draw.RoundedBox(2, 0, 0, DFrame:GetWide(), 30, Color(40, 40, 40, 255))
+		draw.SimpleText( title, "GBayReviewGUITitleFont", DFrame:GetWide() / 2, 15, Color(255,255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	end
+
+  local frameclose = vgui.Create("DButton", DFrame)
+	frameclose:SetSize(20, 20)
+	frameclose:SetPos(DFrame:GetWide() - frameclose:GetWide() - 5, 5)
+	frameclose:SetText("X");
+	frameclose:SetTextColor(Color(0,0,0,255))
+	frameclose:SetFont("GBayReviewGUIFontClose")
+	frameclose.hover = false
+	frameclose.DoClick = function()
+		DFrame:Close()
+	end
+	frameclose.OnCursorEntered = function(self)
+		self.hover = true
+	end
+	frameclose.OnCursorExited = function(self)
+		self.hover = false
+	end
+	function frameclose:Paint(w, h)
+		draw.RoundedBox(0, 0, 0, w, h, (self.hover and Color(255,15,15,250)) or Color(255,255,255,255)) -- Paints on hover
+		frameclose:SetTextColor(self.hover and Color(255,255,255,250) or Color(0,0,0,255))
+	end
+end
+
+function GBayReviewGUIDarkThemeBtn(self)
+  self.OnCursorEntered = function(self)
+    self.hover = true
+  end
+  self.OnCursorExited = function(self)
+    self.hover = false
+  end
+  self.Paint = function( self, w, h )
+    draw.RoundedBox(0, 0, 0, w, h, (self.hover and Color(0,160,255,250) or Color(255,255,255,255))) -- Paints on hover
+    self:SetTextColor(self.hover and Color(255,255,255,255) or Color(0,0,0,250))
+  end
+end
+
+net.Receive("GBayReviewRequest",function()
+	local timeleft = 15
+	local DFrame = vgui.Create( "DFrame" )
+    DFrame:SetPos(-ScrW(), 0)
+    DFrame:SetSize( ScrW(), 105 )
+    DFrame:SetTitle( "" )
+    DFrame:SetDraggable( false )
+    DFrame:ShowCloseButton( false )
+	GBayReviewGUIDarkThemeMain(DFrame, "GBay review request! (15)")
+	timer.Create("GBayReviewRequestTimeLeftTimer",1,15,function()
+		timeleft = timeleft - 1
+		if IsValid(DFrame) then
+			GBayReviewGUIDarkThemeMain(DFrame, "GBay review request! (" .. timeleft .. ")")
+		end
+	end)
+    DFrame:MoveTo( ScrW()/2 - ScrW()/2, 0, 1, 0, 1, function()
+      timer.Simple(15,function()
+		  	if IsValid(DFrame) then
+		        DFrame:MoveTo( ScrW() * 2, 0, 1, 0, 1, function()
+					DFrame:Remove()
+		        end)
+			end
+      end)
+    end)
+
+	local DFramelbl = vgui.Create("DLabel", DFrame)
+	DFramelbl:SetPos(0,40)
+	DFramelbl:SetSize(DFrame:GetWide(), 30)
+	DFramelbl:SetText("This server is running GBay! XxLMM13xXgaming has requested for all servers running GBay to review the addon! If you have ever used GBay on this server (or another) please click the button below!")
+	DFramelbl:SetContentAlignment(5)
+	DFramelbl:SetFont("GBayReviewGUITitleFont")
+
+	local AccBtn = vgui.Create("DButton", DFrame)
+	AccBtn:SetPos(20, 75)
+	AccBtn:SetSize(DFrame:GetWide() - 40, 20)
+	AccBtn:SetText("Yes i would like to review GBay! (please note this will not take very long!)")
+	GBayReviewGUIDarkThemeBtn(AccBtn)
+	AccBtn.DoClick = function()
+		gui.OpenURL("http://www.xxlmm13xxgaming.com/addons2/createreview.php")
+		DFrame:MoveTo( ScrW() * 2, 0, 1, 0, 1, function()
+			DFrame:Remove()
+		end)
 	end
 end)

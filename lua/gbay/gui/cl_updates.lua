@@ -9,15 +9,15 @@ function GBayViewUpdatesFull(DFrame, data)
 	HomePanel:SetDraggable( false )
 	HomePanel:SetTitle( "" )
 	HomePanel:ShowCloseButton( false )
-  local gbaywefailed = false
+	local gbaywefailed = false
 	HomePanel.Paint = function(s, w, h)
-    draw.SimpleText("What's new?","GBayLabelFontBold",w / 2,30,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-    draw.SimpleText("Here we can check what is new with GBay!","GBayLabelFont",w / 2,50,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-    draw.RoundedBox(0,0,70,w,2,Color(221,221,221))
-    if gbaywefailed then
-      draw.SimpleText("Looks like something went wrong!","GBayLabelFont",w / 2,h/2 - 10,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-      draw.SimpleText("Heres what we know... "..gbaywefailederror,"GBayLabelFont",w / 2,h/2 + 10,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-    end
+		draw.SimpleText("What's new?","GBayLabelFontBold",w / 2,30,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText("Here we can check what is new with GBay!","GBayLabelFont",w / 2,50,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.RoundedBox(0,0,70,w,2,Color(221,221,221))
+		if gbaywefailed then
+			draw.SimpleText("Looks like something went wrong!","GBayLabelFont",w / 2,h / 2 - 10,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("Heres what we know... " .. gbaywefailederror,"GBayLabelFont",w / 2,h / 2 + 10,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		end
 	end
 
 	ScrollList = vgui.Create( "DPanelList", HomePanel )
@@ -29,13 +29,13 @@ function GBayViewUpdatesFull(DFrame, data)
 
 	http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/134e58fc74866218b8d0fe7edb01caa0/raw/GBay%2520Updates%2520Versions",function(body)
 		RunString(body)
-		http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/9ca699471e82b1bde1b26454ffaf6ad1/raw/GBay%2520Updates",function(body)
-			RunString(body)
+		http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/9ca699471e82b1bde1b26454ffaf6ad1/raw/GBay%2520Updates",function(body2)
+			RunString(body2)
 		end,function(error)
 			gbaywefailed = true
 			gbaywefailederror = error
 		end)
 	end,function(error)
-		print("error: "..error)
+		print("error: " .. error)
 	end)
 end

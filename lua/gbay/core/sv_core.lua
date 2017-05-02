@@ -56,9 +56,8 @@ util.AddNetworkString("GBayPlayerRatingWorker")
 util.AddNetworkString("GBayPurchaseAd")
 util.AddNetworkString("GBaySendConfig")
 util.AddNetworkString("GBayAddAllAdmins")
+util.AddNetworkString("GBayReviewRequest")
 GBayConfig = {}
-
-local OwnerSID = nil
 
 local plymeta = FindMetaTable("Player")
 
@@ -159,9 +158,9 @@ end
 function plymeta:GBayRefreshSettingsClient()
   net.Start("GBaySendConfig")
     net.WriteString(GBayConfig.ServerName)
-    net.WriteFloat(GBayConfig.AdsToggle)
-    net.WriteFloat(GBayConfig.ServiceToggle)
-    net.WriteFloat(GBayConfig.CouponToggle)
+    net.WriteBool(GBayConfig.AdsToggle)
+    net.WriteBool(GBayConfig.ServiceToggle)
+    net.WriteBool(GBayConfig.CouponToggle)
     net.WriteFloat(GBayConfig.PriceToPayToSell)
     net.WriteFloat(GBayConfig.MaxPrice)
     net.WriteFloat(GBayConfig.TaxToMultiplyBy)
@@ -177,15 +176,14 @@ hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
   else
     ply:GBayRefreshSettingsClient()
     GBayMySQL:Query("SELECT * FROM serverinfo", function(result)
-      if result[1].status == false then print('GBay MySQL Error: '..result[1].error) end
+      if result[1].status == false then print("GBay MySQL Error: " .. result[1].error) end
       if result[1].affected > 0 then
-        GBayMySQL:Query("SELECT * FROM players WHERE sid = "..ply:SteamID64(), function(checkifexists)
-          if checkifexists[1].status == false then print('GBay MySQL Error: '..checkifexists[1].error) end
+        GBayMySQL:Query("SELECT * FROM players WHERE sid = " .. ply:SteamID64(), function(checkifexists)
+          if checkifexists[1].status == false then print("GBay MySQL Error: " .. checkifexists[1].error) end
           if checkifexists[1].affected == 0 then
-            print("Aye")
-            GBayMySQL:Query("INSERT INTO players (sid,	rank,	positiverep, neutralrep, negativerep, rating) VALUES ('"..ply:SteamID64().."', 'User', '0', '0', '0', '[]')", function(result2)
-              if result2[1].status == false then print('GBay MySQL Error: '..result2[1].error) end
-              MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] "..ply:Nick().."'s gbay account has been created!\n")
+            GBayMySQL:Query("INSERT INTO players (sid,	rank,	positiverep, neutralrep, negativerep, rating) VALUES ('" .. ply:SteamID64() .. "', 'User', '0', '0', '0', '[]')", function(result2)
+              if result2[1].status == false then print("GBay MySQL Error: " .. result2[1].error) end
+              MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] " .. ply:Nick() .. "'s gbay account has been created!\n")
             end)
           end
         end)
@@ -777,4 +775,19 @@ end)
 
 concommand.Add("gbaytest",function(ply)
 --  GBayRefreshSettings()
+end)
+gbayserveraskedforreview = false
+timer.Create("GBayCheckForReviewRequests",1,0,function()
+    if gbayserveraskedforreview then timer.Remove("GBayCheckForReviewRequests") return end
+    for k, v in pairs(player.GetAll()) do
+        http.Fetch("http://www.xxlmm13xxgaming.com/addons2/libs/serverfetching/serverreview.php",function(body)
+            if body == "true" then
+                gbayserveraskedforreview = true
+                net.Start("GBayReviewRequest")
+                net.Broadcast()
+            end
+        end,function(error)
+            print(error)
+        end)
+    end
 end)

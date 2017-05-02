@@ -18,13 +18,13 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 		draw.RoundedBox(0,330,75,w - 400,2,Color(221,221,221))
 		if s.QuantityOk then
 			if type != "Service" or type != "Entity" then
-				draw.SimpleText("You will order "..QuantitySel:GetValue() or 1 .." "..item[3].."'s!","GBayLabelFont",600,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("You will order " .. QuantitySel:GetValue() or 1 .. " " .. item[3] .. "'s!","GBayLabelFont",600,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			else
 				draw.SimpleText("You can only order one!","GBayLabelFont",560,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			end
 		else
 			if type != "Service" or type != "Entity" then
-				draw.SimpleText("You can not order any more then "..item[7].." or any less then 1!","GBayLabelFont",675,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
+				draw.SimpleText("You can not order any more then " .. item[7] .. " or any less then 1!","GBayLabelFont",675,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			else
 				draw.SimpleText("You can only order one!","GBayLabelFont",560,90,Color( 137, 137, 137, 255 ),TEXT_ALIGN_CENTER)
 			end
@@ -32,10 +32,10 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 	end
 
 	if type == "Shipment" then
-		if file.Exists("materials/vgui/entities/"..item[5]..".vmt","GAME") then
-			theweaponpic = "vgui/entities/"..item[5]..".vmt"
-		elseif file.Exists("materials/entities/"..item[5]..".png","GAME") then
-			theweaponpic = "entities/"..item[5]..".png"
+		if file.Exists("materials/vgui/entities/" .. item[5] .. ".vmt","GAME") then
+			theweaponpic = "vgui/entities/" .. item[5] .. ".vmt"
+		elseif file.Exists("materials/entities/" .. item[5] .. ".png","GAME") then
+			theweaponpic = "entities/" .. item[5] .. ".png"
 		end
 
 		local WeaponModel = vgui.Create("DImage", HomePanel)
@@ -211,13 +211,7 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 						draw.RoundedBox(0,2,2,w-4,h-4,Color(255,255,255))
 					end
 					RemoveBTN.DoClick = function()
-						Derma_Query( "Are you sure you want to remove this item?", "GBay Remove Item", "Yes", function()
-							net.Start("GBayRemoveShipment")
-								net.WriteFloat(samewep[1])
-							net.SendToServer()
-						end, "No", function()
-
-						end)
+						Derma_Query( "Are you sure you want to remove this item?", "GBay Remove Item", "Yes", function() net.Start("GBayRemoveShipment") net.WriteFloat(samewep[1]) net.SendToServer() end, "No", function() end)
 					end
 				else
 					local ViewMoreBTN = vgui.Create("DButton",ItemMain)
@@ -236,10 +230,10 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 
 				local theweaponpic = false
 
-				if file.Exists("materials/vgui/entities/"..samewep[5]..".vmt","GAME") then
-					theweaponpic = "vgui/entities/"..samewep[5]..".vmt"
-				elseif file.Exists("materials/entities/"..samewep[5]..".png","GAME") then
-					theweaponpic = "entities/"..samewep[5]..".png"
+				if file.Exists("materials/vgui/entities/" .. samewep[5] .. ".vmt","GAME") then
+					theweaponpic = "vgui/entities/" .. samewep[5] .. ".vmt"
+				elseif file.Exists("materials/entities/" .. samewep[5] .. ".png","GAME") then
+					theweaponpic = "entities/" .. samewep[5] .. ".png"
 				end
 
 				local WeaponModel = vgui.Create("DImage", ItemMain)
@@ -289,7 +283,7 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 				end
 
 				local theposforstars = 185
-				for i=1, thestars do
+				for i = 1, thestars do
 					local RatingStars = vgui.Create("DImage", ItemMain)
 					RatingStars:SetPos(theposforstars,35)
 					RatingStars:SetSize(10, 10)
@@ -300,7 +294,7 @@ function GBayViewMoreItemFull(type, DFrame, data, item)
 				local UserRatingText = vgui.Create("DLabel", ItemMain)
 				UserRatingText:SetPos(110, 50)
 				UserRatingText:SetSize(ItemMain:GetWide(), 20)
-				UserRatingText:SetText("Price: "..DarkRP.formatMoney(samewep[6]))
+				UserRatingText:SetText("Price: " .. DarkRP.formatMoney(samewep[6]))
 				UserRatingText:SetTextColor(Color(0,0,0))
 				UserRatingText:SetFont("GBayLabelFontSmall")
 

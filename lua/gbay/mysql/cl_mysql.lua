@@ -62,7 +62,7 @@ net.Receive("GBaySetMySQL",function()
     if worked then
       chat.AddText(Color(0,255,0), "MySQL Connected!")
     else
-      chat.AddText(Color(255,0,0), "MySQL Error! Error: "..error)
+      chat.AddText(Color(255,0,0), "MySQL Error! Error: " .. error)
       chat.AddText(Color(255,0,0), "Menu will re-open in 5 sec...")
     end
   end)

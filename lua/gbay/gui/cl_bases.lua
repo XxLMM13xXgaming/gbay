@@ -13,9 +13,9 @@ end
 function PANEL:CalculatePoly(w, h)
   local poly = {};
 
-  local x = w/2;
-  local y = h/2;
-  local radius = h/2;
+  local x = w / 2;
+  local y = h / 2;
+  local radius = h / 2;
 
   table.insert(poly, { x = x, y = y });
 
@@ -39,7 +39,7 @@ function PANEL:SetPlayer(ply, size)
 end
 
 function PANEL:SetSteamID(ply, size)
-	self.avatar:SetSteamID(ply, size);
+    self.avatar:SetSteamID(ply, size);
 end
 
 function PANEL:DrawPoly( w, h )
@@ -114,42 +114,41 @@ function mf.newparticle(f, x, y)
 end
 
 net.Receive("GBayOpenCreateServer", function()
-  local DFrame = vgui.Create( "DFrame" )
-	DFrame:SetSize( 1000, 700 )
-	DFrame:Center()
-	DFrame:SetDraggable( false )
-	DFrame:MakePopup()
-	DFrame:SetTitle( "" )
-	DFrame:ShowCloseButton( false )
-	DFrame.Paint = function(s, w, h)
-		surface.SetDrawColor(247,247,247)
-    surface.DrawRect(0, 0, w, h)
-	end
+    local DFrame = vgui.Create( "DFrame" )
+    DFrame:SetSize( 1000, 700 )
+    DFrame:Center()
+    DFrame:SetDraggable( false )
+    DFrame:MakePopup()
+    DFrame:SetTitle( "" )
+    DFrame:ShowCloseButton( false )
+    DFrame.Paint = function(s, w, h)
+        surface.SetDrawColor(247,247,247)
+        surface.DrawRect(0, 0, w, h)
+    end
 
-	local DFrameClose = vgui.Create("DButton", DFrame)
-	DFrameClose:SetPos(DFrame:GetWide() - 40, 10)
-	DFrameClose:SetSize(25, 25)
-	DFrameClose:SetText("X")
-	DFrameClose:SetFont("GBayCloseFont")
-	DFrameClose:SetTextColor(Color(214, 214, 214))
-	DFrameClose.DoClick = function()
-		DFrame:Close()
-	end
-	DFrameClose.Paint = function(s, w, h)
-	end
+    local DFrameClose = vgui.Create("DButton", DFrame)
+    DFrameClose:SetPos(DFrame:GetWide() - 40, 10)
+    DFrameClose:SetSize(25, 25)
+    DFrameClose:SetText("X")
+    DFrameClose:SetFont("GBayCloseFont")
+    DFrameClose:SetTextColor(Color(214, 214, 214))
+    DFrameClose.DoClick = function()
+        DFrame:Close()
+    end
+    DFrameClose.Paint = function(s, w, h)
+    end
 
-  local DFrameMin = vgui.Create("DButton", DFrame)
-	DFrameMin:SetPos(DFrame:GetWide() - 60, 10)
-	DFrameMin:SetSize(25, 25)
-	DFrameMin:SetText("_")
-	DFrameMin:SetFont("GBayCloseFont")
-	DFrameMin:SetTextColor(Color(214, 214, 214))
-	DFrameMin.DoClick = function()
-		GBayMenuMin(DFrame)
-	end
-	DFrameMin.Paint = function(s, w, h)
-	end
-  
-	GBaySideBarOpened(DFrame, "Settings", false, {}, true)
+    local DFrameMin = vgui.Create("DButton", DFrame)
+    DFrameMin:SetPos(DFrame:GetWide() - 60, 10)
+    DFrameMin:SetSize(25, 25)
+    DFrameMin:SetText("_")
+    DFrameMin:SetFont("GBayCloseFont")
+    DFrameMin:SetTextColor(Color(214, 214, 214))
+    DFrameMin.DoClick = function()
+        GBayMenuMin(DFrame)
+    end
+    DFrameMin.Paint = function(s, w, h)
+    end
 
+    GBaySideBarOpened(DFrame, "Settings", false, {}, true)
 end)

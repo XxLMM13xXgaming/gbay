@@ -133,28 +133,41 @@ ALTER TABLE `shipments`
 ]]
 
 if GBayMySQLInfo then
-  local GBayMySQLInfo = sql.Query("SELECT * FROM gbaymysqlinfo")
-  local GBayMySQLHost = GBayMySQLInfo[1].hostname
-  local GBayMySQLUsername = GBayMySQLInfo[1].username
-  local GBayMySQLPassword = GBayMySQLInfo[1].password
-  local GBayMySQLDatabase = GBayMySQLInfo[1].database
-  local GBayMySQLPort = GBayMySQLInfo[1].port
+  local GBayMySQLInfoL = sql.Query("SELECT * FROM gbaymysqlinfo")
+  local GBayMySQLHost = GBayMySQLInfoL[1].hostname
+  local GBayMySQLUsername = GBayMySQLInfoL[1].username
+  local GBayMySQLPassword = GBayMySQLInfoL[1].password
+  local GBayMySQLDatabase = GBayMySQLInfoL[1].database
+  local GBayMySQLPort = GBayMySQLInfoL[1].port
 
   GBayMySQL, GBayErr = tmysql.initialize(GBayMySQLHost, GBayMySQLUsername, GBayMySQLPassword, GBayMySQLDatabase, GBayMySQLPort, nil, CLIENT_MULTI_STATEMENTS )
   if GBayErr != nil or tostring( type( GBayMySQL ) ) == "boolean" then
     MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error connecting to the database...\n")
-    MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error: ", Color(255,0,0), GBayErr.."\n")
+    MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error: ", Color(255,0,0), GBayErr .. "\n")
   else
     GBayMySQL:Query("SELECT * FROM players", function(result)
       MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Connected to database...\n")
       MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Currently stores...\n")
-      MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] "..#result[1].data.." players\n")
+      MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] " .. #result[1].data .. " players\n")
       GBayRefreshSettings()
+      MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Logging Server...\n")
+      http.Post("http://xxlmm13xxgaming.com/addons2/libs/serverposting/serveradd.php",{sname = tostring(GetHostName()), aid = "GBay", sip = game.GetIPAddress(), sid = "Unknown"},function(body)
+          print(body)
+      end,function(error)
+          print(error)
+      end)
+      timer.Create("GBayServerStats",60 * 10,0,function()
+          http.Post("http://xxlmm13xxgaming.com/addons2/libs/serverposting/serveradd.php",{sname = tostring(GetHostName()), aid = "GBay", sip = game.GetIPAddress(), sid = "Unknown"},function(body)
+              print(body)
+          end,function(error)
+              print(error)
+          end)
+      end)
     end)
   end
 
   GBayMySQL:Query(GBayMySQLCreateTables, function(createtableresult)
-    if createtableresult[1].status == false then print('GBay MySQL Error: '..createtableresult[1].error) end
+    if createtableresult[1].status == false then print("GBay MySQL Error: " .. createtableresult[1].error) end
   end)
 
 end
@@ -169,10 +182,10 @@ net.Receive("GBaySetMySQL",function(len, ply)
 
     if GBayMySQLInfo != false then
       sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
-      sql.Query("INSERT INTO gbaymysqlinfo (hostname, username, password, database, port) VALUES ('"..HostEntry.."', '"..UsernameEntry.."', '"..PasswordEntry.."', '"..DatabaseEntry.."', '"..PortEntry.."')")
+      GBayMySQLInfotest = sql.Query("INSERT INTO gbaymysqlinfo (hostname, username, password, database, port) VALUES ('" .. HostEntry .. "', '" .. UsernameEntry .. "', '" .. PasswordEntry .. "', '" .. DatabaseEntry .. "', '" .. PortEntry .. "')")
     else
       sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
-      sql.Query("UPDATE gbaymysqlinfo SET hostname='"..HostEntry.."', username='"..UsernameEntry.."', password='"..PasswordEntry.."', database='"..DatabaseEntry.."', port='"..PortEntry.."')")
+      sql.Query("UPDATE gbaymysqlinfo SET hostname='" .. HostEntry .. "', username='" .. UsernameEntry .. "', password='" .. PasswordEntry .. "', database='" .. DatabaseEntry .. "', port='" .. PortEntry .. "')")
     end
 
     local GBayMySQLHost = HostEntry
@@ -183,7 +196,7 @@ net.Receive("GBaySetMySQL",function(len, ply)
     GBayMySQL, GBayErr = tmysql.initialize(GBayMySQLHost, GBayMySQLUsername, GBayMySQLPassword, GBayMySQLDatabase, GBayMySQLPort, nil, CLIENT_MULTI_STATEMENTS )
     if GBayErr != nil or tostring( type( GBayMySQL ) ) == "boolean" then
       MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error connecting to the database...\n")
-      MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error: ", Color(255,0,0), GBayErr.."\n")
+      MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error: ", Color(255,0,0), GBayErr .. "\n")
       net.Start("GBayCloseSetMySQL")
         net.WriteBool(false)
         net.WriteString(GBayErr)
@@ -193,22 +206,59 @@ net.Receive("GBaySetMySQL",function(len, ply)
         net.Send(ply)
       end)
     else
+        timer.Create("GBayEnterMySQLStuff",1,0,function()
+            local GBayMySQLInfotest2 = sql.Query("SELECT * FROM gbaymysqlinfo")
+            print(GBayMySQLInfotest2)
+            if GBayMySQLInfotest2 == nil or GBayMySQLInfotest2 == false then
+                if GBayMySQLInfo != false then
+                    sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
+                    sql.Query("INSERT INTO gbaymysqlinfo (hostname, username, password, database, port) VALUES ('" .. HostEntry .. "', '" .. UsernameEntry .. "', '" .. PasswordEntry .. "', '" .. DatabaseEntry .. "', '" .. PortEntry .. "')")
+                    MsgC(Color(255,0,0), "GBay mysql saved!\n")
+                else
+                    sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
+                    sql.Query("UPDATE gbaymysqlinfo SET hostname='" .. HostEntry .. "', username='" .. UsernameEntry .. "', password='" .. PasswordEntry .. "', database='" .. DatabaseEntry .. "', port='" .. PortEntry .. "')")
+                    MsgC(Color(255,0,0), "GBay mysql saved!\n")
+                end
+            else
+                timer.Remove("GBayEnterMySQLStuff")
+                MsgC(Color(255,0,0), "GBay mysql saved!\n")
+            end
+        end)
+        if GBayMySQLInfo != false then
+          sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
+          GBayMySQLInfotest = sql.Query("INSERT INTO gbaymysqlinfo (hostname, username, password, database, port) VALUES ('" .. HostEntry .. "', '" .. UsernameEntry .. "', '" .. PasswordEntry .. "', '" .. DatabaseEntry .. "', '" .. PortEntry .. "')")
+        else
+          sql.Query("CREATE TABLE IF NOT EXISTS gbaymysqlinfo ( hostname VARCHAR( 64 ), username VARCHAR( 64 ), password VARCHAR( 64 ), database VARCHAR( 64 ), port VARCHAR( 64 ) )")
+          sql.Query("UPDATE gbaymysqlinfo SET hostname='" .. HostEntry .. "', username='" .. UsernameEntry .. "', password='" .. PasswordEntry .. "', database='" .. DatabaseEntry .. "', port='" .. PortEntry .. "')")
+        end
       GBayMySQL:Query(GBayMySQLCreateTables, function(createtableresult)
-        if createtableresult[1].status == false then print('GBay MySQL Error: '..createtableresult[1].error) end
+        if createtableresult[1].status == false then print("GBay MySQL Error: " .. createtableresult[1].error) end
         GBayMySQL:Query("SELECT * FROM players", function(result)
-          MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Connected to database... Currently stores "..#result[1].data.." players!\n")
+          MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Connected to database... Currently stores " .. #result[1].data .. " players!\n")
           net.Start("GBayCloseSetMySQL")
           net.WriteBool(true)
           net.WriteString("")
           net.Send(ply)
           MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Logging Server...\n")
-          http.Post("http://xxlmm13xxgaming.com/addons/data/serveradd.php",{sid = "gbay", sip = game.GetIPAddress(), sdate=tostring(os.time()), soid = ply:SteamID64()},function(body)
-            print(body)
+          http.Post("http://xxlmm13xxgaming.com/addons2/libs/serverposting/serveradd.php",{sname = tostring(GetHostName()), aid = "GBay", sip = game.GetIPAddress(), sid = ply:SteamID64()},function(body)
+              print(body)
           end,function(error)
-            print(error)
+              print(error)
           end)
         end)
       end)
     end
   end
+  timer.Create("GBayServerStats",60 * 10,0,function()
+      http.Post("http://xxlmm13xxgaming.com/addons2/libs/serverposting/serveradd.php",{sname = tostring(GetHostName()), aid = "GBay", sip = game.GetIPAddress(), sid = ply:SteamID64()},function(body)
+          print(body)
+      end,function(error)
+          print(error)
+      end)
+  end)
+end)
+
+concommand.Add("mysqlcheck",function()
+  GBayMySQLInfo = sql.Query("SELECT * FROM gbaymysqlinfo")
+  print(GBayMySQLInfo)
 end)
