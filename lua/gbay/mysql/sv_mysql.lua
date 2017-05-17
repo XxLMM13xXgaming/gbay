@@ -132,44 +132,39 @@ ALTER TABLE `shipments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ]]
 
-if GBayMySQLInfo then
-  local GBayMySQLInfoL = sql.Query("SELECT * FROM gbaymysqlinfo")
-  local GBayMySQLHost = GBayMySQLInfoL[1].hostname
-  local GBayMySQLUsername = GBayMySQLInfoL[1].username
-  local GBayMySQLPassword = GBayMySQLInfoL[1].password
-  local GBayMySQLDatabase = GBayMySQLInfoL[1].database
-  local GBayMySQLPort = GBayMySQLInfoL[1].port
+local GBayMySQLHost = GBay.Config.MySQL.Host
+local GBayMySQLUsername = GBay.Config.MySQL.Username
+local GBayMySQLPassword = GBay.Config.MySQL.Password
+local GBayMySQLDatabase = GBay.Config.MySQL.Database
+local GBayMySQLPort = GBay.Config.MySQL.Port
 
-  GBayMySQL, GBayErr = tmysql.initialize(GBayMySQLHost, GBayMySQLUsername, GBayMySQLPassword, GBayMySQLDatabase, GBayMySQLPort, nil, CLIENT_MULTI_STATEMENTS )
-  if GBayErr != nil or tostring( type( GBayMySQL ) ) == "boolean" then
+GBayMySQL, GBayErr = tmysql.initialize(GBayMySQLHost, GBayMySQLUsername, GBayMySQLPassword, GBayMySQLDatabase, GBayMySQLPort, nil, CLIENT_MULTI_STATEMENTS )
+if GBayErr != nil or tostring( type( GBayMySQL ) ) == "boolean" then
     MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error connecting to the database...\n")
     MsgC(Color(255, 255, 255), "[", Color(255, 0, 0), "GBay", Color(255, 255, 255), "] Error: ", Color(255,0,0), GBayErr .. "\n")
-  else
+else
     GBayMySQL:Query("SELECT * FROM players", function(result)
-      MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Connected to database...\n")
-      MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Currently stores...\n")
-      MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] " .. #result[1].data .. " players\n")
-      GBayRefreshSettings()
-      MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Logging Server...\n")
-      http.Post("http://xxlmm13xxgaming.com/addons2/libs/serverposting/serveradd.php",{sname = tostring(GetHostName()), aid = "GBay", sip = game.GetIPAddress(), sid = "Unknown"},function(body)
-          print(body)
-      end,function(error)
-          print(error)
-      end)
-      timer.Create("GBayServerStats",60 * 10,0,function()
-          http.Post("http://xxlmm13xxgaming.com/addons2/libs/serverposting/serveradd.php",{sname = tostring(GetHostName()), aid = "GBay", sip = game.GetIPAddress(), sid = "Unknown"},function(body)
-              print(body)
-          end,function(error)
-              print(error)
-          end)
-      end)
+        MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Connected to database...\n")
+        MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Currently stores...\n")
+        MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] " .. #result[1].data .. " players\n")
+        GBayRefreshSettings()
+        MsgC(Color(255, 255, 255), "[", Color(0, 0, 255, 255), "GBay", Color(255, 255, 255), "] Logging Server...\n")
+        http.Post("http://xxlmm13xxgaming.com/addons2/libs/serverposting/serveradd.php",{sname = tostring(GetHostName()), aid = "GBay", sip = game.GetIPAddress(), sid = "Unknown"},function(body)
+            print(body)
+        end,function(error)
+            print(error)
+        end)
+        timer.Create("GBayServerStats",60 * 10,0,function()
+            http.Post("http://xxlmm13xxgaming.com/addons2/libs/serverposting/serveradd.php",{sname = tostring(GetHostName()), aid = "GBay", sip = game.GetIPAddress(), sid = "Unknown"},function(body)
+                print(body)
+            end,function(error)
+                print(error)
+            end)
+        end)
+        GBayMySQL:Query(GBayMySQLCreateTables, function(createtableresult)
+            if createtableresult[1].status == false then print("GBay MySQL Error: " .. createtableresult[1].error) end
+        end)
     end)
-  end
-
-  GBayMySQL:Query(GBayMySQLCreateTables, function(createtableresult)
-    if createtableresult[1].status == false then print("GBay MySQL Error: " .. createtableresult[1].error) end
-  end)
-
 end
 
 net.Receive("GBaySetMySQL",function(len, ply)

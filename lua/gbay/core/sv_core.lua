@@ -1,3 +1,6 @@
+GBay = {}
+GBay.Config = {}
+include("gbay/config/mysqlconfig.lua")
 include("gbay/mysql/sv_mysql.lua")
 include("gbay/ads/sv_ads.lua")
 include("gbay/shipment/sv_shipment.lua")
@@ -170,8 +173,7 @@ end
 hook.Add("PlayerInitialSpawn", "GBayPlayerInitialSpawn", function(ply)
   if GBayMySQL == nil then
     if ply:IsSuperAdmin() then
-      net.Start("GBaySetMySQL")
-      net.Send(ply)
+        ply:GBayNotify("error", "Configure GBay MySQL in lua/gbay/config/mysqlconfig.lua")
     end
   else
     ply:GBayRefreshSettingsClient()

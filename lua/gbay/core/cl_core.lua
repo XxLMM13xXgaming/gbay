@@ -148,11 +148,10 @@ function draw.Circle( x, y, radius, seg )
 end
 
 net.Receive("GBayOpenMenu",function()
-	GBayVersion = "1.1.0"
+	GBayVersion = "1.1.5"
 	LocalPlayer().GBayOpenMenuTabStatus = false
 	datatable = net.ReadTable()
 	torate = net.ReadTable()
-	PrintTable(datatable)
 	for k, v in pairs(torate) do
 		if IsValid(player.GetBySteamID64(v[1])) then
 			thequerytext = "What would you rate "..v[1].." ("..player.GetBySteamID64(v[1]):Nick()..") for the item '"..v[2].."'"
