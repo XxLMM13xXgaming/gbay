@@ -21,7 +21,8 @@ function plymeta:GBayIsSuperAdmin(datatable)
 			playerdatatable = v
 		end
 	end
-	if playerdatatable[3] == "Superadmin" then return true else return false end
+	
+	return playerdatatable[3] == "Superadmin"
 end
 
 function plymeta:GBayIsAdmin(datatable)
@@ -30,7 +31,8 @@ function plymeta:GBayIsAdmin(datatable)
 			playerdatatable = v
 		end
 	end
-	if playerdatatable[3] == "Admin" or playerdatatable[3] == "Superadmin" then return true else return false end
+	
+	return playerdatatable[3] == "Admin" or playerdatatable[3] == "Superadmin"
 end
 
 net.Receive("GBayNotify",function()
@@ -150,8 +152,8 @@ end
 net.Receive("GBayOpenMenu",function()
 	GBayVersion = "1.1.5"
 	LocalPlayer().GBayOpenMenuTabStatus = false
-	datatable = net.ReadTable()
-	torate = net.ReadTable()
+	local datatable = net.ReadTable()
+	local torate = net.ReadTable()
 	for k, v in pairs(torate) do
 		if IsValid(player.GetBySteamID64(v[1])) then
 			thequerytext = "What would you rate "..v[1].." ("..player.GetBySteamID64(v[1]):Nick()..") for the item '"..v[2].."'"
@@ -175,7 +177,7 @@ net.Receive("GBayOpenMenu",function()
 			net.SendToServer()
 		end, "Close", function() end )
 	end
-	ServerRunningWrongVersion = false
+	local ServerRunningWrongVersion = false
 	http.Fetch("https://gist.githubusercontent.com/XxLMM13xXgaming/134e58fc74866218b8d0fe7edb01caa0/raw/GBay%2520Updates%2520Versions",function(body)
 		RunString(body)
 		if GBayLVersion != GBayVersion then
@@ -195,7 +197,7 @@ net.Receive("GBayOpenMenu",function()
 	DFrame:ShowCloseButton( false )
 	DFrame.Paint = function(s, w, h)
 		surface.SetDrawColor(247,247,247)
-    surface.DrawRect(0, 0, w, h)
+    		surface.DrawRect(0, 0, w, h)
 
 		if LocalPlayer().GBayOpenMenuTabStatus then
 			draw.RoundedBox(0,350,120,w - 350 - 100,2,Color(221,221,221))
@@ -379,7 +381,6 @@ net.Receive("GBayOpenMenu",function()
 		SettingsBTN:SetPos(800, 130)
 	end)
 
-	print("hello")
 	hook.Add("GBaySideBarOpened","CheckToSeeIfSidebarOpened",function()
 		PrintTable(datatable)
 		if LocalPlayer().TabCurrentlyOn == "Home" then
@@ -445,13 +446,13 @@ surface.CreateFont( "GBayReviewGUIFontClose", {
 })
 
 function GBayReviewGUIDarkThemeMain(DFrame, title)
-  DFrame.Paint = function( self, w, h )
+	DFrame.Paint = function( self, w, h )
 		draw.RoundedBox(2, 0, 0, DFrame:GetWide(), DFrame:GetTall(), Color(35, 35, 35, 250))
 		draw.RoundedBox(2, 0, 0, DFrame:GetWide(), 30, Color(40, 40, 40, 255))
 		draw.SimpleText( title, "GBayReviewGUITitleFont", DFrame:GetWide() / 2, 15, Color(255,255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 
-  local frameclose = vgui.Create("DButton", DFrame)
+	local frameclose = vgui.Create("DButton", DFrame)
 	frameclose:SetSize(20, 20)
 	frameclose:SetPos(DFrame:GetWide() - frameclose:GetWide() - 5, 5)
 	frameclose:SetText("X");
@@ -474,26 +475,26 @@ function GBayReviewGUIDarkThemeMain(DFrame, title)
 end
 
 function GBayReviewGUIDarkThemeBtn(self)
-  self.OnCursorEntered = function(self)
-    self.hover = true
-  end
-  self.OnCursorExited = function(self)
-    self.hover = false
-  end
-  self.Paint = function( self, w, h )
-    draw.RoundedBox(0, 0, 0, w, h, (self.hover and Color(0,160,255,250) or Color(255,255,255,255))) -- Paints on hover
-    self:SetTextColor(self.hover and Color(255,255,255,255) or Color(0,0,0,250))
-  end
+	self.OnCursorEntered = function(self)
+		self.hover = true
+	end
+	self.OnCursorExited = function(self)
+		self.hover = false
+	end
+	self.Paint = function( self, w, h )
+		draw.RoundedBox(0, 0, 0, w, h, (self.hover and Color(0,160,255,250) or Color(255,255,255,255))) -- Paints on hover
+		self:SetTextColor(self.hover and Color(255,255,255,255) or Color(0,0,0,250))
+	end
 end
 
 net.Receive("GBayReviewRequest",function()
 	local timeleft = 15
 	local DFrame = vgui.Create( "DFrame" )
-    DFrame:SetPos(-ScrW(), 0)
-    DFrame:SetSize( ScrW(), 105 )
-    DFrame:SetTitle( "" )
-    DFrame:SetDraggable( false )
-    DFrame:ShowCloseButton( false )
+	DFrame:SetPos(-ScrW(), 0)
+	DFrame:SetSize( ScrW(), 105 )
+	DFrame:SetTitle( "" )
+	DFrame:SetDraggable( false )
+	DFrame:ShowCloseButton( false )
 	GBayReviewGUIDarkThemeMain(DFrame, "GBay review request! (15)")
 	timer.Create("GBayReviewRequestTimeLeftTimer",1,15,function()
 		timeleft = timeleft - 1
@@ -501,15 +502,15 @@ net.Receive("GBayReviewRequest",function()
 			GBayReviewGUIDarkThemeMain(DFrame, "GBay review request! (" .. timeleft .. ")")
 		end
 	end)
-    DFrame:MoveTo( ScrW()/2 - ScrW()/2, 0, 1, 0, 1, function()
-      timer.Simple(15,function()
-		  	if IsValid(DFrame) then
-		        DFrame:MoveTo( ScrW() * 2, 0, 1, 0, 1, function()
+	DFrame:MoveTo( ScrW()/2 - ScrW()/2, 0, 1, 0, 1, function()
+		timer.Simple(15,function()
+			if IsValid(DFrame) then
+				DFrame:MoveTo( ScrW() * 2, 0, 1, 0, 1, function()
 					DFrame:Remove()
-		        end)
+		        	end)
 			end
-      end)
-    end)
+      		end)
+    	end)
 
 	local DFramelbl = vgui.Create("DLabel", DFrame)
 	DFramelbl:SetPos(0,40)
